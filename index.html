@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
     
     <title>Jazztabueno Productions</title>
-    
-    <link rel="apple-touch-icon" sizes="180x180" href="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png">
-    
-    <link rel="icon" type="image/png" sizes="192x192" href="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png">
-    
+    <meta name="description" content="Radio Streaming Exclusivo">
     <meta name="theme-color" content="#000000">
-    <meta name="mobile-web-app-capable" content="yes">
     
+    <link rel="icon" type="image/png" sizes="192x192" href="logo.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+    <link rel="shortcut icon" href="logo.png">
+    
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Jazztabueno","short_name":"Jazztabueno","display":"standalone","background_color":"#000000","theme_color":"#000000","icons":[{"src":"logo.png","sizes":"192x192","type":"image/png"}]}'>
+
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
@@ -105,7 +106,7 @@
 
 <div id="login-screen">
     <div class="login-card">
-        <img src="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png" class="login-logo">
+        <img src="logo.png" class="login-logo">
         <h2 style="color: var(--gold); margin: 0; font-size: 22px;">JAZZTABUENO<br>PRODUCTIONS</h2>
         <p style="color: #888; font-size: 12px; margin-top: 10px;">Acceso Privado</p>
         
@@ -117,7 +118,7 @@
 <div id="app-content">
     <header>
         <div class="header-brand">
-            <img src="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png" class="header-logo">
+            <img src="logo.png" class="header-logo">
             <div class="brand-title">JAZZTABUENO<br>PRODUCTIONS</div>
         </div>
         <button class="btn-logout" id="btnSalir">SALIR 🔒</button>
@@ -156,7 +157,7 @@
 
         <div class="channels-container">
             <div class="channel-item active" onclick="filtrar('Todo', this)">
-                <img src="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png" class="channel-logo">
+                <img src="logo.png" class="channel-logo">
                 <span class="channel-name">Todo</span>
             </div>
             <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)">
@@ -198,7 +199,6 @@
     let todosLosEpisodios = [];
     let filtroActual = 'Todo';
 
-    // MEMORIA AUTOMÁTICA
     const saveDraft = () => {
         localStorage.setItem('draft_prog', document.getElementById('progInput').value);
         localStorage.setItem('draft_title', document.getElementById('titleInput').value);
