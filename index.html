@@ -5,19 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     
     <title>Jazztabueno Productions</title>
-    <meta name="apple-mobile-web-app-title" content="Jazztabueno">
-    <meta name="application-name" content="Jazztabueno">
     
     <link rel="icon" type="image/png" href="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png">
-    <link rel="apple-touch-icon" href="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png">
-    
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
         * { box-sizing: border-box; }
         :root { 
             --gold: #d4af37; 
-            --dark-gold: #aa8c2c;
             --bg-color: #050505; 
             --card-bg: #111111;
             --text-main: #e2e8f0;
@@ -30,21 +25,21 @@
             background-attachment: fixed; 
             color: var(--text-main); 
             overflow-x: hidden; 
-            -webkit-tap-highlight-color: transparent; 
         }
         
         h1, h2, .program-tag { font-family: 'Playfair Display', serif; }
 
+        /* PANTALLA DE LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=1932') no-repeat center center/cover; display: flex; align-items: center; justify-content: center; z-index: 1000; }
         #login-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); }
         .login-card { position: relative; background: rgba(20, 20, 20, 0.95); border: 1px solid var(--gold); padding: 40px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 0 30px rgba(212, 175, 55, 0.2); }
-        
-        #passInput { width: 100%; padding: 15px; border: 1px solid #333; border-bottom: 2px solid var(--gold); background: transparent; color: white; text-align: center; outline: none; margin-top: 20px; font-size: 18px; font-family: 'Playfair Display', serif; }
+        .login-logo { width: 140px; height: 140px; object-fit: contain; margin-bottom: 10px; border-radius: 15px; padding: 5px; }
+
+        /* INPUT DE CLAVE */
+        #passInput { width: 100%; padding: 15px; border: 1px solid #555; border-bottom: 2px solid var(--gold); background: #222; color: white; text-align: center; outline: none; margin-top: 20px; font-size: 18px; border-radius: 5px; }
         
         .btn-enter { background: var(--gold); color: black; border: none; padding: 12px 30px; border-radius: 30px; margin-top: 20px; font-weight: 800; cursor: pointer; font-size: 14px; letter-spacing: 1px; transition: 0.3s; }
         .btn-enter:hover { background: white; box-shadow: 0 0 15px white; }
-
-        .login-logo { width: 140px; height: 140px; object-fit: contain; margin-bottom: 10px; border-radius: 15px; padding: 5px; }
 
         #app-content { display: none; padding-bottom: 80px; }
         
@@ -55,11 +50,9 @@
             display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 1px solid #222; 
         }
-        
         .header-brand { display: flex; align-items: center; gap: 12px; }
         .header-logo { width: 45px; height: 45px; border-radius: 8px; object-fit: contain; background: black; border: 1px solid #333; }
         .brand-title { color: var(--gold); font-size: 13px; font-weight: 700; margin: 0; letter-spacing: 1px; text-transform: uppercase; line-height: 1.2; }
-
         .btn-logout { background: transparent; color: var(--gold); border: 1px solid var(--gold); padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; }
 
         .container { max-width: 600px; margin: auto; padding: 20px 15px; }
@@ -74,28 +67,28 @@
 
         .upload-section { background: #1a1a1a; border: 1px dashed var(--gold); padding: 20px; border-radius: 15px; margin-bottom: 30px; text-align: center; display: none; }
         
-        /* AQUÍ ESTÁ EL TRUCO: Input grande (16px) y con más espacio */
+        /* ESTILOS NUEVOS PARA INPUTS EN PC */
         .input-dark { 
             width: 100%; 
-            padding: 15px; /* Más espacio para el dedo */
-            margin-bottom: 20px; /* Más separado */
-            border-radius: 8px; 
-            background: #000; 
-            border: 1px solid #444; 
+            padding: 12px; 
+            margin-bottom: 15px; 
+            border-radius: 6px; 
+            background: #333; /* Fondo más claro para que se vea */
+            border: 1px solid #888; /* Borde visible */
             color: white; 
-            font-size: 16px; /* Letra grande evita zoom en iPhone */
+            font-size: 14px;
+            cursor: text; /* Cursor de texto explícito */
         }
-        .input-dark:focus { border-color: var(--gold); outline: none; }
+        .input-dark:focus { background: #444; border-color: var(--gold); outline: none; }
+        .input-dark::placeholder { color: #aaa; }
 
         .btn-gold { background: var(--gold); color: black; padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; }
         .btn-toggle-upload { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px; width: 100%; border-radius: 8px; margin-bottom: 20px; cursor: pointer; display: none; }
 
         .episode-card { background: var(--card-bg); border-radius: 15px; margin-bottom: 25px; overflow: hidden; border: 1px solid #222; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
-        
         .cover-art { height: 220px; width: 100%; background-color: #000; background-size: cover; background-repeat: no-repeat; background-position: center; position: relative; border-bottom: 1px solid #222; }
         .play-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
         .play-icon { font-size: 60px; color: rgba(255,255,255,0.7); text-shadow: 0 4px 10px black; opacity: 0.8; }
-
         .episode-info { padding: 20px; }
         .program-tag { display: inline-block; font-size: 10px; color: black; padding: 4px 10px; border-radius: 4px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
         
@@ -139,6 +132,7 @@
         <div id="upload-section" class="upload-section">
             <h3 style="color:var(--gold); margin-top:0;">Nuevo Programa</h3>
             
+            <label style="color: #aaa; font-size: 12px; display:block; text-align:left; margin-bottom:5px;">Elige el Programa:</label>
             <select id="progInput" class="input-dark">
                 <option value="JAZZTABUENO">🎷 JAZZTABUENO</option>
                 <option value="STUDIO79">🎧 STUDIO 79</option>
@@ -146,9 +140,14 @@
                 <option value="OLD SCHOOL">📻 OLD SCHOOL RADIO</option>
             </select>
             
-            <input type="text" id="titleInput" class="input-dark" placeholder="Título (Ej: Especial Fania All Stars)">
-            <input type="text" id="linkInput" class="input-dark" placeholder="Pegar Link MP3 de Archive.org...">
-            <input type="text" id="imgInput" class="input-dark" placeholder="Pegar Link de Carátula (Opcional)">
+            <label style="color: #aaa; font-size: 12px; display:block; text-align:left; margin-bottom:5px;">Título del Episodio:</label>
+            <input type="text" id="titleInput" class="input-dark" placeholder="Ej: Especial Héctor Lavoe">
+            
+            <label style="color: #aaa; font-size: 12px; display:block; text-align:left; margin-bottom:5px;">Link del MP3 (Archive.org):</label>
+            <input type="text" id="linkInput" class="input-dark" placeholder="Pegar Link AQUÍ (Ctrl + V)">
+            
+            <label style="color: #aaa; font-size: 12px; display:block; text-align:left; margin-bottom:5px;">Link de Carátula (Opcional):</label>
+            <input type="text" id="imgInput" class="input-dark" placeholder="Pegar Link de Imagen AQUÍ (Ctrl + V)">
             
             <button class="btn-gold" id="btnPublicar">LANZAR AL AIRE</button>
             <p id="status-msg" style="font-size:12px; color:#888; margin-top:10px;"></p>
