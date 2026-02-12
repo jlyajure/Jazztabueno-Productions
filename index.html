@@ -38,8 +38,13 @@
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=1932') no-repeat center center/cover; display: flex; align-items: center; justify-content: center; z-index: 1000; }
         #login-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); }
         .login-card { position: relative; background: rgba(20, 20, 20, 0.95); border: 1px solid var(--gold); padding: 40px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 0 30px rgba(212, 175, 55, 0.2); }
+        
         #passInput { width: 100%; padding: 15px; border: 1px solid #333; border-bottom: 2px solid var(--gold); background: transparent; color: white; text-align: center; outline: none; margin-top: 20px; font-size: 18px; font-family: 'Playfair Display', serif; }
         
+        /* BOTÓN DE ENTRAR (NUEVO) */
+        .btn-enter { background: var(--gold); color: black; border: none; padding: 12px 30px; border-radius: 30px; margin-top: 20px; font-weight: 800; cursor: pointer; font-size: 14px; letter-spacing: 1px; transition: 0.3s; }
+        .btn-enter:hover { background: white; box-shadow: 0 0 15px white; }
+
         .login-logo { width: 140px; height: 140px; object-fit: contain; margin-bottom: 10px; border-radius: 15px; padding: 5px; }
 
         #app-content { display: none; padding-bottom: 80px; }
@@ -60,7 +65,6 @@
 
         .container { max-width: 600px; margin: auto; padding: 20px 15px; }
 
-        /* CANALES VISUALES */
         .channels-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; padding: 10px 0; }
         .channel-item { display: flex; flex-direction: column; align-items: center; width: 70px; cursor: pointer; transition: transform 0.2s; }
         .channel-item:hover { transform: scale(1.05); }
@@ -72,7 +76,7 @@
         .upload-section { background: #1a1a1a; border: 1px dashed var(--gold); padding: 20px; border-radius: 15px; margin-bottom: 30px; text-align: center; display: none; }
         .input-dark { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; background: #000; border: 1px solid #333; color: white; }
         .btn-gold { background: var(--gold); color: black; padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; }
-        .btn-toggle-upload { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px; width: 100%; border-radius: 8px; margin-bottom: 20px; cursor: pointer; }
+        .btn-toggle-upload { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px; width: 100%; border-radius: 8px; margin-bottom: 20px; cursor: pointer; display: none; /* OCULTO POR DEFECTO */ }
 
         .episode-card { background: var(--card-bg); border-radius: 15px; margin-bottom: 25px; overflow: hidden; border: 1px solid #222; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
         
@@ -101,7 +105,9 @@
         <img src="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png" class="login-logo">
         <h2 style="color: var(--gold); margin: 0; font-size: 22px;">JAZZTABUENO<br>PRODUCTIONS</h2>
         <p style="color: #888; font-size: 12px; margin-top: 10px;">Acceso Privado</p>
+        
         <input type="password" id="passInput" placeholder="Clave de Producción">
+        <button id="btnEnter" class="btn-enter">ENTRAR ▶</button>
     </div>
 </div>
 
@@ -130,7 +136,6 @@
             
             <input type="text" id="titleInput" class="input-dark" placeholder="Título (Ej: Especial Fania All Stars)">
             <input type="text" id="linkInput" class="input-dark" placeholder="Pegar Link MP3 de Archive.org...">
-            
             <input type="text" id="imgInput" class="input-dark" placeholder="Pegar Link de Carátula (Opcional)">
             
             <button class="btn-gold" id="btnPublicar">LANZAR AL AIRE</button>
@@ -171,7 +176,6 @@
     const CLAVE_ACCESO = "jazz2026";
     const CLAVE_ADMIN = "ticoadmin"; 
 
-    // LOGOS POR DEFECTO
     const CARATULAS = {
         'JAZZTABUENO': 'https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png',
         'STUDIO79':    'https://i.postimg.cc/NKMDbYJB/S79.png',
@@ -182,19 +186,31 @@
     let todosLosEpisodios = [];
     let filtroActual = 'Todo';
 
+    // FUNCIÓN PARA REVISAR CLAVES Y MOSTRAR/OCULTAR BOTONES
     const checkAuth = () => {
-        if(localStorage.getItem('jazz_auth')) {
+        const storedKey = localStorage.getItem('jazz_auth');
+        if(storedKey) {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-content').style.display = 'block';
+            
+            // SI ES ADMIN, MOSTRAMOS EL BOTÓN DE SUBIR. SI NO, LO OCULTAMOS.
+            if(storedKey === CLAVE_ADMIN) {
+                document.getElementById('btnUpload').style.display = 'block';
+            } else {
+                document.getElementById('btnUpload').style.display = 'none';
+            }
         }
     };
     checkAuth();
 
-    document.getElementById('passInput').oninput = (e) => {
-        const val = e.target.value;
+    // NUEVA FUNCIÓN MANUAL PARA ENTRAR
+    document.getElementById('btnEnter').onclick = () => {
+        const val = document.getElementById('passInput').value;
         if(val === CLAVE_ACCESO || val === CLAVE_ADMIN) {
             localStorage.setItem('jazz_auth', val);
             location.reload();
+        } else {
+            alert("Clave incorrecta 🚫");
         }
     };
 
@@ -214,7 +230,7 @@
         const programa = document.getElementById('progInput').value;
         const titulo = document.getElementById('titleInput').value;
         const link = document.getElementById('linkInput').value;
-        const imgLink = document.getElementById('imgInput').value; // Capturamos la carátula
+        const imgLink = document.getElementById('imgInput').value; 
         const status = document.getElementById('status-msg');
 
         if(!link || !titulo) { alert("Falta el link o el título"); return; }
@@ -226,7 +242,7 @@
                 programa: programa,
                 titulo: titulo,
                 mp3Url: link, 
-                imagenUrl: imgLink, // Guardamos la carátula (si hay)
+                imagenUrl: imgLink,
                 fecha: new Date()
             });
 
@@ -271,20 +287,14 @@
 
         lista.forEach(ep => {
             let tagClass = "tag-jazz";
-            
-            // LÓGICA DE CARÁTULAS INTELIGENTE
-            // 1. Si subiste una imagen específica, usa esa.
-            // 2. Si no, usa el logo del programa.
             let imagenFondo = ep.imagenUrl && ep.imagenUrl.length > 5 ? ep.imagenUrl : ""; 
 
-            // Si no hay imagen específica, asignamos el logo por defecto
             if (!imagenFondo) {
                 if(ep.programa.includes("JAZZ")) { imagenFondo = CARATULAS['JAZZTABUENO']; }
                 if(ep.programa.includes("STUDIO")) { tagClass = "tag-studio"; imagenFondo = CARATULAS['STUDIO79']; }
                 if(ep.programa.includes("SALSA")) { tagClass = "tag-salsa"; imagenFondo = CARATULAS['SALSA BRAVA']; }
                 if(ep.programa.includes("OLD")) { tagClass = "tag-old"; imagenFondo = CARATULAS['OLD SCHOOL']; }
             } else {
-                // Asignar color de etiqueta aunque la imagen sea personalizada
                 if(ep.programa.includes("STUDIO")) tagClass = "tag-studio";
                 if(ep.programa.includes("SALSA")) tagClass = "tag-salsa";
                 if(ep.programa.includes("OLD")) tagClass = "tag-old";
@@ -300,10 +310,8 @@
                     <div class="episode-info">
                         <span class="program-tag ${tagClass}">${ep.programa}</span>
                         ${isAdmin ? `<button class="btn-delete" onclick="borrarEpisodio('${ep.id}')">🗑️</button>` : ''}
-                        
                         <h3 class="episode-title">${ep.titulo}</h3>
                         <span class="episode-date">Publicado: ${fecha}</span>
-                        
                         <audio controls>
                             <source src="${ep.mp3Url}" type="audio/mpeg">
                             Tu navegador no soporta audio.
