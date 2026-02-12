@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     
-    <title>Jazztabueno Radio</title>
+    <title>Jazztabueno Productions</title>
     <meta name="apple-mobile-web-app-title" content="Jazztabueno">
     <meta name="application-name" content="Jazztabueno">
     
@@ -49,9 +49,8 @@
             display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 1px solid #222; 
         }
-        .brand-title { color: var(--gold); font-size: 20px; font-weight: 700; margin: 0; letter-spacing: 1px; }
+        .brand-title { color: var(--gold); font-size: 16px; font-weight: 700; margin: 0; letter-spacing: 1px; text-transform: uppercase; }
 
-        /* NUEVO ESTILO PARA EL BOTÓN SALIR */
         .btn-logout {
             background: transparent;
             color: var(--gold);
@@ -65,9 +64,9 @@
             text-transform: uppercase;
         }
 
-        .container { max-width: 500px; margin: auto; padding: 20px 15px; }
+        .container { max-width: 600px; margin: auto; padding: 20px 15px; }
 
-        /* SCROLL MEJORADO */
+        /* SCROLL VISIBLE Y ELEGANTE */
         .filter-scroll { 
             display: flex;
             gap: 10px;
@@ -76,9 +75,24 @@
             padding-bottom: 15px; 
             margin-bottom: 15px;
             -webkit-overflow-scrolling: touch; 
-            scrollbar-width: none; 
         }
-        .filter-scroll::-webkit-scrollbar { display: none; }
+
+        /* ESTILO DE LA BARRA DE DESPLAZAMIENTO (DORADA) */
+        .filter-scroll::-webkit-scrollbar {
+            height: 6px; /* Altura de la barra */
+            display: block; /* Asegura que se vea */
+        }
+        .filter-scroll::-webkit-scrollbar-track {
+            background: #222; /* Fondo oscuro del riel */
+            border-radius: 10px;
+        }
+        .filter-scroll::-webkit-scrollbar-thumb {
+            background: var(--gold); /* Color dorado del botón */
+            border-radius: 10px;
+        }
+        .filter-scroll::-webkit-scrollbar-thumb:hover {
+            background: var(--dark-gold); /* Oscurece al tocarlo */
+        }
 
         .filter-btn { 
             flex: 0 0 auto; 
@@ -177,7 +191,7 @@
 
 <div id="app-content">
     <header>
-        <div class="brand-title">JAZZTABUENO</div>
+        <div class="brand-title">JAZZTABUENO PRODUCTIONS</div>
         <button class="btn-logout" onclick="salirDeApp()">SALIR 🔒</button>
     </header>
     
@@ -247,7 +261,6 @@
         }
     };
 
-    // --- FUNCIÓN DE SALIDA SEGURA ---
     window.salirDeApp = () => {
         if(confirm("¿Cerrar sesión?")) {
             localStorage.removeItem('jazz_auth');
