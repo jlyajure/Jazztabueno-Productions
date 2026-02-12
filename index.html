@@ -29,13 +29,11 @@
         
         h1, h2, .program-tag { font-family: 'Playfair Display', serif; }
 
-        /* PANTALLA DE LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=1932') no-repeat center center/cover; display: flex; align-items: center; justify-content: center; z-index: 1000; }
         #login-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); }
         .login-card { position: relative; background: rgba(20, 20, 20, 0.95); border: 1px solid var(--gold); padding: 40px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 0 30px rgba(212, 175, 55, 0.2); }
         .login-logo { width: 140px; height: 140px; object-fit: contain; margin-bottom: 10px; border-radius: 15px; padding: 5px; }
 
-        /* INPUT DE CLAVE */
         #passInput { width: 100%; padding: 15px; border: 1px solid #555; border-bottom: 2px solid var(--gold); background: #222; color: white; text-align: center; outline: none; margin-top: 20px; font-size: 18px; border-radius: 5px; }
         
         .btn-enter { background: var(--gold); color: black; border: none; padding: 12px 30px; border-radius: 30px; margin-top: 20px; font-weight: 800; cursor: pointer; font-size: 14px; letter-spacing: 1px; transition: 0.3s; }
@@ -67,28 +65,44 @@
 
         .upload-section { background: #1a1a1a; border: 1px dashed var(--gold); padding: 20px; border-radius: 15px; margin-bottom: 30px; text-align: center; display: none; }
         
-        /* ESTILOS NUEVOS PARA INPUTS EN PC */
-        .input-dark { 
-            width: 100%; 
-            padding: 12px; 
-            margin-bottom: 15px; 
-            border-radius: 6px; 
-            background: #333; /* Fondo más claro para que se vea */
-            border: 1px solid #888; /* Borde visible */
-            color: white; 
-            font-size: 14px;
-            cursor: text; /* Cursor de texto explícito */
-        }
-        .input-dark:focus { background: #444; border-color: var(--gold); outline: none; }
-        .input-dark::placeholder { color: #aaa; }
-
-        .btn-gold { background: var(--gold); color: black; padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; }
+        .btn-gold { background: var(--gold); color: black; padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; margin-bottom: 10px; }
+        .btn-safe { background: #222; border: 1px solid var(--gold); color: var(--gold); padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-bottom: 20px; font-size: 14px; }
+        .btn-safe:hover { background: var(--gold); color: black; }
         .btn-toggle-upload { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px; width: 100%; border-radius: 8px; margin-bottom: 20px; cursor: pointer; display: none; }
 
         .episode-card { background: var(--card-bg); border-radius: 15px; margin-bottom: 25px; overflow: hidden; border: 1px solid #222; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
-        .cover-art { height: 220px; width: 100%; background-color: #000; background-size: cover; background-repeat: no-repeat; background-position: center; position: relative; border-bottom: 1px solid #222; }
-        .play-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
-        .play-icon { font-size: 60px; color: rgba(255,255,255,0.7); text-shadow: 0 4px 10px black; opacity: 0.8; }
+
+        /* --- NUEVOS ESTILOS PARA EFECTO DESENFOQUE --- */
+        .cover-art-container {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+            background: #000;
+            border-bottom: 1px solid #222;
+        }
+        /* Capa del fondo borroso */
+        .cover-blur {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-size: cover;
+            background-position: center;
+            filter: blur(20px) brightness(0.5); /* Muy borroso y oscuro */
+            transform: scale(1.2); /* Escalar para evitar bordes blancos */
+            z-index: 1;
+        }
+        /* Capa de la imagen nítida al frente */
+        .cover-front {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-size: contain; /* Se asegura que la imagen se vea completa */
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 2;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.7)); /* Sombra para resaltar */
+        }
+        /* SE ELIMINARON .play-overlay Y .play-icon PARA LIMPIAR LA VISTA */
+
         .episode-info { padding: 20px; }
         .program-tag { display: inline-block; font-size: 10px; color: black; padding: 4px 10px; border-radius: 4px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
         
@@ -131,25 +145,8 @@
         
         <div id="upload-section" class="upload-section">
             <h3 style="color:var(--gold); margin-top:0;">Nuevo Programa</h3>
-            
-            <label style="color: #aaa; font-size: 12px; display:block; text-align:left; margin-bottom:5px;">Elige el Programa:</label>
-            <select id="progInput" class="input-dark">
-                <option value="JAZZTABUENO">🎷 JAZZTABUENO</option>
-                <option value="STUDIO79">🎧 STUDIO 79</option>
-                <option value="SALSA BRAVA">🔥 SALSA BRAVA</option>
-                <option value="OLD SCHOOL">📻 OLD SCHOOL RADIO</option>
-            </select>
-            
-            <label style="color: #aaa; font-size: 12px; display:block; text-align:left; margin-bottom:5px;">Título del Episodio:</label>
-            <input type="text" id="titleInput" class="input-dark" placeholder="Ej: Especial Héctor Lavoe">
-            
-            <label style="color: #aaa; font-size: 12px; display:block; text-align:left; margin-bottom:5px;">Link del MP3 (Archive.org):</label>
-            <input type="text" id="linkInput" class="input-dark" placeholder="Pegar Link AQUÍ (Ctrl + V)">
-            
-            <label style="color: #aaa; font-size: 12px; display:block; text-align:left; margin-bottom:5px;">Link de Carátula (Opcional):</label>
-            <input type="text" id="imgInput" class="input-dark" placeholder="Pegar Link de Imagen AQUÍ (Ctrl + V)">
-            
-            <button class="btn-gold" id="btnPublicar">LANZAR AL AIRE</button>
+            <p style="color:#aaa; font-size:12px; margin-bottom:15px;">Usa este botón para subir sin problemas:</p>
+            <button class="btn-safe" onclick="subirModoSeguro()">🚀 SUBIR (MODO SEGURO)</button>
             <p id="status-msg" style="font-size:12px; color:#888; margin-top:10px;"></p>
         </div>
 
@@ -234,32 +231,31 @@
         sec.style.display = sec.style.display === 'block' ? 'none' : 'block';
     };
 
-    document.getElementById('btnPublicar').onclick = async () => {
-        const programa = document.getElementById('progInput').value;
-        const titulo = document.getElementById('titleInput').value;
-        const link = document.getElementById('linkInput').value;
-        const imgLink = document.getElementById('imgInput').value; 
-        const status = document.getElementById('status-msg');
-
-        if(!link || !titulo) { alert("Falta el link o el título"); return; }
+    // --- FUNCIÓN MODO SEGURO (La dejamos porque funciona bien) ---
+    window.subirModoSeguro = async () => {
+        let prog = prompt("PASO 1/4\nEscribe el programa (JAZZ, SALSA, STUDIO o OLD):", "JAZZTABUENO");
+        if (!prog) return;
+        prog = prog.toUpperCase();
+        const titulo = prompt("PASO 2/4\nEscribe el Título del Episodio:", "Jazz Party");
+        if (!titulo) return;
+        const link = prompt("PASO 3/4\nPega el Link del MP3 (Archive.org) aquí:");
+        if (!link) return;
+        const imgLink = prompt("PASO 4/4\nPega el Link de la Carátula (PostImages) o déjalo vacío:", "");
         
+        const status = document.getElementById('status-msg');
         status.innerHTML = "📡 Conectando...";
 
         try {
             await addDoc(collection(db, "radio_programas"), {
-                programa: programa,
+                programa: prog,
                 titulo: titulo,
                 mp3Url: link, 
                 imagenUrl: imgLink,
                 fecha: new Date()
             });
-
-            status.innerHTML = "✅ ¡En el aire!";
-            document.getElementById('linkInput').value = "";
-            document.getElementById('titleInput').value = "";
-            document.getElementById('imgInput').value = "";
-            setTimeout(() => { document.getElementById('upload-section').style.display = 'none'; status.innerHTML = ""; }, 2000);
-
+            alert("✅ ¡ÉXITO! Programa subido correctamente.");
+            document.getElementById('upload-section').style.display = 'none';
+            status.innerHTML = "";
         } catch (e) {
             alert("Error: " + e.message);
         }
@@ -312,9 +308,11 @@
 
             feed.innerHTML += `
                 <div class="episode-card">
-                    <div class="cover-art" style="background-image: url('${imagenFondo}');">
-                        <div class="play-overlay"><span class="play-icon">▶</span></div>
+                    <div class="cover-art-container">
+                        <div class="cover-blur" style="background-image: url('${imagenFondo}');"></div>
+                        <div class="cover-front" style="background-image: url('${imagenFondo}');"></div>
                     </div>
+                    
                     <div class="episode-info">
                         <span class="program-tag ${tagClass}">${ep.programa}</span>
                         ${isAdmin ? `<button class="btn-delete" onclick="borrarEpisodio('${ep.id}')">🗑️</button>` : ''}
