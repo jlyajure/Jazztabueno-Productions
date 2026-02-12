@@ -40,16 +40,7 @@
         .login-card { position: relative; background: rgba(20, 20, 20, 0.95); border: 1px solid var(--gold); padding: 40px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 0 30px rgba(212, 175, 55, 0.2); }
         #passInput { width: 100%; padding: 15px; border: 1px solid #333; border-bottom: 2px solid var(--gold); background: transparent; color: white; text-align: center; outline: none; margin-top: 20px; font-size: 18px; font-family: 'Playfair Display', serif; }
         
-        /* LOGO EN EL LOGIN (Ajustado para que se vea completo) */
-        .login-logo { 
-            width: 140px; 
-            height: 140px; 
-            object-fit: contain; 
-            margin-bottom: 10px; 
-            /* Quitamos el círculo perfecto para que no corte las letras */
-            border-radius: 15px; 
-            padding: 5px; 
-        }
+        .login-logo { width: 140px; height: 140px; object-fit: contain; margin-bottom: 10px; border-radius: 15px; padding: 5px; }
 
         #app-content { display: none; padding-bottom: 80px; }
         
@@ -69,27 +60,55 @@
 
         .container { max-width: 600px; margin: auto; padding: 20px 15px; }
 
-        /* TABLERO DE BOTONES */
-        .filter-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding-bottom: 20px; }
-
-        .filter-btn { 
-            flex: 0 1 auto; 
-            background: #222; 
-            border: 1px solid #444; 
-            color: #888; 
-            padding: 12px 15px; 
-            border-radius: 10px; 
-            font-size: 11px; 
-            font-weight: bold;
-            cursor: pointer; 
-            transition: 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            text-align: center;
-            min-width: 100px; 
+        /* --- NUEVO MENÚ DE CANALES VISUALES --- */
+        .channels-container { 
+            display: flex; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+            margin-bottom: 25px; 
+            padding: 10px 0;
         }
-        .filter-btn:hover { background: #333; border-color: #666; }
-        .filter-btn.active { background: var(--gold); color: black; border-color: var(--gold); font-weight: 800; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); transform: scale(1.05); }
+
+        .channel-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 70px; /* Tamaño de cada ítem */
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .channel-item:hover { transform: scale(1.05); }
+
+        .channel-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%; /* Círculo perfecto */
+            object-fit: cover;
+            border: 2px solid #333; /* Borde apagado normal */
+            padding: 2px;
+            background: #000;
+            transition: 0.3s;
+        }
+
+        .channel-name {
+            font-size: 9px;
+            color: #888;
+            margin-top: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        /* ESTADO ACTIVO (SELECCIONADO) */
+        .channel-item.active .channel-logo {
+            border-color: var(--gold); /* Borde dorado brillante */
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+        .channel-item.active .channel-name {
+            color: var(--gold);
+        }
 
         .upload-section { background: #1a1a1a; border: 1px dashed var(--gold); padding: 20px; border-radius: 15px; margin-bottom: 30px; text-align: center; display: none; }
         .input-dark { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; background: #000; border: 1px solid #333; color: white; }
@@ -98,12 +117,11 @@
 
         .episode-card { background: var(--card-bg); border-radius: 15px; margin-bottom: 25px; overflow: hidden; border: 1px solid #222; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
         
-        /* LOGOS EN LAS TARJETAS (Ajustado para que no se corten) */
         .cover-art { 
             height: 220px; 
             width: 100%; 
-            background-color: #000; /* Fondo negro detrás del logo */
-            background-size: contain; /* Que el logo quepa entero */
+            background-color: #000; 
+            background-size: contain; 
             background-repeat: no-repeat;
             background-position: center; 
             position: relative; 
@@ -131,7 +149,6 @@
 <div id="login-screen">
     <div class="login-card">
         <img src="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png" class="login-logo">
-        
         <h2 style="color: var(--gold); margin: 0; font-size: 22px;">JAZZTABUENO<br>PRODUCTIONS</h2>
         <p style="color: #888; font-size: 12px; margin-top: 10px;">Acceso Privado</p>
         <input type="password" id="passInput" placeholder="Clave de Producción">
@@ -168,12 +185,31 @@
             <p id="status-msg" style="font-size:12px; color:#888; margin-top:10px;"></p>
         </div>
 
-        <div class="filter-grid">
-            <button class="filter-btn active" onclick="filtrar('Todo')">Todo</button>
-            <button class="filter-btn" onclick="filtrar('JAZZTABUENO')">🎷 JAZZTABUENO</button>
-            <button class="filter-btn" onclick="filtrar('STUDIO79')">🎧 STUDIO 79</button>
-            <button class="filter-btn" onclick="filtrar('SALSA BRAVA')">🔥 SALSA BRAVA</button>
-            <button class="filter-btn" onclick="filtrar('OLD SCHOOL')">📻 OLD SCHOOL</button>
+        <div class="channels-container">
+            <div class="channel-item active" onclick="filtrar('Todo', this)">
+                <img src="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png" class="channel-logo">
+                <span class="channel-name">Todo</span>
+            </div>
+            
+            <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)">
+                <img src="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png" class="channel-logo">
+                <span class="channel-name">Jazz</span>
+            </div>
+            
+            <div class="channel-item" onclick="filtrar('STUDIO79', this)">
+                <img src="https://i.postimg.cc/NKMDbYJB/S79.png" class="channel-logo">
+                <span class="channel-name">Studio 79</span>
+            </div>
+            
+            <div class="channel-item" onclick="filtrar('SALSA BRAVA', this)">
+                <img src="https://i.postimg.cc/75fchgyt/Salsa-Brava.png" class="channel-logo">
+                <span class="channel-name">Salsa</span>
+            </div>
+            
+            <div class="channel-item" onclick="filtrar('OLD SCHOOL', this)">
+                <img src="https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png" class="channel-logo">
+                <span class="channel-name">Old School</span>
+            </div>
         </div>
 
         <div id="radio-feed"></div>
@@ -187,7 +223,7 @@
     const CLAVE_ACCESO = "jazz2026";
     const CLAVE_ADMIN = "ticoadmin"; 
 
-    // MATA DE LOGOS (Aquí están tus links organizados)
+    // LINKS DE IMÁGENES
     const CARATULAS = {
         'JAZZTABUENO': 'https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png',
         'STUDIO79':    'https://i.postimg.cc/NKMDbYJB/S79.png',
@@ -254,12 +290,13 @@
         }
     };
 
-    window.filtrar = (cat) => {
+    window.filtrar = (cat, elemento) => {
         filtroActual = cat;
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if(btn.innerText.includes(cat) || (cat === 'Todo' && btn.innerText === 'Todo')) btn.classList.add('active');
-        });
+        
+        // Actualizar visualmente qué canal está activo
+        document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
+        if(elemento) elemento.classList.add('active');
+
         pintarRadio();
     };
 
@@ -286,7 +323,6 @@
 
         lista.forEach(ep => {
             let tagClass = "tag-jazz";
-            // Imagen por defecto si falla algo
             let imagenFondo = "https://via.placeholder.com/800x400/111/333?text=Audio"; 
 
             if(ep.programa.includes("JAZZ")) { imagenFondo = CARATULAS['JAZZTABUENO']; }
