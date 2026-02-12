@@ -60,55 +60,14 @@
 
         .container { max-width: 600px; margin: auto; padding: 20px 15px; }
 
-        /* --- NUEVO MENÚ DE CANALES VISUALES --- */
-        .channels-container { 
-            display: flex; 
-            justify-content: center; 
-            flex-wrap: wrap; 
-            gap: 15px; 
-            margin-bottom: 25px; 
-            padding: 10px 0;
-        }
-
-        .channel-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 70px; /* Tamaño de cada ítem */
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
+        /* CANALES VISUALES */
+        .channels-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; padding: 10px 0; }
+        .channel-item { display: flex; flex-direction: column; align-items: center; width: 70px; cursor: pointer; transition: transform 0.2s; }
         .channel-item:hover { transform: scale(1.05); }
-
-        .channel-logo {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%; /* Círculo perfecto */
-            object-fit: cover;
-            border: 2px solid #333; /* Borde apagado normal */
-            padding: 2px;
-            background: #000;
-            transition: 0.3s;
-        }
-
-        .channel-name {
-            font-size: 9px;
-            color: #888;
-            margin-top: 5px;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: center;
-        }
-
-        /* ESTADO ACTIVO (SELECCIONADO) */
-        .channel-item.active .channel-logo {
-            border-color: var(--gold); /* Borde dorado brillante */
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
-        }
-        .channel-item.active .channel-name {
-            color: var(--gold);
-        }
+        .channel-logo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #333; padding: 2px; background: #000; transition: 0.3s; }
+        .channel-name { font-size: 9px; color: #888; margin-top: 5px; font-weight: bold; text-transform: uppercase; text-align: center; }
+        .channel-item.active .channel-logo { border-color: var(--gold); box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+        .channel-item.active .channel-name { color: var(--gold); }
 
         .upload-section { background: #1a1a1a; border: 1px dashed var(--gold); padding: 20px; border-radius: 15px; margin-bottom: 30px; text-align: center; display: none; }
         .input-dark { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; background: #000; border: 1px solid #333; color: white; }
@@ -117,16 +76,7 @@
 
         .episode-card { background: var(--card-bg); border-radius: 15px; margin-bottom: 25px; overflow: hidden; border: 1px solid #222; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
         
-        .cover-art { 
-            height: 220px; 
-            width: 100%; 
-            background-color: #000; 
-            background-size: contain; 
-            background-repeat: no-repeat;
-            background-position: center; 
-            position: relative; 
-            border-bottom: 1px solid #222;
-        }
+        .cover-art { height: 220px; width: 100%; background-color: #000; background-size: cover; background-repeat: no-repeat; background-position: center; position: relative; border-bottom: 1px solid #222; }
         .play-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
         .play-icon { font-size: 60px; color: rgba(255,255,255,0.7); text-shadow: 0 4px 10px black; opacity: 0.8; }
 
@@ -181,6 +131,8 @@
             <input type="text" id="titleInput" class="input-dark" placeholder="Título (Ej: Especial Fania All Stars)">
             <input type="text" id="linkInput" class="input-dark" placeholder="Pegar Link MP3 de Archive.org...">
             
+            <input type="text" id="imgInput" class="input-dark" placeholder="Pegar Link de Carátula (Opcional)">
+            
             <button class="btn-gold" id="btnPublicar">LANZAR AL AIRE</button>
             <p id="status-msg" style="font-size:12px; color:#888; margin-top:10px;"></p>
         </div>
@@ -190,22 +142,18 @@
                 <img src="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png" class="channel-logo">
                 <span class="channel-name">Todo</span>
             </div>
-            
             <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)">
                 <img src="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png" class="channel-logo">
                 <span class="channel-name">Jazz</span>
             </div>
-            
             <div class="channel-item" onclick="filtrar('STUDIO79', this)">
                 <img src="https://i.postimg.cc/NKMDbYJB/S79.png" class="channel-logo">
                 <span class="channel-name">Studio 79</span>
             </div>
-            
             <div class="channel-item" onclick="filtrar('SALSA BRAVA', this)">
                 <img src="https://i.postimg.cc/75fchgyt/Salsa-Brava.png" class="channel-logo">
                 <span class="channel-name">Salsa</span>
             </div>
-            
             <div class="channel-item" onclick="filtrar('OLD SCHOOL', this)">
                 <img src="https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png" class="channel-logo">
                 <span class="channel-name">Old School</span>
@@ -223,7 +171,7 @@
     const CLAVE_ACCESO = "jazz2026";
     const CLAVE_ADMIN = "ticoadmin"; 
 
-    // LINKS DE IMÁGENES
+    // LOGOS POR DEFECTO
     const CARATULAS = {
         'JAZZTABUENO': 'https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png',
         'STUDIO79':    'https://i.postimg.cc/NKMDbYJB/S79.png',
@@ -266,6 +214,7 @@
         const programa = document.getElementById('progInput').value;
         const titulo = document.getElementById('titleInput').value;
         const link = document.getElementById('linkInput').value;
+        const imgLink = document.getElementById('imgInput').value; // Capturamos la carátula
         const status = document.getElementById('status-msg');
 
         if(!link || !titulo) { alert("Falta el link o el título"); return; }
@@ -277,12 +226,14 @@
                 programa: programa,
                 titulo: titulo,
                 mp3Url: link, 
+                imagenUrl: imgLink, // Guardamos la carátula (si hay)
                 fecha: new Date()
             });
 
             status.innerHTML = "✅ ¡En el aire!";
             document.getElementById('linkInput').value = "";
             document.getElementById('titleInput').value = "";
+            document.getElementById('imgInput').value = "";
             setTimeout(() => { document.getElementById('upload-section').style.display = 'none'; status.innerHTML = ""; }, 2000);
 
         } catch (e) {
@@ -292,11 +243,8 @@
 
     window.filtrar = (cat, elemento) => {
         filtroActual = cat;
-        
-        // Actualizar visualmente qué canal está activo
         document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
         if(elemento) elemento.classList.add('active');
-
         pintarRadio();
     };
 
@@ -323,12 +271,24 @@
 
         lista.forEach(ep => {
             let tagClass = "tag-jazz";
-            let imagenFondo = "https://via.placeholder.com/800x400/111/333?text=Audio"; 
+            
+            // LÓGICA DE CARÁTULAS INTELIGENTE
+            // 1. Si subiste una imagen específica, usa esa.
+            // 2. Si no, usa el logo del programa.
+            let imagenFondo = ep.imagenUrl && ep.imagenUrl.length > 5 ? ep.imagenUrl : ""; 
 
-            if(ep.programa.includes("JAZZ")) { imagenFondo = CARATULAS['JAZZTABUENO']; }
-            if(ep.programa.includes("STUDIO")) { tagClass = "tag-studio"; imagenFondo = CARATULAS['STUDIO79']; }
-            if(ep.programa.includes("SALSA")) { tagClass = "tag-salsa"; imagenFondo = CARATULAS['SALSA BRAVA']; }
-            if(ep.programa.includes("OLD")) { tagClass = "tag-old"; imagenFondo = CARATULAS['OLD SCHOOL']; }
+            // Si no hay imagen específica, asignamos el logo por defecto
+            if (!imagenFondo) {
+                if(ep.programa.includes("JAZZ")) { imagenFondo = CARATULAS['JAZZTABUENO']; }
+                if(ep.programa.includes("STUDIO")) { tagClass = "tag-studio"; imagenFondo = CARATULAS['STUDIO79']; }
+                if(ep.programa.includes("SALSA")) { tagClass = "tag-salsa"; imagenFondo = CARATULAS['SALSA BRAVA']; }
+                if(ep.programa.includes("OLD")) { tagClass = "tag-old"; imagenFondo = CARATULAS['OLD SCHOOL']; }
+            } else {
+                // Asignar color de etiqueta aunque la imagen sea personalizada
+                if(ep.programa.includes("STUDIO")) tagClass = "tag-studio";
+                if(ep.programa.includes("SALSA")) tagClass = "tag-salsa";
+                if(ep.programa.includes("OLD")) tagClass = "tag-old";
+            }
 
             const fecha = ep.fecha ? ep.fecha.toDate().toLocaleDateString() : "";
 
