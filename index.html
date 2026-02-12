@@ -66,65 +66,41 @@
 
         .container { max-width: 600px; margin: auto; padding: 20px 15px; }
 
-        /* CONTENEDOR DEL MENÚ CON FLECHAS */
-        .menu-wrapper {
+        /* --- NUEVO ESTILO DE BOTONES (SIN SCROLL) --- */
+        .filter-grid { 
             display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            gap: 5px;
-        }
-
-        .scroll-arrow {
-            background: rgba(255,255,255,0.1);
-            color: var(--gold);
-            border: 1px solid #333;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0; 
-            transition: 0.2s;
-        }
-        .scroll-arrow:active { background: var(--gold); color: black; } /* Efecto al hacer clic */
-        .scroll-arrow:hover { border-color: var(--gold); }
-
-        /* SCROLL OCULTO PERO FUNCIONAL */
-        .filter-scroll { 
-            display: flex;
+            flex-wrap: wrap; /* ESTO ES LA MAGIA: Si no caben, bajan */
+            justify-content: center; /* Centrados */
             gap: 10px;
-            overflow-x: auto; 
-            white-space: nowrap; 
-            padding-bottom: 5px; 
-            -webkit-overflow-scrolling: touch; 
-            scrollbar-width: none; 
-            scroll-behavior: smooth; /* Movimiento suave */
-            flex-grow: 1; 
+            padding-bottom: 20px; 
         }
-        .filter-scroll::-webkit-scrollbar { display: none; } 
 
         .filter-btn { 
-            flex: 0 0 auto; 
+            flex: 0 1 auto; /* Tamaño automático */
             background: #222; 
             border: 1px solid #444; 
             color: #888; 
-            padding: 10px 20px; 
-            border-radius: 30px; 
-            font-size: 12px; 
+            padding: 12px 15px; 
+            border-radius: 10px; /* Menos redondos, más botones */
+            font-size: 11px; 
+            font-weight: bold;
             cursor: pointer; 
-            transition: 0.3s;
+            transition: 0.2s;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            text-align: center;
+            min-width: 100px; /* Ancho mínimo para que se vean bien */
         }
+        
+        .filter-btn:hover { background: #333; border-color: #666; }
+        
         .filter-btn.active { 
             background: var(--gold); 
             color: black; 
             border-color: var(--gold); 
             font-weight: 800; 
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+            transform: scale(1.05); /* Un poquito más grande al seleccionar */
         }
 
         .upload-section { background: #1a1a1a; border: 1px dashed var(--gold); padding: 20px; border-radius: 15px; margin-bottom: 30px; text-align: center; display: none; }
@@ -228,16 +204,13 @@
             <p id="status-msg" style="font-size:12px; color:#888; margin-top:10px;"></p>
         </div>
 
-        <div class="menu-wrapper">
-            <button class="scroll-arrow" id="btnLeft">&#10094;</button> <div class="filter-scroll" id="menuScroll">
-                <button class="filter-btn active" onclick="filtrar('Todo')">Todo</button>
-                <button class="filter-btn" onclick="filtrar('JAZZTABUENO')">🎷 JAZZTABUENO</button>
-                <button class="filter-btn" onclick="filtrar('STUDIO79')">🎧 STUDIO 79</button>
-                <button class="filter-btn" onclick="filtrar('SALSA BRAVA')">🔥 SALSA BRAVA</button>
-                <button class="filter-btn" onclick="filtrar('OLD SCHOOL')">📻 OLD SCHOOL</button>
-            </div>
-            
-            <button class="scroll-arrow" id="btnRight">&#10095;</button> </div>
+        <div class="filter-grid">
+            <button class="filter-btn active" onclick="filtrar('Todo')">Todo</button>
+            <button class="filter-btn" onclick="filtrar('JAZZTABUENO')">🎷 JAZZTABUENO</button>
+            <button class="filter-btn" onclick="filtrar('STUDIO79')">🎧 STUDIO 79</button>
+            <button class="filter-btn" onclick="filtrar('SALSA BRAVA')">🔥 SALSA BRAVA</button>
+            <button class="filter-btn" onclick="filtrar('OLD SCHOOL')">📻 OLD SCHOOL</button>
+        </div>
 
         <div id="radio-feed"></div>
     </div>
@@ -276,9 +249,6 @@
         }
     };
 
-    // --- CONEXIÓN BLINDADA DE BOTONES (LISTENERS) ---
-    // Esto asegura que el click funcione sí o sí
-    
     document.getElementById('btnSalir').onclick = () => {
         if(confirm("¿Cerrar sesión?")) {
             localStorage.removeItem('jazz_auth');
@@ -286,13 +256,7 @@
         }
     };
 
-    document.getElementById('btnLeft').onclick = () => {
-        document.getElementById('menuScroll').scrollBy({ left: -200, behavior: 'smooth' });
-    };
-
-    document.getElementById('btnRight').onclick = () => {
-        document.getElementById('menuScroll').scrollBy({ left: 200, behavior: 'smooth' });
-    };
+    // ELIMINÉ LOS BOTONES DE FLECHA DEL JS PORQUE YA NO EXISTEN EN EL HTML
 
     document.getElementById('btnUpload').onclick = () => {
         const sec = document.getElementById('upload-section');
@@ -327,7 +291,6 @@
         }
     };
 
-    // --- FUNCIONES GLOBALES PARA FILTROS (Estas se quedan igual) ---
     window.filtrar = (cat) => {
         filtroActual = cat;
         document.querySelectorAll('.filter-btn').forEach(btn => {
