@@ -41,7 +41,6 @@
         
         #passInput { width: 100%; padding: 15px; border: 1px solid #333; border-bottom: 2px solid var(--gold); background: transparent; color: white; text-align: center; outline: none; margin-top: 20px; font-size: 18px; font-family: 'Playfair Display', serif; }
         
-        /* BOTÓN DE ENTRAR (NUEVO) */
         .btn-enter { background: var(--gold); color: black; border: none; padding: 12px 30px; border-radius: 30px; margin-top: 20px; font-weight: 800; cursor: pointer; font-size: 14px; letter-spacing: 1px; transition: 0.3s; }
         .btn-enter:hover { background: white; box-shadow: 0 0 15px white; }
 
@@ -74,9 +73,22 @@
         .channel-item.active .channel-name { color: var(--gold); }
 
         .upload-section { background: #1a1a1a; border: 1px dashed var(--gold); padding: 20px; border-radius: 15px; margin-bottom: 30px; text-align: center; display: none; }
-        .input-dark { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; background: #000; border: 1px solid #333; color: white; }
+        
+        /* AQUÍ ESTÁ EL TRUCO: Input grande (16px) y con más espacio */
+        .input-dark { 
+            width: 100%; 
+            padding: 15px; /* Más espacio para el dedo */
+            margin-bottom: 20px; /* Más separado */
+            border-radius: 8px; 
+            background: #000; 
+            border: 1px solid #444; 
+            color: white; 
+            font-size: 16px; /* Letra grande evita zoom en iPhone */
+        }
+        .input-dark:focus { border-color: var(--gold); outline: none; }
+
         .btn-gold { background: var(--gold); color: black; padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; }
-        .btn-toggle-upload { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px; width: 100%; border-radius: 8px; margin-bottom: 20px; cursor: pointer; display: none; /* OCULTO POR DEFECTO */ }
+        .btn-toggle-upload { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px; width: 100%; border-radius: 8px; margin-bottom: 20px; cursor: pointer; display: none; }
 
         .episode-card { background: var(--card-bg); border-radius: 15px; margin-bottom: 25px; overflow: hidden; border: 1px solid #222; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
         
@@ -186,14 +198,12 @@
     let todosLosEpisodios = [];
     let filtroActual = 'Todo';
 
-    // FUNCIÓN PARA REVISAR CLAVES Y MOSTRAR/OCULTAR BOTONES
     const checkAuth = () => {
         const storedKey = localStorage.getItem('jazz_auth');
         if(storedKey) {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-content').style.display = 'block';
             
-            // SI ES ADMIN, MOSTRAMOS EL BOTÓN DE SUBIR. SI NO, LO OCULTAMOS.
             if(storedKey === CLAVE_ADMIN) {
                 document.getElementById('btnUpload').style.display = 'block';
             } else {
@@ -203,7 +213,6 @@
     };
     checkAuth();
 
-    // NUEVA FUNCIÓN MANUAL PARA ENTRAR
     document.getElementById('btnEnter').onclick = () => {
         const val = document.getElementById('passInput').value;
         if(val === CLAVE_ACCESO || val === CLAVE_ADMIN) {
