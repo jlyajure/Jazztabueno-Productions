@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-title" content="Jazztabueno">
     <meta name="application-name" content="Jazztabueno">
     
-    <link rel="icon" type="image/png" href="https://img.icons8.com/color/192/saxophone.png">
-    <link rel="apple-touch-icon" href="https://img.icons8.com/color/192/saxophone.png">
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png">
     
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
     
@@ -36,52 +36,49 @@
         h1, h2, .program-tag { font-family: 'Playfair Display', serif; }
 
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=1932') no-repeat center center/cover; display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        #login-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
+        #login-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); }
         .login-card { position: relative; background: rgba(20, 20, 20, 0.95); border: 1px solid var(--gold); padding: 40px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 0 30px rgba(212, 175, 55, 0.2); }
         #passInput { width: 100%; padding: 15px; border: 1px solid #333; border-bottom: 2px solid var(--gold); background: transparent; color: white; text-align: center; outline: none; margin-top: 20px; font-size: 18px; font-family: 'Playfair Display', serif; }
         
+        /* LOGO EN EL LOGIN (Ajustado para que se vea completo) */
+        .login-logo { 
+            width: 140px; 
+            height: 140px; 
+            object-fit: contain; 
+            margin-bottom: 10px; 
+            /* Quitamos el círculo perfecto para que no corte las letras */
+            border-radius: 15px; 
+            padding: 5px; 
+        }
+
         #app-content { display: none; padding-bottom: 80px; }
         
         header { 
             background: rgba(5, 5, 5, 0.95); 
-            padding: 15px 20px; 
+            padding: 10px 20px; 
             position: sticky; top: 0; z-index: 100; 
             display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 1px solid #222; 
         }
-        .brand-title { color: var(--gold); font-size: 16px; font-weight: 700; margin: 0; letter-spacing: 1px; text-transform: uppercase; }
+        
+        .header-brand { display: flex; align-items: center; gap: 12px; }
+        .header-logo { width: 45px; height: 45px; border-radius: 8px; object-fit: contain; background: black; border: 1px solid #333; }
+        .brand-title { color: var(--gold); font-size: 13px; font-weight: 700; margin: 0; letter-spacing: 1px; text-transform: uppercase; line-height: 1.2; }
 
-        .btn-logout {
-            background: transparent;
-            color: var(--gold);
-            border: 1px solid var(--gold);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
+        .btn-logout { background: transparent; color: var(--gold); border: 1px solid var(--gold); padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; }
 
         .container { max-width: 600px; margin: auto; padding: 20px 15px; }
 
-        /* --- NUEVO ESTILO DE BOTONES (SIN SCROLL) --- */
-        .filter-grid { 
-            display: flex;
-            flex-wrap: wrap; /* ESTO ES LA MAGIA: Si no caben, bajan */
-            justify-content: center; /* Centrados */
-            gap: 10px;
-            padding-bottom: 20px; 
-        }
+        /* TABLERO DE BOTONES */
+        .filter-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding-bottom: 20px; }
 
         .filter-btn { 
-            flex: 0 1 auto; /* Tamaño automático */
+            flex: 0 1 auto; 
             background: #222; 
             border: 1px solid #444; 
             color: #888; 
             padding: 12px 15px; 
-            border-radius: 10px; /* Menos redondos, más botones */
+            border-radius: 10px; 
             font-size: 11px; 
             font-weight: bold;
             cursor: pointer; 
@@ -89,63 +86,34 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             text-align: center;
-            min-width: 100px; /* Ancho mínimo para que se vean bien */
+            min-width: 100px; 
         }
-        
         .filter-btn:hover { background: #333; border-color: #666; }
-        
-        .filter-btn.active { 
-            background: var(--gold); 
-            color: black; 
-            border-color: var(--gold); 
-            font-weight: 800; 
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
-            transform: scale(1.05); /* Un poquito más grande al seleccionar */
-        }
+        .filter-btn.active { background: var(--gold); color: black; border-color: var(--gold); font-weight: 800; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); transform: scale(1.05); }
 
         .upload-section { background: #1a1a1a; border: 1px dashed var(--gold); padding: 20px; border-radius: 15px; margin-bottom: 30px; text-align: center; display: none; }
         .input-dark { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; background: #000; border: 1px solid #333; color: white; }
         .btn-gold { background: var(--gold); color: black; padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; }
         .btn-toggle-upload { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px; width: 100%; border-radius: 8px; margin-bottom: 20px; cursor: pointer; }
 
-        .episode-card { 
-            background: var(--card-bg); 
-            border-radius: 15px; 
-            margin-bottom: 25px; 
-            overflow: hidden; 
-            border: 1px solid #222;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-        }
+        .episode-card { background: var(--card-bg); border-radius: 15px; margin-bottom: 25px; overflow: hidden; border: 1px solid #222; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
         
-        .cover-art {
-            height: 180px;
-            width: 100%;
-            background-size: cover;
-            background-position: center;
-            position: relative;
+        /* LOGOS EN LAS TARJETAS (Ajustado para que no se corten) */
+        .cover-art { 
+            height: 220px; 
+            width: 100%; 
+            background-color: #000; /* Fondo negro detrás del logo */
+            background-size: contain; /* Que el logo quepa entero */
+            background-repeat: no-repeat;
+            background-position: center; 
+            position: relative; 
+            border-bottom: 1px solid #222;
         }
-        .play-overlay {
-            position: absolute; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.3);
-            display: flex; align-items: center; justify-content: center;
-        }
-        .play-icon { font-size: 50px; color: rgba(255,255,255,0.8); }
+        .play-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
+        .play-icon { font-size: 60px; color: rgba(255,255,255,0.7); text-shadow: 0 4px 10px black; opacity: 0.8; }
 
         .episode-info { padding: 20px; }
-        
-        .program-tag { 
-            display: inline-block; 
-            font-size: 10px; 
-            color: black; 
-            padding: 4px 10px; 
-            border-radius: 4px; 
-            font-weight: bold; 
-            text-transform: uppercase; 
-            margin-bottom: 10px;
-            letter-spacing: 1px;
-        }
+        .program-tag { display: inline-block; font-size: 10px; color: black; padding: 4px 10px; border-radius: 4px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
         
         .tag-jazz { background: var(--gold); }
         .tag-studio { background: #3b82f6; color: white; }
@@ -154,15 +122,7 @@
 
         .episode-title { font-size: 18px; margin: 0 0 5px 0; color: white; }
         .episode-date { font-size: 12px; color: #666; display: block; margin-bottom: 15px; }
-
-        audio {
-            width: 100%;
-            height: 40px;
-            margin-top: 10px;
-            filter: invert(100%); 
-            border-radius: 20px;
-        }
-
+        audio { width: 100%; height: 40px; margin-top: 10px; filter: invert(100%); border-radius: 20px; }
         .btn-delete { float: right; background: transparent; border: none; color: #ef4444; font-size: 20px; cursor: pointer; margin-top: -5px; }
     </style>
 </head>
@@ -170,8 +130,9 @@
 
 <div id="login-screen">
     <div class="login-card">
-        <div style="font-size: 50px; margin-bottom: 10px;">🎷</div>
-        <h2 style="color: var(--gold); margin: 0;">Jazztabueno<br>Productions</h2>
+        <img src="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png" class="login-logo">
+        
+        <h2 style="color: var(--gold); margin: 0; font-size: 22px;">JAZZTABUENO<br>PRODUCTIONS</h2>
         <p style="color: #888; font-size: 12px; margin-top: 10px;">Acceso Privado</p>
         <input type="password" id="passInput" placeholder="Clave de Producción">
     </div>
@@ -179,7 +140,10 @@
 
 <div id="app-content">
     <header>
-        <div class="brand-title">JAZZTABUENO PRODUCTIONS</div>
+        <div class="header-brand">
+            <img src="https://i.postimg.cc/GHMVbX6G/Jazz-Ta-Bueno-Productions.png" class="header-logo">
+            <div class="brand-title">JAZZTABUENO<br>PRODUCTIONS</div>
+        </div>
         <button class="btn-logout" id="btnSalir">SALIR 🔒</button>
     </header>
     
@@ -223,15 +187,16 @@
     const CLAVE_ACCESO = "jazz2026";
     const CLAVE_ADMIN = "ticoadmin"; 
 
+    // MATA DE LOGOS (Aquí están tus links organizados)
+    const CARATULAS = {
+        'JAZZTABUENO': 'https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png',
+        'STUDIO79':    'https://i.postimg.cc/NKMDbYJB/S79.png',
+        'SALSA BRAVA': 'https://i.postimg.cc/75fchgyt/Salsa-Brava.png',
+        'OLD SCHOOL':  'https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png'
+    };
+
     let todosLosEpisodios = [];
     let filtroActual = 'Todo';
-
-    const CARATULAS = {
-        'JAZZTABUENO': 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=800',
-        'STUDIO79': 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=800',
-        'SALSA BRAVA': 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?auto=format&fit=crop&q=80&w=800',
-        'OLD SCHOOL': 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=800'
-    };
 
     const checkAuth = () => {
         if(localStorage.getItem('jazz_auth')) {
@@ -255,8 +220,6 @@
             location.reload();
         }
     };
-
-    // ELIMINÉ LOS BOTONES DE FLECHA DEL JS PORQUE YA NO EXISTEN EN EL HTML
 
     document.getElementById('btnUpload').onclick = () => {
         const sec = document.getElementById('upload-section');
@@ -313,7 +276,7 @@
         const feed = document.getElementById('radio-feed');
         feed.innerHTML = "";
         const isAdmin = localStorage.getItem('jazz_auth') === CLAVE_ADMIN;
-
+        
         const lista = todosLosEpisodios.filter(ep => filtroActual === 'Todo' || ep.programa.includes(filtroActual) || filtroActual.includes(ep.programa));
 
         if(lista.length === 0) {
@@ -323,8 +286,10 @@
 
         lista.forEach(ep => {
             let tagClass = "tag-jazz";
-            let imagenFondo = CARATULAS['JAZZTABUENO'];
+            // Imagen por defecto si falla algo
+            let imagenFondo = "https://via.placeholder.com/800x400/111/333?text=Audio"; 
 
+            if(ep.programa.includes("JAZZ")) { imagenFondo = CARATULAS['JAZZTABUENO']; }
             if(ep.programa.includes("STUDIO")) { tagClass = "tag-studio"; imagenFondo = CARATULAS['STUDIO79']; }
             if(ep.programa.includes("SALSA")) { tagClass = "tag-salsa"; imagenFondo = CARATULAS['SALSA BRAVA']; }
             if(ep.programa.includes("OLD")) { tagClass = "tag-old"; imagenFondo = CARATULAS['OLD SCHOOL']; }
@@ -334,11 +299,8 @@
             feed.innerHTML += `
                 <div class="episode-card">
                     <div class="cover-art" style="background-image: url('${imagenFondo}');">
-                        <div class="play-overlay">
-                            <span class="play-icon">▶</span>
-                        </div>
+                        <div class="play-overlay"><span class="play-icon">▶</span></div>
                     </div>
-                    
                     <div class="episode-info">
                         <span class="program-tag ${tagClass}">${ep.programa}</span>
                         ${isAdmin ? `<button class="btn-delete" onclick="borrarEpisodio('${ep.id}')">🗑️</button>` : ''}
