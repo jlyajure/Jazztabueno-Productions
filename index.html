@@ -51,16 +51,42 @@
         }
         .brand-title { color: var(--gold); font-size: 20px; font-weight: 700; margin: 0; letter-spacing: 1px; }
 
+        /* NUEVO ESTILO PARA EL BOTÓN SALIR */
+        .btn-logout {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
         .container { max-width: 500px; margin: auto; padding: 20px 15px; }
 
-        .filter-scroll { overflow-x: auto; white-space: nowrap; padding-bottom: 15px; margin-bottom: 10px; }
+        /* SCROLL MEJORADO */
+        .filter-scroll { 
+            display: flex;
+            gap: 10px;
+            overflow-x: auto; 
+            white-space: nowrap; 
+            padding-bottom: 15px; 
+            margin-bottom: 15px;
+            -webkit-overflow-scrolling: touch; 
+            scrollbar-width: none; 
+        }
+        .filter-scroll::-webkit-scrollbar { display: none; }
+
         .filter-btn { 
+            flex: 0 0 auto; 
             background: #222; 
             border: 1px solid #444; 
             color: #888; 
             padding: 10px 20px; 
             border-radius: 30px; 
-            margin-right: 8px; 
             font-size: 13px; 
             cursor: pointer; 
             transition: 0.3s;
@@ -80,7 +106,6 @@
         .btn-gold { background: var(--gold); color: black; padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; }
         .btn-toggle-upload { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px; width: 100%; border-radius: 8px; margin-bottom: 20px; cursor: pointer; }
 
-        /* TARJETA DE AUDIO */
         .episode-card { 
             background: var(--card-bg); 
             border-radius: 15px; 
@@ -92,7 +117,6 @@
             flex-direction: column;
         }
         
-        /* PORTADA DEL DISCO (VISUAL) */
         .cover-art {
             height: 180px;
             width: 100%;
@@ -129,17 +153,15 @@
         .episode-title { font-size: 18px; margin: 0 0 5px 0; color: white; }
         .episode-date { font-size: 12px; color: #666; display: block; margin-bottom: 15px; }
 
-        /* REPRODUCTOR DE AUDIO PERSONALIZADO */
         audio {
             width: 100%;
             height: 40px;
             margin-top: 10px;
-            filter: invert(100%); /* Para que se vea blanco/gris en fondo negro */
+            filter: invert(100%); 
             border-radius: 20px;
         }
 
         .btn-delete { float: right; background: transparent; border: none; color: #ef4444; font-size: 20px; cursor: pointer; margin-top: -5px; }
-
     </style>
 </head>
 <body>
@@ -156,7 +178,7 @@
 <div id="app-content">
     <header>
         <div class="brand-title">JAZZTABUENO</div>
-        <button onclick="localStorage.removeItem('jazz_auth'); location.reload();" style="background:transparent; color:#666; border:none; font-size:12px;">SALIR</button>
+        <button class="btn-logout" onclick="salirDeApp()">SALIR 🔒</button>
     </header>
     
     <div class="container">
@@ -167,10 +189,10 @@
             <h3 style="color:var(--gold); margin-top:0;">Nuevo Programa</h3>
             
             <select id="progInput" class="input-dark">
-                <option value="JAZZTABUENO">🎷 Jazztabueno</option>
-                <option value="STUDIO79">🎧 Studio 79</option>
-                <option value="SALSA BRAVA">🔥 Salsa Brava</option>
-                <option value="OLD SCHOOL">📻 Old School Radio</option>
+                <option value="JAZZTABUENO">🎷 JAZZTABUENO</option>
+                <option value="STUDIO79">🎧 STUDIO 79</option>
+                <option value="SALSA BRAVA">🔥 SALSA BRAVA</option>
+                <option value="OLD SCHOOL">📻 OLD SCHOOL RADIO</option>
             </select>
             
             <input type="text" id="titleInput" class="input-dark" placeholder="Título (Ej: Especial Fania All Stars)">
@@ -182,10 +204,10 @@
 
         <div class="filter-scroll">
             <button class="filter-btn active" onclick="filtrar('Todo')">Todo</button>
-            <button class="filter-btn" onclick="filtrar('JAZZTABUENO')">🎷 Jazz</button>
-            <button class="filter-btn" onclick="filtrar('STUDIO79')">🎧 Studio79</button>
-            <button class="filter-btn" onclick="filtrar('SALSA BRAVA')">🔥 Salsa</button>
-            <button class="filter-btn" onclick="filtrar('OLD SCHOOL')">📻 Old School</button>
+            <button class="filter-btn" onclick="filtrar('JAZZTABUENO')">🎷 JAZZTABUENO</button>
+            <button class="filter-btn" onclick="filtrar('STUDIO79')">🎧 STUDIO 79</button>
+            <button class="filter-btn" onclick="filtrar('SALSA BRAVA')">🔥 SALSA BRAVA</button>
+            <button class="filter-btn" onclick="filtrar('OLD SCHOOL')">📻 OLD SCHOOL</button>
         </div>
 
         <div id="radio-feed"></div>
@@ -202,12 +224,11 @@
     let todosLosEpisodios = [];
     let filtroActual = 'Todo';
 
-    // IMÁGENES AUTOMÁTICAS POR CATEGORÍA (Para que se vea bonito sin subir fotos)
     const CARATULAS = {
-        'JAZZTABUENO': 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=800', // Jazz Sax
-        'STUDIO79': 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=800', // Disco/Studio
-        'SALSA BRAVA': 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?auto=format&fit=crop&q=80&w=800', // Congas/Fiesta
-        'OLD SCHOOL': 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=800'  // Radio Antigua/Cassette
+        'JAZZTABUENO': 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=800',
+        'STUDIO79': 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=800',
+        'SALSA BRAVA': 'https://images.unsplash.com/photo-1516280440614-6697288d5d38?auto=format&fit=crop&q=80&w=800',
+        'OLD SCHOOL': 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=800'
     };
 
     const checkAuth = () => {
@@ -226,12 +247,19 @@
         }
     };
 
+    // --- FUNCIÓN DE SALIDA SEGURA ---
+    window.salirDeApp = () => {
+        if(confirm("¿Cerrar sesión?")) {
+            localStorage.removeItem('jazz_auth');
+            location.reload();
+        }
+    };
+
     window.toggleUpload = () => {
         const sec = document.getElementById('upload-section');
         sec.style.display = sec.style.display === 'block' ? 'none' : 'block';
     };
 
-    // --- PUBLICAR MP3 DIRECTO ---
     window.publicarEpisodio = async () => {
         const programa = document.getElementById('progInput').value;
         const titulo = document.getElementById('titleInput').value;
@@ -239,16 +267,14 @@
         const status = document.getElementById('status-msg');
 
         if(!link || !titulo) { alert("Falta el link o el título"); return; }
-        // Validación básica (opcional, por si quieres asegurarte que sea audio)
-        // if(!link.endsWith('.mp3')) { alert("Recomendación: El link debería terminar en .mp3"); }
-
+        
         status.innerHTML = "📡 Conectando...";
 
         try {
             await addDoc(collection(db, "radio_programas"), {
                 programa: programa,
                 titulo: titulo,
-                mp3Url: link, // Guardamos el link directo
+                mp3Url: link, 
                 fecha: new Date()
             });
 
@@ -285,7 +311,7 @@
         feed.innerHTML = "";
         const isAdmin = localStorage.getItem('jazz_auth') === CLAVE_ADMIN;
 
-        const lista = todosLosEpisodios.filter(ep => filtroActual === 'Todo' || ep.programa === filtroActual);
+        const lista = todosLosEpisodios.filter(ep => filtroActual === 'Todo' || ep.programa.includes(filtroActual) || filtroActual.includes(ep.programa));
 
         if(lista.length === 0) {
             feed.innerHTML = `<div style="text-align:center; padding:40px; color:#444;">Sin transmisión en esta frecuencia... 📻</div>`;
@@ -296,10 +322,9 @@
             let tagClass = "tag-jazz";
             let imagenFondo = CARATULAS['JAZZTABUENO'];
 
-            // Asignar colores e imagen según categoría
-            if(ep.programa === "STUDIO79") { tagClass = "tag-studio"; imagenFondo = CARATULAS['STUDIO79']; }
-            if(ep.programa === "SALSA BRAVA") { tagClass = "tag-salsa"; imagenFondo = CARATULAS['SALSA BRAVA']; }
-            if(ep.programa === "OLD SCHOOL") { tagClass = "tag-old"; imagenFondo = CARATULAS['OLD SCHOOL']; }
+            if(ep.programa.includes("STUDIO")) { tagClass = "tag-studio"; imagenFondo = CARATULAS['STUDIO79']; }
+            if(ep.programa.includes("SALSA")) { tagClass = "tag-salsa"; imagenFondo = CARATULAS['SALSA BRAVA']; }
+            if(ep.programa.includes("OLD")) { tagClass = "tag-old"; imagenFondo = CARATULAS['OLD SCHOOL']; }
 
             const fecha = ep.fecha ? ep.fecha.toDate().toLocaleDateString() : "";
 
