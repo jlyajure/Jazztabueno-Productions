@@ -77,18 +77,20 @@
         .scroll-arrow {
             background: rgba(255,255,255,0.1);
             color: var(--gold);
-            border: none;
-            width: 30px;
-            height: 30px;
+            border: 1px solid #333;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             cursor: pointer;
             font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0; /* Evita que se aplasten */
+            flex-shrink: 0; 
+            transition: 0.2s;
         }
-        .scroll-arrow:hover { background: rgba(212, 175, 55, 0.2); }
+        .scroll-arrow:active { background: var(--gold); color: black; } /* Efecto al hacer clic */
+        .scroll-arrow:hover { border-color: var(--gold); }
 
         /* SCROLL OCULTO PERO FUNCIONAL */
         .filter-scroll { 
@@ -98,11 +100,11 @@
             white-space: nowrap; 
             padding-bottom: 5px; 
             -webkit-overflow-scrolling: touch; 
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none; 
             scroll-behavior: smooth; /* Movimiento suave */
-            flex-grow: 1; /* Ocupa el espacio disponible */
+            flex-grow: 1; 
         }
-        .filter-scroll::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+        .filter-scroll::-webkit-scrollbar { display: none; } 
 
         .filter-btn { 
             flex: 0 0 auto; 
@@ -202,12 +204,12 @@
 <div id="app-content">
     <header>
         <div class="brand-title">JAZZTABUENO PRODUCTIONS</div>
-        <button class="btn-logout" onclick="salirDeApp()">SALIR 🔒</button>
+        <button class="btn-logout" id="btnSalir">SALIR 🔒</button>
     </header>
     
     <div class="container">
         
-        <button class="btn-toggle-upload" onclick="toggleUpload()">📡 SUBIR NUEVO PROGRAMA</button>
+        <button class="btn-toggle-upload" id="btnUpload">📡 SUBIR NUEVO PROGRAMA</button>
         
         <div id="upload-section" class="upload-section">
             <h3 style="color:var(--gold); margin-top:0;">Nuevo Programa</h3>
@@ -222,12 +224,12 @@
             <input type="text" id="titleInput" class="input-dark" placeholder="Título (Ej: Especial Fania All Stars)">
             <input type="text" id="linkInput" class="input-dark" placeholder="Pegar Link MP3 de Archive.org...">
             
-            <button class="btn-gold" onclick="publicarEpisodio()">LANZAR AL AIRE</button>
+            <button class="btn-gold" id="btnPublicar">LANZAR AL AIRE</button>
             <p id="status-msg" style="font-size:12px; color:#888; margin-top:10px;"></p>
         </div>
 
         <div class="menu-wrapper">
-            <button class="scroll-arrow" onclick="moverMenu(-1)">&#10094;</button> <div class="filter-scroll" id="menuScroll">
+            <button class="scroll-arrow" id="btnLeft">&#10094;</button> <div class="filter-scroll" id="menuScroll">
                 <button class="filter-btn active" onclick="filtrar('Todo')">Todo</button>
                 <button class="filter-btn" onclick="filtrar('JAZZTABUENO')">🎷 JAZZTABUENO</button>
                 <button class="filter-btn" onclick="filtrar('STUDIO79')">🎧 STUDIO 79</button>
@@ -235,7 +237,7 @@
                 <button class="filter-btn" onclick="filtrar('OLD SCHOOL')">📻 OLD SCHOOL</button>
             </div>
             
-            <button class="scroll-arrow" onclick="moverMenu(1)">&#10095;</button> </div>
+            <button class="scroll-arrow" id="btnRight">&#10095;</button> </div>
 
         <div id="radio-feed"></div>
     </div>
@@ -274,26 +276,30 @@
         }
     };
 
-    // --- FUNCION PARA MOVER EL MENÚ ---
-    window.moverMenu = (direccion) => {
-        const menu = document.getElementById('menuScroll');
-        const cantidad = 200; // Cuánto se mueve en pixeles
-        menu.scrollLeft += (cantidad * direccion);
-    };
-
-    window.salirDeApp = () => {
+    // --- CONEXIÓN BLINDADA DE BOTONES (LISTENERS) ---
+    // Esto asegura que el click funcione sí o sí
+    
+    document.getElementById('btnSalir').onclick = () => {
         if(confirm("¿Cerrar sesión?")) {
             localStorage.removeItem('jazz_auth');
             location.reload();
         }
     };
 
-    window.toggleUpload = () => {
+    document.getElementById('btnLeft').onclick = () => {
+        document.getElementById('menuScroll').scrollBy({ left: -200, behavior: 'smooth' });
+    };
+
+    document.getElementById('btnRight').onclick = () => {
+        document.getElementById('menuScroll').scrollBy({ left: 200, behavior: 'smooth' });
+    };
+
+    document.getElementById('btnUpload').onclick = () => {
         const sec = document.getElementById('upload-section');
         sec.style.display = sec.style.display === 'block' ? 'none' : 'block';
     };
 
-    window.publicarEpisodio = async () => {
+    document.getElementById('btnPublicar').onclick = async () => {
         const programa = document.getElementById('progInput').value;
         const titulo = document.getElementById('titleInput').value;
         const link = document.getElementById('linkInput').value;
@@ -321,6 +327,7 @@
         }
     };
 
+    // --- FUNCIONES GLOBALES PARA FILTROS (Estas se quedan igual) ---
     window.filtrar = (cat) => {
         filtroActual = cat;
         document.querySelectorAll('.filter-btn').forEach(btn => {
