@@ -15,27 +15,33 @@
         html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow: hidden; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; }
         
-        /* LOGIN PREMIUM BLINDADO */
+        /* LOGIN PREMIUM BLINDADO V10.2 */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 330px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; box-shadow: 0 15px 50px rgba(0,0,0,0.8); }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
-        .btn-gold { display: block !important; width: 100% !important; background: linear-gradient(145deg, #d4af37, #b8962d) !important; color: black !important; border: none !important; padding: 18px !important; border-radius: 50px !important; font-weight: 800 !important; text-transform: uppercase !important; cursor: pointer !important; box-shadow: 0 10px 30px rgba(212,175,55,0.3) !important; }
+        
+        .btn-gold-premium { 
+            display: block !important; width: 100% !important; background: linear-gradient(145deg, #d4af37, #b8962d) !important;
+            color: black !important; border: none !important; padding: 18px !important; border-radius: 50px !important;
+            font-weight: 800 !important; text-transform: uppercase !important; cursor: pointer !important;
+            box-shadow: 0 10px 30px rgba(212,175,55,0.3) !important;
+        }
 
         header { background: rgba(0,0,0,0.98); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; }
         .header-logo { width: 40px; height: 40px; border-radius: 8px; }
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 13px; text-transform: uppercase; }
-        .btn-logout { background: transparent; border: 1px solid var(--gold); color: white; font-size: 10px; padding: 6px 14px; border-radius: 6px; font-weight: 800; cursor: pointer; }
+        .btn-logout { background: transparent; border: 1.5px solid var(--gold); color: white; font-size: 10px; padding: 6px 14px; border-radius: 6px; font-weight: 800; cursor: pointer; }
 
         #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
+        /* TARJETAS CON SINCRO TOTAL */
         .episode-card { background: var(--card); border-radius: 22px; margin-bottom: 35px; overflow: hidden; border: 1px solid #222; position: relative; }
         .cover-art { width: 100%; height: 220px; background-size: cover; background-position: center; position: relative; }
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; }
         .btn-play-card { background: var(--gold); border: none; width: 70px; height: 70px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-play-card::before { content: '▶'; font-size: 28px; color: black; margin-left: 6px; }
         
-        /* SINCRO DE ICONOS */
         .is-playing .btn-play-card { background: rgba(0, 0, 0, 0.8) !important; border: 3px solid var(--gold); }
         .is-playing .btn-play-card::before { content: ''; width: 6px; height: 26px; background: var(--gold); box-shadow: 16px 0 0 var(--gold); margin-right: 16px; margin-left: 0; }
 
@@ -61,7 +67,7 @@
         .btn-tool { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 15px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; }
 
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        #main-media { width: 100%; height: 50px; margin-bottom: 10px; display: none; background: #000; }
+        #main-media { width: 100%; height: 50px; display: none; background: #000; }
     </style>
 </head>
 <body>
@@ -69,9 +75,9 @@
 <div id="login-screen">
     <div class="login-card">
         <img src="logo.png" style="width:100px; margin-bottom:20px;">
-        <h2 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom: 30px;">ESTACIÓN TICO</h2>
-        <input type="password" id="passInput" placeholder="Clave de Director">
-        <button onclick="checkLogin()" class="btn-gold">ENTRAR ▶</button>
+        <h2 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom: 25px;">JAZZTABUENO</h2>
+        <input type="password" id="passInput" placeholder="Introduce Clave">
+        <button onclick="checkLogin()" class="btn-gold-premium">ENTRAR ▶</button>
     </div>
 </div>
 
@@ -81,7 +87,7 @@
             <img src="logo.png" class="header-logo">
             <div class="brand-title">Jazztabueno<br>Productions</div>
         </div>
-        <button onclick="window.limpiarTodo()" class="btn-logout">SALIR / REINICIAR</button>
+        <button onclick="window.reiniciarCabina()" class="btn-logout">LIMPIAR TODO</button>
     </header>
     <div class="container" id="radio-feed"></div>
 </div>
@@ -98,7 +104,7 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button onclick="window.activarCastTico()" class="btn-tool" style="border-color: var(--gold); color: var(--gold); padding: 12px 20px;">📡 CONECTAR A ONN TV</button>
+        <button onclick="window.conectarOnnTV()" class="btn-tool" style="border-color: var(--gold); color: var(--gold); padding: 10px 20px;">📡 TRANSMITIR A TV</button>
         <button onclick="window.cambiarVelocidad()" id="btn-speed" class="btn-tool">1.0x</button>
         <button onclick="window.toggleMute()" id="btn-mute" class="btn-tool">🔊 VOL</button>
     </div>
@@ -111,7 +117,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
-    let programas = []; let idActual = localStorage.getItem('last_id') || null;
+    let programas = []; let idActual = localStorage.getItem('active_id') || null;
 
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value;
@@ -122,11 +128,10 @@
     if(localStorage.getItem('jazz_auth')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
-        // Recuperar estado previo si existía
         if(idActual) {
             document.getElementById('global-player').style.display = 'block';
-            document.getElementById('p-title').innerText = localStorage.getItem('last_title') || '...';
-            document.getElementById('p-vinyl').style.backgroundImage = `url('${localStorage.getItem('last_img') || 'logo.png'}')`;
+            document.getElementById('p-title').innerText = localStorage.getItem('active_title') || '...';
+            document.getElementById('p-vinyl').style.backgroundImage = `url('${localStorage.getItem('active_img') || 'logo.png'}')`;
         }
     }
 
@@ -150,7 +155,8 @@
         });
     }
 
-    function syncMetadata(titulo, prog, img) {
+    // --- REFUERZO VISUAL PARA GOOGLE TV V10.2 ---
+    function updateTVPoster(titulo, prog, img) {
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: titulo, artist: prog, album: 'Jazztabueno Productions',
@@ -166,34 +172,41 @@
     window.gestionarReproduccion = (id, url, titulo, prog, img) => {
         if (idActual === id) { window.togglePlay(); } 
         else {
-            // LIMPIEZA: Antes de poner algo nuevo, detenemos lo viejo
+            // MATAR SESIÓN ANTERIOR PARA EVITAR DOBLE AUDIO
             media.pause(); media.src = "";
             
             idActual = id; 
-            localStorage.setItem('last_id', id);
-            localStorage.setItem('last_title', titulo);
-            localStorage.setItem('last_img', img);
+            localStorage.setItem('active_id', id);
+            localStorage.setItem('active_title', titulo);
+            localStorage.setItem('active_img', img);
 
             document.getElementById('p-title').innerText = titulo;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img || 'logo.png'}')`;
             document.getElementById('global-player').style.display = 'block';
             
             media.src = url; 
-            media.setAttribute('poster', img || 'logo.png');
-            syncMetadata(titulo, prog, img || 'logo.png');
+            media.setAttribute('poster', img || 'logo.png'); // Clave para Onn TV
+            updateTVPoster(titulo, prog, img || 'logo.png');
             media.play();
         }
         render();
     };
 
-    window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
+    window.togglePlay = () => { 
+        if (media.paused) media.play(); else media.pause(); 
+        render(); 
+        if(idActual) {
+            const p = programas.find(x => x.id === idActual);
+            if(p) updateTVPoster(p.titulo, p.programa, p.imagenUrl);
+        }
+    };
     
-    window.activarCastTico = () => { 
+    window.conectarOnnTV = () => { 
         media.style.display = (media.style.display === 'block') ? 'none' : 'block';
         if(media.remotePlayback) media.remotePlayback.prompt().catch(() => {});
     };
 
-    window.limpiarTodo = () => {
+    window.reiniciarCabina = () => {
         media.pause(); media.src = ""; localStorage.clear(); location.reload();
     };
 
