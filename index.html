@@ -14,17 +14,12 @@
         :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
-        /* CORRECCIÓN DE SCROLL PARA PC */
         html, body { 
-            margin: 0; 
-            padding: 0;
-            background: var(--bg); 
-            color: #e2e8f0; 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            min-height: 100vh;
-            overflow-y: auto !important; /* Permitir scroll siempre */
+            margin: 0; padding: 0; background: var(--bg); color: #e2e8f0; 
+            font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-y: auto !important; 
         }
 
+        /* LOGIN */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
@@ -41,11 +36,15 @@
         .input-box, .select-box, .text-area { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 8px; font-family: inherit; }
         .text-area { height: 120px; resize: none; font-size: 12px; }
 
-        /* TARJETAS DE EPISODIOS */
-        .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; overflow: hidden; transition: 0.3s; }
-        .cover-art { width: 100%; height: 210px; background-size: cover; background-position: center; position: relative; }
+        /* TARJETAS DE EPISODIOS - ICONOS CORREGIDOS */
+        .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; overflow: hidden; }
+        
+        /* Contenedor de la foto */
+        .cover-art-container { width: 100%; height: 230px; position: relative; background: #000; overflow: hidden; }
+        .cover-img { width: 100%; height: 100%; object-fit: cover; display: block; } /* La foto ahora es una imagen real */
+        
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
-        .btn-play-card { background: var(--gold); border: none; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; font-size: 26px; display: flex; align-items: center; justify-content: center; }
+        .btn-play-card { background: var(--gold); border: none; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; font-size: 26px; display: flex; align-items: center; justify-content: center; z-index: 5; }
 
         .episode-info { padding: 15px; }
         .program-tag { color: var(--gold); font-size: 10px; font-weight: 800; text-transform: uppercase; }
@@ -54,22 +53,15 @@
         .btn-ver-setlist { background: #1a1a1a; border: 1px solid #333; color: #aaa; padding: 10px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; margin-top: 10px; width: 100%; }
         .setlist-box { display: none; margin-top: 15px; padding: 15px; background: #080808; border-radius: 10px; border: 1px solid #222; font-size: 12px; color: #bbb; white-space: pre-wrap; line-height: 1.6; }
 
-        /* BOTONES DJ */
         .dj-controls { margin-top: 20px; display: flex; gap: 10px; border-top: 1px solid #222; padding-top: 15px; }
         .btn-edit { background: var(--gold); color: black; border: none; padding: 10px; flex: 1; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; }
         .btn-delete { background: transparent; border: 1px solid #ff4444; color: #ff4444; padding: 10px; flex: 1; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; }
 
-        /* REPRODUCTOR FIJO */
+        /* REPRODUCTOR */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        /* SCROLLBAR PARA PC */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
     </style>
 </head>
 <body>
@@ -89,7 +81,7 @@
             <img src="logo.png" class="header-logo" id="logo-admin-trigger" onerror="this.src='https://i.postimg.cc/zX8P0Xp3/jazz-logo.jpg'">
             <div class="brand-title">Jazztabueno Productions</div>
         </div>
-        <button onclick="window.salirTotal()" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:5px 10px; border-radius:5px; font-size:9px; font-weight:800; cursor:pointer;">CERRAR SESIÓN</button>
+        <button onclick="window.salirTotal()" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:5px 10px; border-radius:5px; font-size:9px; font-weight:800; cursor:pointer;">SALIR</button>
     </header>
 
     <div class="container">
@@ -103,11 +95,11 @@
                 <option value="SALSA">SALSA BRAVA</option>
                 <option value="OLD">OLD SCHOOL</option>
             </select>
-            <input type="text" id="t-url" class="input-box" placeholder="Link del Audio (MP3)">
-            <input type="text" id="t-img" class="input-box" placeholder="Link de la Imagen">
-            <textarea id="t-setlist" class="text-area" placeholder="Lista de ARTISTAS y CANCIONES del programa..."></textarea>
-            <button id="btn-save" class="btn-gold-tico" style="padding:12px !important;">💾 GUARDAR CAMBIOS</button>
-            <button onclick="cancelarEdicion()" style="width:100%; background:none; color:#666; border:none; margin-top:10px; font-size:11px; cursor:pointer;">Cerrar sin guardar</button>
+            <input type="text" id="t-url" class="input-box" placeholder="Link del MP3">
+            <input type="text" id="t-img" class="input-box" placeholder="URL de la Imagen (Postimages)">
+            <textarea id="t-setlist" class="text-area" placeholder="Lista de ARTISTAS y CANCIONES..."></textarea>
+            <button id="btn-save" class="btn-gold-tico" style="padding:12px !important;">💾 GUARDAR PROGRAMA</button>
+            <button onclick="cancelarEdicion()" style="width:100%; background:none; color:#666; border:none; margin-top:10px; font-size:11px; cursor:pointer;">Cerrar panel</button>
         </div>
 
         <div id="radio-feed"></div>
@@ -136,15 +128,16 @@
     const seekBar = document.getElementById('seek-bar');
     let programas = []; let idActual = null; let isAdmin = false;
 
+    // Login
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value;
         if(p === "ticoadmin" || p === "jtp2026") { 
-            localStorage.setItem('jazz_auth_jtp', 'true'); 
+            localStorage.setItem('jazz_auth_v2', 'true'); 
             location.reload(); 
         } else { alert("Clave Incorrecta"); }
     };
 
-    if(localStorage.getItem('jazz_auth_jtp') === 'true') {
+    if(localStorage.getItem('jazz_auth_v2') === 'true') {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
@@ -167,14 +160,14 @@
         document.getElementById('t-setlist').value = p.setlist || "";
         document.getElementById('admin-label').innerText = "🖋️ EDITANDO: " + p.titulo;
         document.getElementById('admin-panel').style.display = 'block';
-        window.scrollTo(0, 0);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     window.cancelarEdicion = () => {
         document.getElementById('edit-id').value = "";
         document.getElementById('t-titulo').value = "";
         document.getElementById('t-setlist').value = "";
-        document.getElementById('admin-label').innerText = "NUEVO PROGRAMA";
+        document.getElementById('admin-label').innerText = "GESTIÓN DE PROGRAMA";
         document.getElementById('admin-panel').style.display = 'none';
     };
 
@@ -189,13 +182,13 @@
             fecha: new Date().getTime()
         };
         try {
-            if(id) { await updateDoc(doc(db, "radio_programas", id), datos); alert("Actualizado con éxito"); }
-            else { await addDoc(collection(db, "radio_programas"), datos); alert("Subido con éxito"); }
+            if(id) { await updateDoc(doc(db, "radio_programas", id), datos); alert("Actualizado"); }
+            else { await addDoc(collection(db, "radio_programas"), datos); alert("Subido"); }
             cancelarEdicion();
         } catch (e) { alert("Error al guardar"); }
     };
 
-    window.borrarDoc = async (id) => { if(confirm("¿Eliminar este programa definitivamente?")) await deleteDoc(doc(db, "radio_programas", id)); };
+    window.borrarDoc = async (id) => { if(confirm("¿Borrar definitivamente?")) await deleteDoc(doc(db, "radio_programas", id)); };
 
     onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => {
         programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
@@ -208,17 +201,23 @@
             const isPlaying = idActual === p.id;
             const div = document.createElement('div');
             div.className = `episode-card ${isPlaying ? 'is-playing' : ''}`;
+            
+            // LOGICA DE IMAGEN SEGURA
+            const fallbackImg = "https://i.postimg.cc/zX8P0Xp3/jazz-logo.jpg";
+            const imgUrl = p.imagenUrl && p.imagenUrl.trim() !== "" ? p.imagenUrl : fallbackImg;
+
             div.innerHTML = `
-                <div class="cover-art" style="background-image: url('${p.imagenUrl || 'logo.png'}')">
+                <div class="cover-art-container">
+                    <img class="cover-img" src="${imgUrl}" onerror="this.src='${fallbackImg}'">
                     <div class="cover-overlay">
-                        <button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo}', '${p.imagenUrl}')">${isPlaying ? '⏸' : '▶'}</button>
+                        <button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo}', '${imgUrl}')">${isPlaying ? '⏸' : '▶'}</button>
                     </div>
                 </div>
                 <div class="episode-info">
                     <span class="program-tag">${p.programa}</span>
                     <h3 class="episode-title">${p.titulo}</h3>
                     <button class="btn-ver-setlist" onclick="window.toggleSetlist('${p.id}')">📋 VER ARTISTAS Y CANCIONES</button>
-                    <div id="set-${p.id}" class="setlist-box">${p.setlist || "Detalles del programa no disponibles."}</div>
+                    <div id="set-${p.id}" class="setlist-box">${p.setlist || "Detalles próximamente."}</div>
                     ${isAdmin ? `
                     <div class="dj-controls">
                         <button class="btn-edit" onclick="prepararEdicion('${p.id}')">🖋️ EDITAR</button>
