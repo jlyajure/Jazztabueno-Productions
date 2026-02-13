@@ -70,7 +70,7 @@
     <div class="login-card">
         <img src="logo.png" style="width:90px; margin-bottom:20px;">
         <h2 style="color:var(--gold); font-family:'Playfair Display';">JAZZTABUENO</h2>
-        <input type="password" id="passInput" placeholder="Introduce Clave">
+        <input type="password" id="passInput" placeholder="Clave de Director">
         <button onclick="checkLogin()" class="btn-gold-tico">ENTRAR ▶</button>
     </div>
 </div>
@@ -126,9 +126,10 @@
     const timeDisplay = document.getElementById('p-time-display');
     let programas = []; let idActual = null; let filtroActivo = 'Todo';
 
-    // --- INICIALIZACIÓN OFICIAL DE GOOGLE CAST ---
+    // --- INICIALIZACIÓN OFICIAL DE GOOGLE CAST CON MEMORIA DE TIEMPO ---
     window.player = null;
     window.playerController = null;
+    window.lastCastTime = 0; // LA MEMORIA SECRETA DEL TIEMPO
 
     window['__onGCastApiAvailable'] = function(isAvailable) {
         if (isAvailable) {
@@ -140,14 +141,13 @@
             window.player = new cast.framework.RemotePlayer();
             window.playerController = new cast.framework.RemotePlayerController(window.player);
             
-            // SENSOR DE CONEXIÓN Y SINCRONIZACIÓN DE TIEMPO
+            // SENSOR DE CONEXIÓN
             window.playerController.addEventListener(cast.framework.RemotePlayerEventType.IS_CONNECTED_CHANGED, function() {
                 var isConnected = cast.framework.CastContext.getInstance().getCurrentSession() !== null;
                 if (isConnected) {
                     document.getElementById('cast-text').style.color = "black";
                     document.getElementById('btn-cast-box').style.background = "var(--gold)";
                     
-                    // Si estaba sonando en el celular, lo mandamos a la TV
                     if (idActual && !media.paused) {
                         var p = programas.find(x => x.id === idActual);
                         if(p) window.loadCastMedia(p.titulo, p.programa, p.mp3Url, p.imagenUrl);
@@ -156,17 +156,18 @@
                     document.getElementById('cast-text').style.color = "var(--gold)";
                     document.getElementById('btn-cast-box').style.background = "#1a1a1a";
                     
-                    // ¡EL TRUCO DEL TIEMPO! Rescatamos el minuto exacto de la TV
+                    // AL DESCONECTAR: USAMOS LA MEMORIA SECRETA DEL TIEMPO
                     if (idActual) {
-                        media.currentTime = window.player.currentTime;
-                        media.play(); // Continúa en el celular sin perder ni un segundo
+                        media.currentTime = window.lastCastTime;
+                        media.play(); 
                     }
                 }
             });
 
-            // Sensor de barra de tiempo en TV
+            // SENSOR CONTINUO DE TIEMPO EN TV (Llena la memoria secreta cada segundo)
             window.playerController.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, function() {
                 if (cast.framework.CastContext.getInstance().getCurrentSession() && idActual) {
+                    window.lastCastTime = window.player.currentTime; // Guardando el tiempo...
                     seekBar.value = Math.floor(window.player.currentTime);
                     timeDisplay.innerText = formatTime(window.player.currentTime) + " / " + formatTime(window.player.duration);
                 }
@@ -291,7 +292,6 @@
 
     window.salirTotal = () => { localStorage.clear(); location.reload(); };
     
-    // Controles de tiempo (Sincronizados)
     media.onloadedmetadata = () => { if(!cast.framework || !cast.framework.CastContext.getInstance().getCurrentSession()){ seekBar.max = Math.floor(media.duration); } };
     media.onplay = () => { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; render(); };
     media.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; render(); };
