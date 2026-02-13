@@ -13,81 +13,75 @@
     <style>
         :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow: hidden; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; }
+        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 220px; }
         
-        /* LOGIN TOTALMENTE CENTRADO */
+        /* LOGIN CENTRADO Y ELEGANTE */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
-        .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 30px; border-radius: 20px; border: 1px solid #222; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .login-card input { width: 100%; padding: 15px; margin-bottom: 20px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; font-weight: bold; outline: none; }
-        .btn-enter { background: var(--gold); border: none; padding: 15px; border-radius: 30px; font-weight: 800; cursor: pointer; width: 100%; color: black; text-transform: uppercase; }
+        .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 30px; border-radius: 20px; border: 1px solid #222; }
+        .login-card input { width: 100%; padding: 15px; margin-bottom: 20px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; font-weight: bold; }
+        .btn-enter { background: var(--gold); border: none; padding: 15px; border-radius: 30px; font-weight: 800; cursor: pointer; width: 100%; color: black; }
 
-        header { background: rgba(0,0,0,0.98); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; flex-shrink: 0; }
-        .header-logo { width: 35px; height: 35px; border-radius: 6px; }
-        .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 12px; text-transform: uppercase; text-align: left; }
-        .btn-logout { background: transparent; border: 1px solid var(--gold); color: white; font-size: 9px; padding: 5px 10px; border-radius: 6px; font-weight: 800; cursor: pointer; }
+        header { background: rgba(0,0,0,0.98); padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
+        .header-logo { width: 40px; height: 40px; border-radius: 8px; }
+        .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 13px; text-transform: uppercase; }
+        .btn-logout { background: transparent; border: 1.5px solid var(--gold); color: white; font-size: 10px; padding: 6px 14px; border-radius: 6px; font-weight: 800; cursor: pointer; }
 
-        #app-content { flex: 1; overflow-y: auto; padding-bottom: 180px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
-        /* CATEGORÍAS */
-        .channels-container { display: flex; gap: 12px; margin-bottom: 25px; overflow-x: auto; padding: 5px 0; scrollbar-width: none; }
-        .channel-item { text-align: center; opacity: 0.4; transition: 0.3s; min-width: 80px; cursor: pointer; }
+        .channels-container { display: flex; gap: 15px; margin-bottom: 25px; overflow-x: auto; padding: 10px 5px; scrollbar-width: none; }
+        .channel-item { text-align: center; opacity: 0.4; transition: 0.3s; min-width: 85px; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
-        .channel-logo { width: 55px; height: 55px; border-radius: 50%; border: 2px solid #333; margin-bottom: 5px; object-fit: cover; }
+        .channel-logo { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #333; margin-bottom: 5px; object-fit: cover; }
         .active .channel-logo { border-color: var(--gold); }
-        .channel-name { font-size: 9px; font-weight: 800; text-transform: uppercase; color: #888; display: block; }
-        .active .channel-name { color: var(--gold); }
 
-        /* TARJETAS */
-        .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; overflow: hidden; border: 1px solid #222; position: relative; }
-        .cover-art { width: 100%; height: 210px; background-size: cover; background-position: center; position: relative; }
-        .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
+        .episode-card { background: var(--card); border-radius: 22px; margin-bottom: 35px; overflow: hidden; border: 1px solid #222; position: relative; }
+        .cover-art { width: 100%; height: 220px; background-size: cover; background-position: center; position: relative; }
+        .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; }
         
-        .btn-play-card { background: var(--gold); border: none; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .btn-play-card::before { content: '▶'; font-size: 24px; color: black; margin-left: 5px; }
-        .is-actually-playing .btn-play-card { background: rgba(0, 0, 0, 0.8) !important; border: 2px solid var(--gold); }
-        .is-actually-playing .btn-play-card::before { content: ''; width: 5px; height: 22px; background: var(--gold); box-shadow: 12px 0 0 var(--gold); margin-right: 12px; margin-left: 0; }
+        .btn-play-card { background: var(--gold); border: none; width: 70px; height: 70px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-play-card::before { content: '▶'; font-size: 28px; color: black; margin-left: 6px; }
+        .is-actually-playing .btn-play-card { background: rgba(0, 0, 0, 0.8) !important; border: 3px solid var(--gold); }
+        .is-actually-playing .btn-play-card::before { content: ''; width: 6px; height: 26px; background: var(--gold); box-shadow: 16px 0 0 var(--gold); margin-right: 16px; margin-left: 0; }
 
-        .admin-float { position: absolute; top: 12px; right: 12px; display: flex; gap: 8px; z-index: 10; }
-        .btn-mini { background: rgba(0,0,0,0.8); border: 1px solid #444; color: white; padding: 8px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        /* ADMIN EN LA ESQUINA */
+        .admin-float { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; z-index: 10; }
+        .btn-mini { background: rgba(0,0,0,0.9); border: 1.5px solid #444; color: white; padding: 12px; border-radius: 12px; cursor: pointer; }
 
-        .episode-info { padding: 18px; }
-        .program-tag { display: inline-block; font-size: 9px; color: black; padding: 4px 10px; border-radius: 50px; background: var(--gold); font-weight: 800; text-transform: uppercase; margin-bottom: 10px; }
-        .episode-title { font-size: 18px; margin: 0; font-weight: 700; color: white; line-height: 1.2; }
+        .episode-info { padding: 22px; }
+        .program-tag { display: inline-block; font-size: 9px; color: black; padding: 5px 14px; border-radius: 50px; background: var(--gold); font-weight: 800; text-transform: uppercase; margin-bottom: 12px; }
+        .episode-title { font-size: 20px; margin: 0; font-weight: 700; color: white; line-height: 1.2; }
 
-        /* CONSOLA DE MANDO (REPRODUCTOR) */
-        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #0a0a0a; border-top: 1px solid var(--gold); padding: 15px; display: none; z-index: 1000; box-shadow: 0 -15px 40px rgba(0,0,0,0.8); }
-        .player-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-        .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 1.5px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
+        /* CONSOLA DORADA (REPRODUCTOR) */
+        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 18px 20px; display: none; z-index: 1000; box-shadow: 0 -20px 50px rgba(0,0,0,1); }
+        .player-top { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .p-vinyl { width: 55px; height: 55px; border-radius: 50%; border: 2.5px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
         .p-info { flex: 1; overflow: hidden; }
-        .p-info h4 { margin: 0; font-size: 12px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .p-time { font-size: 10px; color: var(--gold); font-weight: bold; margin-top: 3px; }
+        .p-info h4 { margin: 0; font-size: 14px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .p-time { font-size: 11px; color: var(--gold); font-weight: 900; margin-top: 5px; }
 
-        .player-btns { display: flex; align-items: center; gap: 12px; }
-        .btn-p { background: none; border: none; color: var(--gold); font-size: 26px; cursor: pointer; }
+        .btn-p-main { background: none; border: none; color: var(--gold); font-size: 32px; cursor: pointer; padding: 5px; }
 
-        .seek-container { width: 100%; padding: 5px 0; }
-        #seek-bar { width: 100%; -webkit-appearance: none; background: #333; height: 5px; border-radius: 3px; outline: none; }
-        #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--gold); border-radius: 50%; cursor: pointer; border: 2px solid #000; }
+        .seek-container { width: 100%; padding: 8px 0; }
+        #seek-bar { width: 100%; -webkit-appearance: none; background: #222; height: 6px; border-radius: 3px; outline: none; }
+        #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: var(--gold); border-radius: 50%; cursor: pointer; border: 3px solid #000; }
 
-        .tool-row { display: flex; justify-content: space-between; margin-top: 10px; border-top: 1px solid #222; padding-top: 10px; }
-        .btn-tool { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 7px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; }
+        .tool-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 15px; margin-top: 5px; }
+        .btn-tool { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 15px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; }
 
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
-        /* OCULTAMOS EL AUDIO NATIVO PERO LO HAREMOS VISIBLE CON EL TRUCO */
-        #main-audio { width: 100%; height: 40px; margin-top: 10px; display: none; }
+        /* EL REPRODUCTOR DE GOOGLE QUE NO FALLA */
+        audio { width: 100%; height: 45px; margin-top: 15px; display: none; filter: invert(100%) hue-rotate(180deg) brightness(1.5); }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
     <div class="login-card">
-        <img src="logo.png" style="width:90px; margin-bottom:15px;">
-        <h2 style="color:var(--gold); font-family:'Playfair Display'; margin: 0;">JAZZTABUENO</h2>
-        <p style="font-size: 8px; color: #666; margin-bottom: 25px; letter-spacing: 2px;">ESTACIÓN DE MANDO</p>
+        <img src="logo.png" style="width:100px; margin-bottom:20px;">
+        <h2 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom: 25px;">JAZZTABUENO</h2>
         <input type="password" id="passInput" placeholder="Introduce tu Clave">
         <button onclick="checkLogin()" class="btn-enter">ENTRAR ▶</button>
     </div>
@@ -95,7 +89,7 @@
 
 <div id="app-content" style="display:none;">
     <header>
-        <div style="display:flex; align-items:center; gap:8px;">
+        <div style="display:flex; align-items:center; gap:10px;">
             <img src="logo.png" class="header-logo">
             <div class="brand-title">Jazztabueno<br>Productions</div>
         </div>
@@ -104,13 +98,12 @@
 
     <div class="container">
         <div id="admin-panel" style="display:none;">
-            <button onclick="toggleUpload()" style="width:100%; padding:14px; background:var(--gold); border:none; border-radius:12px; font-weight:800; margin-bottom:20px; color: black; font-size: 13px;">📡 SUBIR NUEVO PROGRAMA</button>
-            <div id="upload-form" style="display:none; background:#161616; padding:20px; border-radius:15px; border:1px solid var(--gold); margin-bottom:20px;">
+            <button onclick="toggleUpload()" style="width:100%; padding:16px; background:var(--gold); border:none; border-radius:15px; font-weight:800; margin-bottom:25px; color: black;">📡 SUBIR NUEVO PROGRAMA</button>
+            <div id="upload-form" style="display:none; background:#111; padding:22px; border-radius:20px; border:1px solid var(--gold); margin-bottom:25px;">
                 <input type="hidden" id="edit-id"><input type="text" id="prog-name" placeholder="Categoría"><input type="text" id="prog-title" placeholder="Título"><input type="text" id="prog-mp3" placeholder="Link MP3"><input type="text" id="prog-img" placeholder="Link Imagen">
-                <button onclick="guardarPrograma()" style="width:100%; padding:12px; background:white; color:black; border:none; border-radius:10px; font-weight:800;">PUBLICAR</button>
+                <button onclick="guardarPrograma()" style="width:100%; padding:14px; background:white; color:black; border:none; border-radius:10px; font-weight:800;">PUBLICAR</button>
             </div>
         </div>
-
         <div class="channels-container">
             <div class="channel-item active" onclick="filtrar('Todo', this)"><img src="logo.png" class="channel-logo"><span class="channel-name">Todo</span></div>
             <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)"><img src="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png" class="channel-logo"><span class="channel-name">Jazztabueno</span></div>
@@ -126,19 +119,18 @@
     <div class="player-top">
         <div id="p-vinyl" class="p-vinyl" style="background-image: url('logo.png');"></div>
         <div class="p-info"><h4 id="p-title">...</h4><div id="p-time-display" class="p-time">00:00 / 00:00</div></div>
-        <div class="player-btns">
-            <button onclick="window.togglePlay()" id="p-play-btn" class="btn-p">▶</button>
-            <button onclick="window.cerrarPlayer()" class="btn-p" style="color:#444">×</button>
+        <div style="display:flex; align-items:center;">
+            <button onclick="window.togglePlay()" id="p-play-btn" class="btn-p-main">▶</button>
+            <button onclick="window.cerrarPlayer()" class="btn-p-main" style="color:#555; font-size:26px; margin-left:10px;">×</button>
         </div>
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
-    
     <div class="tool-row">
-        <button onclick="window.activarCast()" class="btn-tool">📡 TRANSMITIR</button>
+        <button onclick="window.activarCastNativo()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 CONECTAR TV/CORNETA</button>
         <button onclick="window.cambiarVelocidad()" id="btn-speed" class="btn-tool">1.0x</button>
         <button onclick="window.toggleMute()" id="btn-mute" class="btn-tool">🔊 VOL</button>
     </div>
-    <audio id="main-audio" controlsList="nodownload"></audio>
+    <audio id="main-audio" controls controlsList="nodownload"></audio>
 </div>
 
 <script type="module">
@@ -181,7 +173,7 @@
                 <div class="cover-art" style="background-image: url('${p.imagenUrl || 'logo.png'}')">
                     ${isAdmin ? `<div class="admin-float">
                         <button class="btn-mini" onclick="window.iniciarEdicion('${p.id}')">📝</button>
-                        <button class="btn-mini" style="color:#ff5555;" onclick="window.borrar('${p.id}')">🗑️</button>
+                        <button class="btn-mini" style="color:#ff4444;" onclick="window.borrar('${p.id}')">🗑️</button>
                     </div>` : ''}
                     <div class="cover-overlay"><button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo}', '${p.programa}', '${p.imagenUrl}')"></button></div>
                 </div>
@@ -204,28 +196,23 @@
 
     window.togglePlay = () => { if (audio.paused) audio.play(); else audio.pause(); render(); };
     
-    // --- EL TRUCO DE TRANSMISIÓN V8.3 ---
-    window.activarCast = () => { 
-        // Hacemos visible el reproductor nativo de Google por un momento
-        audio.style.display = 'block';
-        audio.style.marginTop = '10px';
-        
-        // Intentamos abrir el prompt de cast si el navegador lo permite
-        if (audio.remotePlayback) {
-            audio.remotePlayback.prompt().catch(() => {
-                // Si falla el prompt, al menos el usuario ahora ve el reproductor de Google 
-                // con su propio icono de transmisión que SÍ funciona siempre.
-            });
+    // --- LA SOLUCIÓN DEFINITIVA V8.4 ---
+    window.activarCastNativo = () => { 
+        // Mostramos el reproductor gris de Google
+        if(audio.style.display === 'block') {
+            audio.style.display = 'none';
+        } else {
+            audio.style.display = 'block';
+            // Intentamos disparar el menú, pero si no abre, ya el usuario tiene el botón a la mano
+            if(audio.remotePlayback) audio.remotePlayback.prompt().catch(() => {});
         }
-        
-        // El reproductor nativo se quedará visible para que puedas tocar su icono de Cast.
-        // Si quieres ocultarlo de nuevo, solo cierra el player global.
     };
 
     window.cambiarVelocidad = () => {
         const speeds = [1.0, 1.25, 1.5, 2.0, 0.5];
-        let next = speeds[(speeds.indexOf(audio.playbackRate) + 1) % speeds.length];
-        audio.playbackRate = next; document.getElementById('btn-speed').innerText = next + "x";
+        let current = speeds.indexOf(audio.playbackRate);
+        audio.playbackRate = speeds[(current + 1) % speeds.length];
+        document.getElementById('btn-speed').innerText = audio.playbackRate + "x";
     };
 
     window.toggleMute = () => { audio.muted = !audio.muted; document.getElementById('btn-mute').innerText = audio.muted ? "🔇 MUTE" : "🔊 VOL"; };
