@@ -19,7 +19,6 @@
             font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-y: auto !important; 
         }
 
-        /* LOGIN */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
@@ -31,25 +30,20 @@
 
         .container { max-width: 550px; margin: auto; padding: 15px; padding-bottom: 200px; }
 
-        /* PANEL ADMIN */
         #admin-panel { display: none; background: #111; padding: 20px; border-radius: 20px; border: 2px solid var(--gold); margin-bottom: 25px; }
         .input-box, .select-box, .text-area { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 8px; font-family: inherit; }
         .text-area { height: 120px; resize: none; font-size: 12px; }
 
-        /* TARJETAS DE EPISODIOS - ICONOS CORREGIDOS */
+        /* TARJETAS DE EPISODIOS */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; overflow: hidden; }
-        
-        /* Contenedor de la foto */
-        .cover-art-container { width: 100%; height: 230px; position: relative; background: #000; overflow: hidden; }
-        .cover-img { width: 100%; height: 100%; object-fit: cover; display: block; } /* La foto ahora es una imagen real */
-        
-        .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
-        .btn-play-card { background: var(--gold); border: none; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; font-size: 26px; display: flex; align-items: center; justify-content: center; z-index: 5; }
+        .cover-art-container { width: 100%; height: 230px; position: relative; background: #000; overflow: hidden; border-bottom: 1px solid #222; }
+        .cover-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
+        .btn-play-card { background: var(--gold); border: none; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; font-size: 26px; display: flex; align-items: center; justify-content: center; }
 
         .episode-info { padding: 15px; }
         .program-tag { color: var(--gold); font-size: 10px; font-weight: 800; text-transform: uppercase; }
         .episode-title { margin: 5px 0; font-size: 16px; font-weight: 700; color: #fff; }
-        
         .btn-ver-setlist { background: #1a1a1a; border: 1px solid #333; color: #aaa; padding: 10px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; margin-top: 10px; width: 100%; }
         .setlist-box { display: none; margin-top: 15px; padding: 15px; background: #080808; border-radius: 10px; border: 1px solid #222; font-size: 12px; color: #bbb; white-space: pre-wrap; line-height: 1.6; }
 
@@ -86,7 +80,7 @@
 
     <div class="container">
         <div id="admin-panel">
-            <h4 id="admin-label" style="color:var(--gold); text-align:center; font-size:12px; margin-bottom:15px;">GESTIÓN DE PROGRAMA</h4>
+            <h4 id="admin-label" style="color:var(--gold); text-align:center; font-size:12px; margin-bottom:15px;">GESTIÓN DJ</h4>
             <input type="hidden" id="edit-id">
             <input type="text" id="t-titulo" class="input-box" placeholder="Título del Episodio">
             <select id="t-programa" class="select-box">
@@ -95,13 +89,12 @@
                 <option value="SALSA">SALSA BRAVA</option>
                 <option value="OLD">OLD SCHOOL</option>
             </select>
-            <input type="text" id="t-url" class="input-box" placeholder="Link del MP3">
-            <input type="text" id="t-img" class="input-box" placeholder="URL de la Imagen (Postimages)">
+            <input type="text" id="t-url" class="input-box" placeholder="Link MP3">
+            <input type="text" id="t-img" class="input-box" placeholder="Link de la Imagen (Postimages)">
             <textarea id="t-setlist" class="text-area" placeholder="Lista de ARTISTAS y CANCIONES..."></textarea>
             <button id="btn-save" class="btn-gold-tico" style="padding:12px !important;">💾 GUARDAR PROGRAMA</button>
             <button onclick="cancelarEdicion()" style="width:100%; background:none; color:#666; border:none; margin-top:10px; font-size:11px; cursor:pointer;">Cerrar panel</button>
         </div>
-
         <div id="radio-feed"></div>
     </div>
 </div>
@@ -128,16 +121,15 @@
     const seekBar = document.getElementById('seek-bar');
     let programas = []; let idActual = null; let isAdmin = false;
 
-    // Login
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value;
         if(p === "ticoadmin" || p === "jtp2026") { 
-            localStorage.setItem('jazz_auth_v2', 'true'); 
+            localStorage.setItem('jtp_auth_key', 'true'); 
             location.reload(); 
         } else { alert("Clave Incorrecta"); }
     };
 
-    if(localStorage.getItem('jazz_auth_v2') === 'true') {
+    if(localStorage.getItem('jtp_auth_key') === 'true') {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
@@ -158,7 +150,6 @@
         document.getElementById('t-url').value = p.mp3Url;
         document.getElementById('t-img').value = p.imagenUrl;
         document.getElementById('t-setlist').value = p.setlist || "";
-        document.getElementById('admin-label').innerText = "🖋️ EDITANDO: " + p.titulo;
         document.getElementById('admin-panel').style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -167,7 +158,6 @@
         document.getElementById('edit-id').value = "";
         document.getElementById('t-titulo').value = "";
         document.getElementById('t-setlist').value = "";
-        document.getElementById('admin-label').innerText = "GESTIÓN DE PROGRAMA";
         document.getElementById('admin-panel').style.display = 'none';
     };
 
@@ -177,7 +167,7 @@
             titulo: document.getElementById('t-titulo').value,
             programa: document.getElementById('t-programa').value,
             mp3Url: document.getElementById('t-url').value,
-            imagenUrl: document.getElementById('t-img').value || "logo.png",
+            imagenUrl: document.getElementById('t-img').value || "",
             setlist: document.getElementById('t-setlist').value,
             fecha: new Date().getTime()
         };
@@ -185,7 +175,7 @@
             if(id) { await updateDoc(doc(db, "radio_programas", id), datos); alert("Actualizado"); }
             else { await addDoc(collection(db, "radio_programas"), datos); alert("Subido"); }
             cancelarEdicion();
-        } catch (e) { alert("Error al guardar"); }
+        } catch (e) { alert("Error"); }
     };
 
     window.borrarDoc = async (id) => { if(confirm("¿Borrar definitivamente?")) await deleteDoc(doc(db, "radio_programas", id)); };
@@ -202,15 +192,15 @@
             const div = document.createElement('div');
             div.className = `episode-card ${isPlaying ? 'is-playing' : ''}`;
             
-            // LOGICA DE IMAGEN SEGURA
+            const rawImg = p.imagenUrl ? p.imagenUrl.trim() : "";
             const fallbackImg = "https://i.postimg.cc/zX8P0Xp3/jazz-logo.jpg";
-            const imgUrl = p.imagenUrl && p.imagenUrl.trim() !== "" ? p.imagenUrl : fallbackImg;
+            const finalImg = (rawImg !== "" && rawImg.startsWith('http')) ? rawImg : fallbackImg;
 
             div.innerHTML = `
                 <div class="cover-art-container">
-                    <img class="cover-img" src="${imgUrl}" onerror="this.src='${fallbackImg}'">
+                    <img class="cover-img" src="${finalImg}" onerror="this.src='${fallbackImg}'">
                     <div class="cover-overlay">
-                        <button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo}', '${imgUrl}')">${isPlaying ? '⏸' : '▶'}</button>
+                        <button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo}', '${finalImg}')">${isPlaying ? '⏸' : '▶'}</button>
                     </div>
                 </div>
                 <div class="episode-info">
