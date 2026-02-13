@@ -13,54 +13,70 @@
     <style>
         :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
         
-        /* LOGIN */
-        #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
+        /* CORRECCIÓN DE SCROLL PARA PC */
+        html, body { 
+            margin: 0; 
+            padding: 0;
+            background: var(--bg); 
+            color: #e2e8f0; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            overflow-y: auto !important; /* Permitir scroll siempre */
+        }
+
+        #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
         .btn-gold-tico { width: 100%; background: linear-gradient(145deg, #d4af37, #b8962d); color: black; border: none; padding: 18px; border-radius: 50px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 
-        header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; position: sticky; top: 0; }
-        .header-logo { width: 35px; height: 35px; border-radius: 8px; cursor: pointer; }
+        header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
+        .header-logo { width: 35px; height: 35px; border-radius: 8px; cursor: pointer; border: 1px solid #333; }
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; }
 
-        #app-content { flex: 1; overflow-y: auto; padding-bottom: 250px; }
-        .container { max-width: 550px; margin: auto; padding: 15px; }
+        .container { max-width: 550px; margin: auto; padding: 15px; padding-bottom: 200px; }
 
         /* PANEL ADMIN */
         #admin-panel { display: none; background: #111; padding: 20px; border-radius: 20px; border: 2px solid var(--gold); margin-bottom: 25px; }
         .input-box, .select-box, .text-area { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 8px; font-family: inherit; }
-        .text-area { height: 120px; resize: none; font-size: 12px; border: 1px solid #444; }
+        .text-area { height: 120px; resize: none; font-size: 12px; }
 
-        .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; overflow: hidden; }
+        /* TARJETAS DE EPISODIOS */
+        .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; overflow: hidden; transition: 0.3s; }
         .cover-art { width: 100%; height: 210px; background-size: cover; background-position: center; position: relative; }
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
-        .btn-play-card { background: var(--gold); border: none; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; font-size: 26px; }
+        .btn-play-card { background: var(--gold); border: none; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; font-size: 26px; display: flex; align-items: center; justify-content: center; }
 
         .episode-info { padding: 15px; }
         .program-tag { color: var(--gold); font-size: 10px; font-weight: 800; text-transform: uppercase; }
         .episode-title { margin: 5px 0; font-size: 16px; font-weight: 700; color: #fff; }
-        .btn-ver-setlist { background: #1a1a1a; border: 1px solid #333; color: #aaa; padding: 8px 15px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; margin-top: 10px; width: 100%; }
+        
+        .btn-ver-setlist { background: #1a1a1a; border: 1px solid #333; color: #aaa; padding: 10px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; margin-top: 10px; width: 100%; }
         .setlist-box { display: none; margin-top: 15px; padding: 15px; background: #080808; border-radius: 10px; border: 1px solid #222; font-size: 12px; color: #bbb; white-space: pre-wrap; line-height: 1.6; }
 
-        /* BOTONES DE ACCIÓN DJ */
+        /* BOTONES DJ */
         .dj-controls { margin-top: 20px; display: flex; gap: 10px; border-top: 1px solid #222; padding-top: 15px; }
         .btn-edit { background: var(--gold); color: black; border: none; padding: 10px; flex: 1; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; }
         .btn-delete { background: transparent; border: 1px solid #ff4444; color: #ff4444; padding: 10px; flex: 1; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; }
 
-        /* REPRODUCTOR */
+        /* REPRODUCTOR FIJO */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* SCROLLBAR PARA PC */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
     <div class="login-card">
-        <img src="logo.png" style="width:90px; margin-bottom:20px;">
+        <img src="logo.png" style="width:90px; margin-bottom:20px;" onerror="this.src='https://i.postimg.cc/zX8P0Xp3/jazz-logo.jpg'">
         <h2 style="color:var(--gold); font-family:'Playfair Display';">JAZZTABUENO</h2>
         <input type="password" id="passInput" placeholder="Clave de Director">
         <button onclick="checkLogin()" class="btn-gold-tico">ENTRAR ▶</button>
@@ -70,15 +86,15 @@
 <div id="app-content" style="display:none;">
     <header>
         <div style="display:flex; align-items:center; gap:10px;">
-            <img src="logo.png" class="header-logo" id="logo-admin-trigger">
+            <img src="logo.png" class="header-logo" id="logo-admin-trigger" onerror="this.src='https://i.postimg.cc/zX8P0Xp3/jazz-logo.jpg'">
             <div class="brand-title">Jazztabueno Productions</div>
         </div>
-        <button onclick="window.salirTotal()" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:5px 10px; border-radius:5px; font-size:9px; font-weight:800; cursor:pointer;">SALIR</button>
+        <button onclick="window.salirTotal()" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:5px 10px; border-radius:5px; font-size:9px; font-weight:800; cursor:pointer;">CERRAR SESIÓN</button>
     </header>
 
     <div class="container">
         <div id="admin-panel">
-            <h4 id="admin-label" style="color:var(--gold); text-align:center; font-size:12px; margin-bottom:15px;">NUEVO PROGRAMA</h4>
+            <h4 id="admin-label" style="color:var(--gold); text-align:center; font-size:12px; margin-bottom:15px;">GESTIÓN DE PROGRAMA</h4>
             <input type="hidden" id="edit-id">
             <input type="text" id="t-titulo" class="input-box" placeholder="Título del Episodio">
             <select id="t-programa" class="select-box">
@@ -87,11 +103,11 @@
                 <option value="SALSA">SALSA BRAVA</option>
                 <option value="OLD">OLD SCHOOL</option>
             </select>
-            <input type="text" id="t-url" class="input-box" placeholder="Link MP3">
-            <input type="text" id="t-img" class="input-box" placeholder="Link Portada">
-            <textarea id="t-setlist" class="text-area" placeholder="Pega aquí la lista de ARTISTAS y CANCIONES..."></textarea>
-            <button id="btn-save" class="btn-gold-tico" style="padding:12px !important;">📻 GUARDAR CAMBIOS</button>
-            <button onclick="cancelarEdicion()" style="width:100%; background:none; color:#666; border:none; margin-top:10px; font-size:11px; cursor:pointer;">Limpiar / Cerrar</button>
+            <input type="text" id="t-url" class="input-box" placeholder="Link del Audio (MP3)">
+            <input type="text" id="t-img" class="input-box" placeholder="Link de la Imagen">
+            <textarea id="t-setlist" class="text-area" placeholder="Lista de ARTISTAS y CANCIONES del programa..."></textarea>
+            <button id="btn-save" class="btn-gold-tico" style="padding:12px !important;">💾 GUARDAR CAMBIOS</button>
+            <button onclick="cancelarEdicion()" style="width:100%; background:none; color:#666; border:none; margin-top:10px; font-size:11px; cursor:pointer;">Cerrar sin guardar</button>
         </div>
 
         <div id="radio-feed"></div>
@@ -120,28 +136,26 @@
     const seekBar = document.getElementById('seek-bar');
     let programas = []; let idActual = null; let isAdmin = false;
 
-    // LOGIN DE DIRECTOR
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value;
         if(p === "ticoadmin" || p === "jtp2026") { 
-            localStorage.setItem('jazz_auth', 'true'); 
+            localStorage.setItem('jazz_auth_jtp', 'true'); 
             location.reload(); 
         } else { alert("Clave Incorrecta"); }
     };
 
-    if(localStorage.getItem('jazz_auth') === 'true') {
+    if(localStorage.getItem('jazz_auth_jtp') === 'true') {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
     }
 
-    // ABRIR PANEL CON EL LOGO
     document.getElementById('logo-admin-trigger').onclick = () => {
+        if(!isAdmin) return;
         const panel = document.getElementById('admin-panel');
         panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
     };
 
-    // FUNCION PARA CARGAR DATOS EN EL PANEL PARA EDITAR
     window.prepararEdicion = (id) => {
         const p = programas.find(x => x.id === id);
         if(!p) return;
@@ -151,10 +165,9 @@
         document.getElementById('t-url').value = p.mp3Url;
         document.getElementById('t-img').value = p.imagenUrl;
         document.getElementById('t-setlist').value = p.setlist || "";
-        
         document.getElementById('admin-label').innerText = "🖋️ EDITANDO: " + p.titulo;
         document.getElementById('admin-panel').style.display = 'block';
-        document.getElementById('app-content').scrollTo(0, 0);
+        window.scrollTo(0, 0);
     };
 
     window.cancelarEdicion = () => {
@@ -165,7 +178,6 @@
         document.getElementById('admin-panel').style.display = 'none';
     };
 
-    // GUARDAR O ACTUALIZAR FIREBASE
     document.getElementById('btn-save').onclick = async () => {
         const id = document.getElementById('edit-id').value;
         const datos = {
@@ -176,22 +188,15 @@
             setlist: document.getElementById('t-setlist').value,
             fecha: new Date().getTime()
         };
-
         try {
-            if(id) {
-                await updateDoc(doc(db, "radio_programas", id), datos);
-                alert("¡Programa actualizado!");
-            } else {
-                await addDoc(collection(db, "radio_programas"), datos);
-                alert("¡Programa subido!");
-            }
+            if(id) { await updateDoc(doc(db, "radio_programas", id), datos); alert("Actualizado con éxito"); }
+            else { await addDoc(collection(db, "radio_programas"), datos); alert("Subido con éxito"); }
             cancelarEdicion();
         } catch (e) { alert("Error al guardar"); }
     };
 
-    window.borrarDoc = async (id) => { if(confirm("¿Eliminar para siempre?")) await deleteDoc(doc(db, "radio_programas", id)); };
+    window.borrarDoc = async (id) => { if(confirm("¿Eliminar este programa definitivamente?")) await deleteDoc(doc(db, "radio_programas", id)); };
 
-    // ESCUCHAR FIREBASE
     onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => {
         programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
     });
@@ -206,18 +211,17 @@
             div.innerHTML = `
                 <div class="cover-art" style="background-image: url('${p.imagenUrl || 'logo.png'}')">
                     <div class="cover-overlay">
-                        <button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo}', '${p.imagenUrl}')">${isPlaying ? '||' : '▶'}</button>
+                        <button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo}', '${p.imagenUrl}')">${isPlaying ? '⏸' : '▶'}</button>
                     </div>
                 </div>
                 <div class="episode-info">
                     <span class="program-tag">${p.programa}</span>
                     <h3 class="episode-title">${p.titulo}</h3>
                     <button class="btn-ver-setlist" onclick="window.toggleSetlist('${p.id}')">📋 VER ARTISTAS Y CANCIONES</button>
-                    <div id="set-${p.id}" class="setlist-box">${p.setlist || "Lista de canciones no disponible."}</div>
-                    
+                    <div id="set-${p.id}" class="setlist-box">${p.setlist || "Detalles del programa no disponibles."}</div>
                     ${isAdmin ? `
                     <div class="dj-controls">
-                        <button class="btn-edit" onclick="prepararEdicion('${p.id}')">🖋️ EDITAR PROGRAMA</button>
+                        <button class="btn-edit" onclick="prepararEdicion('${p.id}')">🖋️ EDITAR</button>
                         <button class="btn-delete" onclick="borrarDoc('${p.id}')">🗑️ BORRAR</button>
                     </div>` : ''}
                 </div>`;
@@ -225,7 +229,6 @@
         });
     }
 
-    // REPRODUCTOR
     window.gestionarReproduccion = (id, url, titulo, img) => {
         if (idActual === id) { window.togglePlay(); } 
         else {
@@ -241,7 +244,7 @@
     window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
     window.cerrarPlayer = () => { media.pause(); document.getElementById('global-player').style.display = 'none'; idActual = null; render(); };
     window.toggleSetlist = (id) => { const box = document.getElementById(`set-${id}`); box.style.display = (box.style.display === 'block') ? 'none' : 'block'; };
-    media.onplay = () => { document.getElementById('p-play-btn').innerText = '||'; document.getElementById('global-player').classList.add('playing'); };
+    media.onplay = () => { document.getElementById('p-play-btn').innerText = '⏸'; document.getElementById('global-player').classList.add('playing'); };
     media.onpause = () => { document.getElementById('p-play-btn').innerText = '▶'; document.getElementById('global-player').classList.remove('playing'); };
     media.ontimeupdate = () => { seekBar.value = Math.floor(media.currentTime); document.getElementById('p-time-display').innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration); };
     media.onloadedmetadata = () => { seekBar.max = Math.floor(media.duration); };
