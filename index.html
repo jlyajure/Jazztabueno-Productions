@@ -29,7 +29,7 @@
         #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
-        /* CATEGORÍAS */
+        /* CANALES CENTRADOS V12.7 */
         .channels-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 25px; padding: 10px 0; width: 100%; }
         .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; cursor: pointer; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
@@ -63,8 +63,8 @@
         .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 2px; border-radius: 8px; font-size: 8px; font-weight: 800; cursor: pointer; }
         
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        /* El reproductor nativo oculto */
-        #main-media { position: absolute; top: -100px; width: 100%; height: 50px; opacity: 0; pointer-events: none; }
+        /* Motor nativo oculto */
+        #main-media { position: absolute; top: -100px; opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -111,9 +111,9 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button id="cast-btn-126" onclick="window.activarCastAtomico()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR TV</button>
+        <button id="cast-btn-127" onclick="window.activarCastLlaveMaestra()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR TV</button>
         <button onclick="window.refrescarVisual()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
-        <button onclick="window.limpiarSoloIcono()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
+        <button onclick="window.resetVisualIcono()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
     </div>
 </div>
 
@@ -124,7 +124,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
-    const castBtn = document.getElementById('cast-btn-126');
+    const castBtn = document.getElementById('cast-btn-127');
     let programas = []; let idActual = null; let filtroActivo = 'Todo';
 
     window.checkLogin = () => {
@@ -166,7 +166,10 @@
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: titulo, artist: prog, album: 'Jazztabueno Productions',
-                artwork: [{ src: img, sizes: '512x512', type: 'image/png' }]
+                artwork: [
+                    { src: img, sizes: '512x512', type: 'image/png' },
+                    { src: img, sizes: '1024x1024', type: 'image/png' }
+                ]
             });
         }
     }
@@ -189,17 +192,17 @@
 
     window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
     
-    // --- BYPASS ATÓMICO V12.6 ---
-    window.activarCastAtomico = () => { 
+    // --- BYPASS V12.7: ORDEN DIRECTA SIN ESCALAS ---
+    window.activarCastLlaveMaestra = () => { 
+        // Primero lanzamos el prompt de una vez (esto vence el bloqueo de Chrome)
         if(media.remotePlayback) {
-            // Orden directa sin escalas
             media.remotePlayback.prompt().catch(() => {
-                // Si falla el prompt directo, mostramos el video para usar sus 3 puntos
-                media.style.opacity = "1";
-                media.style.pointerEvents = "auto";
+                // Fallback solo si realmente falla el prompt
                 media.style.position = "relative";
                 media.style.top = "0";
-                alert("📡 BLOQUEO DETECTADO: Chrome no permite abrir el menú automático. Toca los 3 PUNTITOS del reproductor gris que apareció y dale a 'Transmitir'.");
+                media.style.opacity = "1";
+                media.style.pointerEvents = "all";
+                alert("📡 Toca los 3 PUNTITOS del reproductor que apareció arriba y dale a 'Transmitir'.");
             });
         }
     };
@@ -207,14 +210,15 @@
     window.refrescarVisual = () => {
         if(idActual) {
             const p = programas.find(x => x.id === idActual);
-            if(p) { syncTV(p.titulo, p.programa, p.imagenUrl); alert("📡 Imagen enviada."); }
+            if(p) { syncTV(p.titulo, p.programa, p.imagenUrl); alert("📡 Imagen re-enviada."); }
         }
     };
 
-    window.limpiarSoloIcono = () => { 
+    // BOTÓN ROJO CORREGIDO V12.7: NO TOCA LA MÚSICA
+    window.resetVisualIcono = () => { 
         castBtn.style.background = "#1a1a1a"; castBtn.style.color = "#fff"; castBtn.innerText = "📡 TRANSMITIR TV";
         media.style.opacity = "0"; media.style.pointerEvents = "none"; media.style.position = "absolute"; media.style.top = "-100px";
-        alert("♻️ Reset Visual. ¡Música continúa!");
+        alert("♻️ Visual limpia. La música sigue."); 
     };
 
     setInterval(() => {
@@ -223,7 +227,7 @@
         } else if (media.remotePlayback && media.remotePlayback.state === 'disconnected') {
             castBtn.style.background = "#1a1a1a"; castBtn.style.color = "#fff"; castBtn.innerText = "📡 TRANSMITIR TV";
         }
-    }, 2000);
+    }, 2500);
 
     window.filtrar = (cat, el) => {
         filtroActivo = cat;
