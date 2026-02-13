@@ -11,7 +11,7 @@
     
     <style>
         :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none !important; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow: hidden; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; }
         
@@ -24,7 +24,7 @@
         header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; }
         .header-logo { width: 35px; height: 35px; border-radius: 8px; }
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; }
-        .btn-salir-premium { background: transparent !important; border: 1.5px solid var(--gold) !important; color: var(--gold) !important; padding: 7px 15px !important; border-radius: 8px !important; font-size: 11px !important; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+        .btn-salir-premium { background: transparent; border: 1.5px solid var(--gold); color: var(--gold); padding: 7px 15px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 
         #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
@@ -49,7 +49,7 @@
         /* REPRODUCTOR */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .player-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
+        .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2.5px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
         .p-info { flex: 1; overflow: hidden; }
         .p-info h4 { margin: 0; font-size: 13px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -63,7 +63,8 @@
         .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 2px; border-radius: 8px; font-size: 8px; font-weight: 800; cursor: pointer; }
         
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        #main-media { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+        /* El reproductor nativo oculto */
+        #main-media { position: absolute; top: -100px; width: 100%; height: 50px; opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -99,7 +100,7 @@
 </div>
 
 <div id="global-player">
-    <video id="main-media" playsinline crossorigin="anonymous"></video>
+    <video id="main-media" playsinline crossorigin="anonymous" controls></video>
     <div class="player-top">
         <div id="p-vinyl" class="p-vinyl" style="background-image: url('logo.png');"></div>
         <div class="p-info"><h4 id="p-title">...</h4><div id="p-time-display" class="p-time">00:00 / 00:00</div></div>
@@ -110,9 +111,9 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button id="btn-cast-125" onclick="window.dispararCastV125()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR TV</button>
+        <button id="cast-btn-126" onclick="window.activarCastAtomico()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR TV</button>
         <button onclick="window.refrescarVisual()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
-        <button onclick="window.limpiarIconoSolo()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
+        <button onclick="window.limpiarSoloIcono()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
     </div>
 </div>
 
@@ -123,7 +124,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
-    const castBtn = document.getElementById('btn-cast-125');
+    const castBtn = document.getElementById('cast-btn-126');
     let programas = []; let idActual = null; let filtroActivo = 'Todo';
 
     window.checkLogin = () => {
@@ -188,11 +189,17 @@
 
     window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
     
-    // --- BYPASS DE TRANSMISIÓN V12.5 ---
-    window.dispararCastV125 = () => { 
+    // --- BYPASS ATÓMICO V12.6 ---
+    window.activarCastAtomico = () => { 
         if(media.remotePlayback) {
+            // Orden directa sin escalas
             media.remotePlayback.prompt().catch(() => {
-                alert("📡 Director: Dale al botón PLAY primero y luego a este botón.");
+                // Si falla el prompt directo, mostramos el video para usar sus 3 puntos
+                media.style.opacity = "1";
+                media.style.pointerEvents = "auto";
+                media.style.position = "relative";
+                media.style.top = "0";
+                alert("📡 BLOQUEO DETECTADO: Chrome no permite abrir el menú automático. Toca los 3 PUNTITOS del reproductor gris que apareció y dale a 'Transmitir'.");
             });
         }
     };
@@ -200,16 +207,14 @@
     window.refrescarVisual = () => {
         if(idActual) {
             const p = programas.find(x => x.id === idActual);
-            if(p) { syncTV(p.titulo, p.programa, p.imagenUrl); alert("📡 Imagen re-enviada."); }
+            if(p) { syncTV(p.titulo, p.programa, p.imagenUrl); alert("📡 Imagen enviada."); }
         }
     };
 
-    // BOTÓN ROJO CORREGIDO FINAL: MÚSICA SIGUE SONANDO
-    window.limpiarIconoSolo = () => { 
-        castBtn.style.background = "#1a1a1a"; 
-        castBtn.style.color = "#fff"; 
-        castBtn.innerText = "📡 TRANSMITIR TV";
-        alert("♻️ Visual reseteada. ¡Música continúa!");
+    window.limpiarSoloIcono = () => { 
+        castBtn.style.background = "#1a1a1a"; castBtn.style.color = "#fff"; castBtn.innerText = "📡 TRANSMITIR TV";
+        media.style.opacity = "0"; media.style.pointerEvents = "none"; media.style.position = "absolute"; media.style.top = "-100px";
+        alert("♻️ Reset Visual. ¡Música continúa!");
     };
 
     setInterval(() => {
