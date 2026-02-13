@@ -3,398 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
-    
     <title>Jazztabueno Productions</title>
-    <meta name="description" content="Radio Streaming Exclusivo">
-    
+    <meta name="theme-color" content="#000000">
     <link rel="manifest" href="manifest.json">
-    
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
-    
-    <meta name="theme-color" content="#000000">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     
     <style>
-        * { box-sizing: border-box; }
-        :root { 
-            --gold: #d4af37; 
-            --bg-color: #050505; 
-            --card-bg: #111111;
-            --text-main: #e2e8f0;
-        }
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            margin: 0; 
-            min-height: 100vh; 
-            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%); 
-            background-attachment: fixed; 
-            color: var(--text-main); 
-            overflow-x: hidden; 
-        }
+        :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: #e2e8f0; padding-bottom: 120px; }
         
-        h1, h2, .program-tag { font-family: 'Playfair Display', serif; }
+        header { background: rgba(0,0,0,0.9); padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
+        .header-logo { width: 40px; height: 40px; border-radius: 8px; }
+        .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 14px; text-transform: uppercase; }
 
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=1932') no-repeat center center/cover; display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        #login-screen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); }
-        .login-card { position: relative; background: rgba(20, 20, 20, 0.95); border: 1px solid var(--gold); padding: 40px 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 0 30px rgba(212, 175, 55, 0.2); }
-        .login-logo { width: 140px; height: 140px; object-fit: contain; margin-bottom: 10px; border-radius: 15px; padding: 5px; }
+        .container { max-width: 600px; margin: auto; padding: 15px; }
 
-        #passInput { width: 100%; padding: 15px; border: 1px solid #555; border-bottom: 2px solid var(--gold); background: #222; color: white; text-align: center; outline: none; margin-top: 20px; font-size: 18px; border-radius: 5px; }
+        /* CATEGORÍAS */
+        .channels-container { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; overflow-x: auto; padding: 10px 0; }
+        .channel-item { text-align: center; opacity: 0.6; transition: 0.3s; cursor: pointer; min-width: 65px; }
+        .channel-item.active { opacity: 1; transform: scale(1.1); }
+        .channel-logo { width: 55px; height: 55px; border-radius: 50%; border: 2px solid #333; }
+        .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.4); }
+
+        /* TARJETAS DE PROGRAMAS */
+        .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 20px; overflow: hidden; border: 1px solid #222; position: relative; }
+        .cover-art { width: 100%; height: 200px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; position: relative; }
+        .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; }
+        .btn-play-card { background: var(--gold); border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 24px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+
+        .episode-info { padding: 15px; }
+        /* CORRECCIÓN: Nombres completos */
+        .program-tag { display: inline-block; font-size: 10px; color: black; padding: 4px 14px; border-radius: 50px; background: var(--gold); font-weight: 800; text-transform: uppercase; margin-bottom: 8px; max-width: 100%; }
+        .episode-title { font-size: 18px; margin: 0; font-weight: 700; color: white; }
+
+        /* REPRODUCTOR GLOBAL (FIJO ABAJO) */
+        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; border-top: 2px solid var(--gold); padding: 10px 20px; display: none; z-index: 1000; box-shadow: 0 -10px 30px rgba(0,0,0,0.8); }
+        .player-flex { display: flex; align-items: center; gap: 15px; }
+        .mini-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
+        .playing .mini-vinyl { animation-play-state: running; }
+        .player-data { flex-grow: 1; }
+        .player-data h4 { margin: 0; font-size: 13px; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .player-data p { margin: 0; font-size: 11px; color: #888; }
+        @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        audio { width: 100%; height: 30px; margin-top: 5px; filter: invert(100%) hue-rotate(180deg); }
+
+        /* ADMIN PANEL */
+        .admin-controls { margin-top: 10px; display: flex; gap: 10px; }
+        .btn-edit { background: #333; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+        .btn-del { background: #420b0b; color: #ff4444; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
         
-        .btn-enter { background: var(--gold); color: black; border: none; padding: 12px 30px; border-radius: 30px; margin-top: 20px; font-weight: 800; cursor: pointer; font-size: 14px; letter-spacing: 1px; transition: 0.3s; }
-        .btn-enter:hover { background: white; box-shadow: 0 0 15px white; }
+        .upload-modal { background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid var(--gold); margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin-bottom: 10px; background: #222; border: 1px solid #444; color: white; border-radius: 8px; }
 
-        #app-content { display: none; padding-bottom: 80px; }
-        
-        header { 
-            background: rgba(5, 5, 5, 0.95); 
-            padding: 10px 20px; 
-            position: sticky; top: 0; z-index: 100; 
-            display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 1px solid #222; 
-        }
-        .header-brand { display: flex; align-items: center; gap: 12px; }
-        .header-logo { width: 45px; height: 45px; border-radius: 8px; object-fit: contain; background: black; border: 1px solid #333; }
-        .brand-title { color: var(--gold); font-size: 13px; font-weight: 700; margin: 0; letter-spacing: 1px; text-transform: uppercase; line-height: 1.2; }
-        .btn-logout { background: transparent; color: var(--gold); border: 1px solid var(--gold); padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; }
-
-        .container { max-width: 600px; margin: auto; padding: 20px 15px; }
-
-        .channels-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; padding: 10px 0; }
-        .channel-item { display: flex; flex-direction: column; align-items: center; width: 70px; cursor: pointer; transition: transform 0.2s; }
-        .channel-item:hover { transform: scale(1.05); }
-        .channel-logo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #333; padding: 2px; background: #000; transition: 0.3s; }
-        .channel-name { font-size: 9px; color: #888; margin-top: 5px; font-weight: bold; text-transform: uppercase; text-align: center; }
-        .channel-item.active .channel-logo { border-color: var(--gold); box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
-        .channel-item.active .channel-name { color: var(--gold); }
-
-        .upload-section { background: #1a1a1a; border: 1px dashed var(--gold); padding: 20px; border-radius: 15px; margin-bottom: 30px; text-align: center; display: none; }
-        
-        .input-dark { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; background: #333; border: 1px solid #888; color: white; font-size: 14px; cursor: text; }
-        .input-dark:focus { background: #444; border-color: var(--gold); outline: none; }
-        .input-dark::placeholder { color: #aaa; }
-
-        .btn-gold { background: var(--gold); color: black; padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; margin-bottom: 10px; }
-        .btn-safe { background: #222; border: 1px solid var(--gold); color: var(--gold); padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-bottom: 20px; font-size: 14px; }
-        .btn-safe:hover { background: var(--gold); color: black; }
-        .btn-toggle-upload { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px; width: 100%; border-radius: 8px; margin-bottom: 20px; cursor: pointer; display: none; }
-
-        .episode-card { background: var(--card-bg); border-radius: 15px; margin-bottom: 25px; overflow: hidden; border: 1px solid #222; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
-        
-        .cover-art-container { position: relative; width: 100%; height: 220px; overflow: hidden; background: #000; border-bottom: 1px solid #222; }
-        .cover-blur { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-size: cover; background-position: center; filter: blur(20px) brightness(0.5); transform: scale(1.2); z-index: 1; }
-        .cover-front { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 2; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.7)); }
-
-        .episode-info { padding: 20px; }
-        .program-tag { display: inline-block; font-size: 10px; color: black; padding: 4px 10px; border-radius: 4px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
-        
-        .tag-jazz { background: var(--gold); }
-        .tag-studio { background: #3b82f6; color: white; }
-        .tag-salsa { background: #ef4444; color: white; }
-        .tag-old { background: #a8a29e; color: black; }
-
-        .episode-title { font-size: 18px; margin: 0 0 5px 0; color: white; }
-        .episode-date { font-size: 12px; color: #666; display: block; margin-bottom: 15px; }
-        audio { width: 100%; height: 40px; margin-top: 10px; filter: invert(100%); border-radius: 20px; }
-        .btn-delete { float: right; background: transparent; border: none; color: #ef4444; font-size: 20px; cursor: pointer; margin-top: -5px; }
+        #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
+        .login-card { text-align: center; width: 85%; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
     <div class="login-card">
-        <img src="logo.png" class="login-logo">
-        <h2 style="color: var(--gold); margin: 0; font-size: 22px;">JAZZTABUENO<br>PRODUCTIONS</h2>
-        <p style="color: #888; font-size: 12px; margin-top: 10px;">Acceso Privado</p>
-        
-        <input type="password" id="passInput" placeholder="Clave de Producción">
-        <button id="btnEnter" class="btn-enter">ENTRAR ▶</button>
+        <img src="logo.png" style="width:100px; margin-bottom:20px;">
+        <h2 style="color:var(--gold);">JAZZTABUENO</h2>
+        <input type="password" id="passInput" placeholder="Clave de Acceso">
+        <button onclick="checkLogin()" style="background:var(--gold); border:none; padding:15px 40px; border-radius:30px; font-weight:800; cursor:pointer; width:100%;">ENTRAR ▶</button>
     </div>
 </div>
 
-<div id="app-content">
+<div id="app-content" style="display:none;">
     <header>
-        <div class="header-brand">
+        <div style="display:flex; align-items:center; gap:10px;">
             <img src="logo.png" class="header-logo">
-            <div class="brand-title">JAZZTABUENO<br>PRODUCTIONS</div>
+            <div class="brand-title">Jazztabueno Productions</div>
         </div>
-        <button class="btn-logout" id="btnSalir">SALIR 🔒</button>
+        <button onclick="localStorage.clear(); location.reload();" style="background:transparent; border:1px solid #444; color:#888; font-size:10px; padding:5px; border-radius:5px;">SALIR</button>
     </header>
-    
+
     <div class="container">
-        
-        <button class="btn-toggle-upload" id="btnUpload">📡 SUBIR NUEVO PROGRAMA</button>
-        
-        <div id="upload-section" class="upload-section">
-            <h3 style="color:var(--gold); margin-top:0;">Nuevo Programa</h3>
-            <p style="color:#aaa; font-size:12px; margin-bottom:15px;">Tus datos se guardan automáticamente mientras escribes.</p>
-
-            <label style="color: #aaa; font-size: 12px; display:block; text-align:left; margin-bottom:5px;">Elige el Programa:</label>
-            <select id="progInput" class="input-dark">
-                <option value="JAZZTABUENO">🎷 JAZZTABUENO</option>
-                <option value="STUDIO79">🎧 STUDIO 79</option>
-                <option value="SALSA BRAVA">🔥 SALSA BRAVA</option>
-                <option value="OLD SCHOOL">📻 OLD SCHOOL RADIO</option>
-            </select>
-            
-            <label style="color: #aaa; font-size: 12px; display:block; text-align:left; margin-bottom:5px;">Título del Episodio:</label>
-            <input type="text" id="titleInput" class="input-dark" placeholder="Ej: Especial Héctor Lavoe">
-            
-            <label style="color: #aaa; font-size: 12px; display:block; text-align:left; margin-bottom:5px;">Link del MP3 (Archive.org):</label>
-            <input type="text" id="linkInput" class="input-dark" placeholder="Pegar Link AQUÍ (Ctrl + V)">
-            
-            <label style="color: #aaa; font-size: 12px; display:block; text-align:left; margin-bottom:5px;">Link de Carátula (PostImages):</label>
-            <input type="text" id="imgInput" class="input-dark" placeholder="Pegar Link AQUÍ (Ctrl + V)">
-            
-            <button class="btn-gold" id="btnPublicar">LANZAR AL AIRE</button>
-            <button class="btn-safe" onclick="subirModoSeguro()" style="margin-top:10px;">O usar Modo Ventana</button>
-
-            <p id="status-msg" style="font-size:12px; color:#888; margin-top:10px;"></p>
+        <div id="admin-panel" style="display:none;">
+            <button onclick="toggleUpload()" id="btnMainAction" style="width:100%; padding:15px; background:var(--gold); border:none; border-radius:12px; font-weight:800; margin-bottom:20px;">📡 NUEVO PROGRAMA</button>
+            <div id="upload-form" class="upload-modal" style="display:none;">
+                <h3 id="form-title" style="margin-top:0; color:var(--gold);">Subir Programa</h3>
+                <input type="hidden" id="edit-id">
+                <input type="text" id="prog-name" placeholder="Categoría (JAZZTABUENO, SALSA BRAVA, etc)">
+                <input type="text" id="prog-title" placeholder="Título del Episodio">
+                <input type="text" id="prog-mp3" placeholder="Link MP3 (Archive.org)">
+                <input type="text" id="prog-img" placeholder="Link Imagen (PostImages)">
+                <button onclick="guardarPrograma()" id="btnGuardar" style="width:100%; padding:12px; background:white; color:black; border:none; border-radius:8px; font-weight:800;">PUBLICAR AHORA</button>
+            </div>
         </div>
 
         <div class="channels-container">
-            <div class="channel-item active" onclick="filtrar('Todo', this)">
-                <img src="logo.png" class="channel-logo">
-                <span class="channel-name">Todo</span>
-            </div>
-            <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)">
-                <img src="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png" class="channel-logo">
-                <span class="channel-name">Jazz</span>
-            </div>
-            <div class="channel-item" onclick="filtrar('STUDIO79', this)">
-                <img src="https://i.postimg.cc/NKMDbYJB/S79.png" class="channel-logo">
-                <span class="channel-name">Studio 79</span>
-            </div>
-            <div class="channel-item" onclick="filtrar('SALSA BRAVA', this)">
-                <img src="https://i.postimg.cc/75fchgyt/Salsa-Brava.png" class="channel-logo">
-                <span class="channel-name">Salsa</span>
-            </div>
-            <div class="channel-item" onclick="filtrar('OLD SCHOOL', this)">
-                <img src="https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png" class="channel-logo">
-                <span class="channel-name">Old School</span>
-            </div>
+            <div class="channel-item active" onclick="filtrar('Todo', this)"><img src="logo.png" class="channel-logo"></div>
+            <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)"><img src="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png" class="channel-logo"></div>
+            <div class="channel-item" onclick="filtrar('STUDIO 79', this)"><img src="https://i.postimg.cc/NKMDbYJB/S79.png" class="channel-logo"></div>
+            <div class="channel-item" onclick="filtrar('SALSA BRAVA', this)"><img src="https://i.postimg.cc/75fchgyt/Salsa-Brava.png" class="channel-logo"></div>
+            <div class="channel-item" onclick="filtrar('OLD SCHOOL', this)"><img src="https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png" class="channel-logo"></div>
         </div>
 
         <div id="radio-feed"></div>
     </div>
 </div>
 
+<div id="global-player">
+    <div class="player-flex">
+        <div id="p-vinyl" class="mini-vinyl" style="background-image: url('logo.png');"></div>
+        <div class="player-data">
+            <h4 id="p-title">Selecciona un programa</h4>
+            <p id="p-prog">Jazztabueno Productions</p>
+            <audio id="main-audio" controls onplay="playUI(true)" onpause="playUI(false)"></audio>
+        </div>
+        <button onclick="document.getElementById('global-player').style.display='none'; document.getElementById('main-audio').pause();" style="background:none; border:none; color:#555;">✖</button>
+    </div>
+</div>
+
 <script type="module">
     import { db } from "./firebase.js";
-    import { collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const CLAVE_ACCESO = "jazz2026";
-    const CLAVE_ADMIN = "ticoadmin"; 
-
-    const CARATULAS = {
-        'JAZZTABUENO': 'https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png',
-        'STUDIO79':    'https://i.postimg.cc/NKMDbYJB/S79.png',
-        'SALSA BRAVA': 'https://i.postimg.cc/75fchgyt/Salsa-Brava.png',
-        'OLD SCHOOL':  'https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png'
-    };
-
-    let todosLosEpisodios = [];
-    let filtroActual = 'Todo';
-
-    // MEMORIA AUTOMÁTICA
-    const saveDraft = () => {
-        localStorage.setItem('draft_prog', document.getElementById('progInput').value);
-        localStorage.setItem('draft_title', document.getElementById('titleInput').value);
-        localStorage.setItem('draft_link', document.getElementById('linkInput').value);
-        localStorage.setItem('draft_img', document.getElementById('imgInput').value);
-    };
-
-    const loadDraft = () => {
-        if(localStorage.getItem('draft_title')) document.getElementById('titleInput').value = localStorage.getItem('draft_title');
-        if(localStorage.getItem('draft_link')) document.getElementById('linkInput').value = localStorage.getItem('draft_link');
-        if(localStorage.getItem('draft_img')) document.getElementById('imgInput').value = localStorage.getItem('draft_img');
-        if(localStorage.getItem('draft_prog')) document.getElementById('progInput').value = localStorage.getItem('draft_prog');
-    };
-
-    const clearDraft = () => {
-        localStorage.removeItem('draft_prog');
-        localStorage.removeItem('draft_title');
-        localStorage.removeItem('draft_link');
-        localStorage.removeItem('draft_img');
-        document.getElementById('titleInput').value = "";
-        document.getElementById('linkInput').value = "";
-        document.getElementById('imgInput').value = "";
-    };
-
-    document.getElementById('progInput').onchange = saveDraft;
-    document.getElementById('titleInput').oninput = saveDraft;
-    document.getElementById('linkInput').oninput = saveDraft;
-    document.getElementById('imgInput').oninput = saveDraft;
-
-    loadDraft();
-
-    const checkAuth = () => {
-        const storedKey = localStorage.getItem('jazz_auth');
-        if(storedKey) {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app-content').style.display = 'block';
-            if(storedKey === CLAVE_ADMIN) {
-                document.getElementById('btnUpload').style.display = 'block';
-            } else {
-                document.getElementById('btnUpload').style.display = 'none';
-            }
-        }
-    };
-    checkAuth();
-
-    document.getElementById('btnEnter').onclick = () => {
-        const val = document.getElementById('passInput').value;
-        if(val === CLAVE_ACCESO || val === CLAVE_ADMIN) {
-            localStorage.setItem('jazz_auth', val);
+    // --- LOGIN ---
+    window.checkLogin = () => {
+        const p = document.getElementById('passInput').value;
+        if(p === "jazz2026" || p === "ticoadmin") {
+            localStorage.setItem('jazz_auth', p);
             location.reload();
-        } else {
-            alert("Clave incorrecta 🚫");
-        }
+        } else { alert("Clave Incorrecta"); }
     };
 
-    document.getElementById('btnSalir').onclick = () => {
-        if(confirm("¿Cerrar sesión?")) {
-            localStorage.removeItem('jazz_auth');
-            location.reload();
-        }
-    };
+    const auth = localStorage.getItem('jazz_auth');
+    if(auth) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-content').style.display = 'block';
+        if(auth === 'ticoadmin') document.getElementById('admin-panel').style.display = 'block';
+    }
 
-    document.getElementById('btnUpload').onclick = () => {
-        const sec = document.getElementById('upload-section');
-        sec.style.display = sec.style.display === 'block' ? 'none' : 'block';
-    };
+    // --- LOGICA DE RADIO ---
+    let programas = [];
+    let filtroActivo = 'Todo';
 
-    document.getElementById('btnPublicar').onclick = async () => {
-        const programa = document.getElementById('progInput').value;
-        const titulo = document.getElementById('titleInput').value;
-        const link = document.getElementById('linkInput').value;
-        const imgLink = document.getElementById('imgInput').value; 
-        const status = document.getElementById('status-msg');
-
-        if(!link || !titulo) { alert("Falta el link o el título"); return; }
-        
-        status.innerHTML = "📡 Conectando...";
-
-        try {
-            await addDoc(collection(db, "radio_programas"), {
-                programa: programa,
-                titulo: titulo,
-                mp3Url: link, 
-                imagenUrl: imgLink,
-                fecha: new Date()
-            });
-
-            status.innerHTML = "✅ ¡En el aire!";
-            clearDraft();
-            setTimeout(() => { document.getElementById('upload-section').style.display = 'none'; status.innerHTML = ""; }, 2000);
-
-        } catch (e) {
-            alert("Error: " + e.message);
-        }
-    };
-
-    window.subirModoSeguro = async () => {
-        let prog = prompt("PASO 1/4\nEscribe el programa (JAZZ, SALSA, STUDIO o OLD):", "JAZZTABUENO");
-        if (!prog) return;
-        prog = prog.toUpperCase();
-        const titulo = prompt("PASO 2/4\nEscribe el Título del Episodio:", "Jazz Party");
-        if (!titulo) return;
-        const link = prompt("PASO 3/4\nPega el Link del MP3 (Archive.org) aquí:");
-        if (!link) return;
-        const imgLink = prompt("PASO 4/4\nPega el Link de la Carátula (PostImages) o déjalo vacío:", "");
-        
-        try {
-            await addDoc(collection(db, "radio_programas"), {
-                programa: prog,
-                titulo: titulo,
-                mp3Url: link, 
-                imagenUrl: imgLink,
-                fecha: new Date()
-            });
-            alert("✅ ¡ÉXITO! Programa subido.");
-            clearDraft();
-            location.reload();
-        } catch (e) {
-            alert("Error: " + e.message);
-        }
-    };
-
-    window.filtrar = (cat, elemento) => {
-        filtroActual = cat;
-        document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
-        if(elemento) elemento.classList.add('active');
-        pintarRadio();
-    };
-
-    const q = query(collection(db, "radio_programas"), orderBy("fecha", "desc"));
-    onSnapshot(q, (snapshot) => {
-        todosLosEpisodios = [];
-        snapshot.forEach((doc) => {
-            todosLosEpisodios.push({ id: doc.id, ...doc.data() });
-        });
-        pintarRadio();
+    onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => {
+        programas = [];
+        snap.forEach(d => programas.push({id: d.id, ...d.data()}));
+        render();
     });
 
-    function pintarRadio() {
+    function render() {
         const feed = document.getElementById('radio-feed');
         feed.innerHTML = "";
-        const isAdmin = localStorage.getItem('jazz_auth') === CLAVE_ADMIN;
-        
-        const lista = todosLosEpisodios.filter(ep => filtroActual === 'Todo' || ep.programa.includes(filtroActual) || filtroActual.includes(ep.programa));
+        const lista = programas.filter(p => filtroActivo === 'Todo' || p.programa.toUpperCase().includes(filtroActivo.toUpperCase()));
 
-        if(lista.length === 0) {
-            feed.innerHTML = `<div style="text-align:center; padding:40px; color:#444;">Sin transmisión en esta frecuencia... 📻</div>`;
-            return;
-        }
-
-        lista.forEach(ep => {
-            let tagClass = "tag-jazz";
-            let imagenFondo = ep.imagenUrl && ep.imagenUrl.length > 5 ? ep.imagenUrl : ""; 
-
-            if (!imagenFondo) {
-                if(ep.programa.includes("JAZZ")) { imagenFondo = CARATULAS['JAZZTABUENO']; }
-                if(ep.programa.includes("STUDIO")) { tagClass = "tag-studio"; imagenFondo = CARATULAS['STUDIO79']; }
-                if(ep.programa.includes("SALSA")) { tagClass = "tag-salsa"; imagenFondo = CARATULAS['SALSA BRAVA']; }
-                if(ep.programa.includes("OLD")) { tagClass = "tag-old"; imagenFondo = CARATULAS['OLD SCHOOL']; }
-            } else {
-                if(ep.programa.includes("STUDIO")) tagClass = "tag-studio";
-                if(ep.programa.includes("SALSA")) tagClass = "tag-salsa";
-                if(ep.programa.includes("OLD")) tagClass = "tag-old";
-            }
-
-            const fecha = ep.fecha ? ep.fecha.toDate().toLocaleDateString() : "";
-
-            feed.innerHTML += `
-                <div class="episode-card">
-                    <div class="cover-art-container">
-                        <div class="cover-blur" style="background-image: url('${imagenFondo}');"></div>
-                        <div class="cover-front" style="background-image: url('${imagenFondo}');"></div>
-                    </div>
-                    <div class="episode-info">
-                        <span class="program-tag ${tagClass}">${ep.programa}</span>
-                        ${isAdmin ? `<button class="btn-delete" onclick="borrarEpisodio('${ep.id}')">🗑️</button>` : ''}
-                        <h3 class="episode-title">${ep.titulo}</h3>
-                        <span class="episode-date">Publicado: ${fecha}</span>
-                        <audio controls>
-                            <source src="${ep.mp3Url}" type="audio/mpeg">
-                            Tu navegador no soporta audio.
-                        </audio>
+        lista.forEach(p => {
+            const img = p.imagenUrl || 'logo.png';
+            const card = document.createElement('div');
+            card.className = 'episode-card';
+            card.innerHTML = `
+                <div class="cover-art" style="background-image: url('${img}')">
+                    <div class="cover-overlay">
+                        <button class="btn-play-card" onclick="cargarAudio('${p.mp3Url}', '${p.titulo}', '${p.programa}', '${img}')">▶</button>
                     </div>
                 </div>
+                <div class="episode-info">
+                    <span class="program-tag">${p.programa}</span>
+                    <h3 class="episode-title">${p.titulo}</h3>
+                    ${auth === 'ticoadmin' ? `
+                        <div class="admin-controls">
+                            <button class="btn-edit" onclick="iniciarEdicion('${p.id}')">📝 Editar</button>
+                            <button class="btn-del" onclick="borrar('${p.id}')">🗑️</button>
+                        </div>
+                    ` : ''}
+                </div>
             `;
+            feed.appendChild(card);
         });
     }
 
-    window.borrarEpisodio = async (id) => {
-        if(confirm("¿Eliminar este episodio del aire?")) {
-            await deleteDoc(doc(db, "radio_programas", id));
+    // --- REPRODUCTOR ---
+    window.cargarAudio = (url, titulo, prog, img) => {
+        const player = document.getElementById('global-player');
+        const audio = document.getElementById('main-audio');
+        document.getElementById('p-title').innerText = titulo;
+        document.getElementById('p-prog').innerText = prog;
+        document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`;
+        
+        audio.src = url;
+        player.style.display = 'block';
+        audio.play();
+
+        // LLAVE MAESTRA: Background Audio & Lock Screen
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: titulo,
+                artist: prog,
+                album: 'Jazztabueno Productions',
+                artwork: [{ src: img, sizes: '512x512', type: 'image/png' }]
+            });
         }
     };
-</script>
 
+    window.playUI = (isPlay) => {
+        if(isPlay) document.getElementById('global-player').classList.add('playing');
+        else document.getElementById('global-player').classList.remove('playing');
+    };
+
+    window.filtrar = (cat, el) => {
+        filtroActivo = cat;
+        document.querySelectorAll('.channel-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        render();
+    };
+
+    // --- FUNCIONES ADMIN (EDITAR / SUBIR) ---
+    window.toggleUpload = () => {
+        const form = document.getElementById('upload-form');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        if(form.style.display === 'none') resetForm();
+    };
+
+    window.iniciarEdicion = (id) => {
+        const p = programas.find(x => x.id === id);
+        document.getElementById('edit-id').value = id;
+        document.getElementById('prog-name').value = p.programa;
+        document.getElementById('prog-title').value = p.titulo;
+        document.getElementById('prog-mp3').value = p.mp3Url;
+        document.getElementById('prog-img').value = p.imagenUrl;
+        document.getElementById('form-title').innerText = "Editando Programa";
+        document.getElementById('btnGuardar').innerText = "GUARDAR CAMBIOS";
+        document.getElementById('upload-form').style.display = 'block';
+        window.scrollTo(0,0);
+    };
+
+    window.guardarPrograma = async () => {
+        const id = document.getElementById('edit-id').value;
+        const data = {
+            programa: document.getElementById('prog-name').value,
+            titulo: document.getElementById('prog-title').value,
+            mp3Url: document.getElementById('prog-mp3').value,
+            imagenUrl: document.getElementById('prog-img').value,
+            fecha: new Date()
+        };
+
+        if(id) {
+            await updateDoc(doc(db, "radio_programas", id), data);
+            alert("✅ Programa Actualizado");
+        } else {
+            await addDoc(collection(db, "radio_programas"), data);
+            alert("🚀 ¡Lanzado al Aire!");
+        }
+        resetForm();
+        toggleUpload();
+    };
+
+    function resetForm() {
+        document.getElementById('edit-id').value = "";
+        document.getElementById('prog-name').value = "";
+        document.getElementById('prog-title').value = "";
+        document.getElementById('prog-mp3').value = "";
+        document.getElementById('prog-img').value = "";
+        document.getElementById('form-title').innerText = "Subir Programa";
+        document.getElementById('btnGuardar').innerText = "PUBLICAR AHORA";
+    }
+
+    window.borrar = async (id) => { if(confirm("¿Eliminar para siempre?")) await deleteDoc(doc(db, "radio_programas", id)); };
+</script>
 </body>
 </html>
