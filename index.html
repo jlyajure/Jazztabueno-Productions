@@ -13,44 +13,46 @@
     <style>
         :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow: hidden; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; }
+        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
         
+        /* LOGIN */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
-        .btn-gold-tico { display: block !important; width: 100% !important; background: linear-gradient(145deg, #d4af37, #b8962d) !important; color: black !important; border: none !important; padding: 18px !important; border-radius: 50px !important; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+        .btn-gold-tico { width: 100%; background: linear-gradient(145deg, #d4af37, #b8962d); color: black; border: none; padding: 18px; border-radius: 50px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 
-        header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; }
+        header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; position: sticky; top: 0; }
         .header-logo { width: 35px; height: 35px; border-radius: 8px; cursor: pointer; }
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; }
-        .btn-salir-premium { background: transparent; border: 1.5px solid var(--gold); color: var(--gold); padding: 7px 15px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 
-        #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; scroll-behavior: smooth; }
+        #app-content { flex: 1; overflow-y: auto; padding-bottom: 250px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
-        #admin-panel { display: none; background: #111; padding: 20px; border-radius: 20px; border: 1px dashed var(--gold); margin-bottom: 25px; }
+        /* PANEL ADMIN */
+        #admin-panel { display: none; background: #111; padding: 20px; border-radius: 20px; border: 2px solid var(--gold); margin-bottom: 25px; }
         .input-box, .select-box, .text-area { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 8px; font-family: inherit; }
-        .text-area { height: 120px; resize: none; font-size: 12px; border: 1px solid var(--gold); }
+        .text-area { height: 120px; resize: none; font-size: 12px; border: 1px solid #444; }
 
-        .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; position: relative; overflow: hidden; }
+        .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; overflow: hidden; }
         .cover-art { width: 100%; height: 210px; background-size: cover; background-position: center; position: relative; }
-        .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
-        .btn-play-card { background: var(--gold); border: none; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; }
-        .btn-play-card::before { content: '▶'; font-size: 26px; color: black; margin-left: 5px; }
-        .is-playing .btn-play-card::before { content: '||'; font-family: Arial; font-weight: bold; }
+        .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
+        .btn-play-card { background: var(--gold); border: none; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; font-size: 26px; }
 
         .episode-info { padding: 15px; }
         .program-tag { color: var(--gold); font-size: 10px; font-weight: 800; text-transform: uppercase; }
         .episode-title { margin: 5px 0; font-size: 16px; font-weight: 700; color: #fff; }
-        .btn-ver-setlist { background: #1a1a1a; border: 1px solid #333; color: #888; padding: 6px 12px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; margin-top: 10px; }
-        .setlist-box { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #222; font-size: 12px; color: #bbb; white-space: pre-wrap; line-height: 1.6; }
+        .btn-ver-setlist { background: #1a1a1a; border: 1px solid #333; color: #aaa; padding: 8px 15px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; margin-top: 10px; width: 100%; }
+        .setlist-box { display: none; margin-top: 15px; padding: 15px; background: #080808; border-radius: 10px; border: 1px solid #222; font-size: 12px; color: #bbb; white-space: pre-wrap; line-height: 1.6; }
+
+        /* BOTONES DE ACCIÓN DJ */
+        .dj-controls { margin-top: 20px; display: flex; gap: 10px; border-top: 1px solid #222; padding-top: 15px; }
+        .btn-edit { background: var(--gold); color: black; border: none; padding: 10px; flex: 1; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; }
+        .btn-delete { background: transparent; border: 1px solid #ff4444; color: #ff4444; padding: 10px; flex: 1; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; }
 
         /* REPRODUCTOR */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
-        
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
@@ -69,26 +71,27 @@
     <header>
         <div style="display:flex; align-items:center; gap:10px;">
             <img src="logo.png" class="header-logo" id="logo-admin-trigger">
-            <div class="brand-title">Jazztabueno<br>Productions</div>
+            <div class="brand-title">Jazztabueno Productions</div>
         </div>
-        <button onclick="window.salirTotal()" class="btn-salir-premium">SALIR</button>
+        <button onclick="window.salirTotal()" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:5px 10px; border-radius:5px; font-size:9px; font-weight:800; cursor:pointer;">SALIR</button>
     </header>
 
     <div class="container">
         <div id="admin-panel">
-            <h4 id="admin-label" style="color:var(--gold); margin-top:0; font-size:12px; text-align:center;">NUEVO PROGRAMA</h4>
-            <input type="hidden" id="edit-id"> <input type="text" id="t-titulo" class="input-box" placeholder="Título del Episodio">
+            <h4 id="admin-label" style="color:var(--gold); text-align:center; font-size:12px; margin-bottom:15px;">NUEVO PROGRAMA</h4>
+            <input type="hidden" id="edit-id">
+            <input type="text" id="t-titulo" class="input-box" placeholder="Título del Episodio">
             <select id="t-programa" class="select-box">
                 <option value="JAZZTABUENO">JAZZTABUENO</option>
                 <option value="STUDIO">STUDIO 79</option>
                 <option value="SALSA">SALSA BRAVA</option>
                 <option value="OLD">OLD SCHOOL</option>
             </select>
-            <input type="text" id="t-url" class="input-box" placeholder="URL del MP3">
-            <input type="text" id="t-img" class="input-box" placeholder="URL de la Portada">
-            <textarea id="t-setlist" class="text-area" placeholder="Escribe aquí los ARTISTAS y CANCIONES del programa..."></textarea>
-            <button id="btn-subir-fb" class="btn-gold-tico" style="padding:10px !important; font-size:12px !important;">📻 GUARDAR PROGRAMA</button>
-            <button onclick="cancelarEdicion()" style="width:100%; background:none; border:none; color:#666; font-size:10px; margin-top:10px; cursor:pointer;">Cancelar / Limpiar</button>
+            <input type="text" id="t-url" class="input-box" placeholder="Link MP3">
+            <input type="text" id="t-img" class="input-box" placeholder="Link Portada">
+            <textarea id="t-setlist" class="text-area" placeholder="Pega aquí la lista de ARTISTAS y CANCIONES..."></textarea>
+            <button id="btn-save" class="btn-gold-tico" style="padding:12px !important;">📻 GUARDAR CAMBIOS</button>
+            <button onclick="cancelarEdicion()" style="width:100%; background:none; color:#666; border:none; margin-top:10px; font-size:11px; cursor:pointer;">Limpiar / Cerrar</button>
         </div>
 
         <div id="radio-feed"></div>
@@ -96,14 +99,14 @@
 </div>
 
 <div id="global-player">
-    <audio id="main-media" playsinline crossorigin="anonymous"></audio>
+    <audio id="main-media" crossorigin="anonymous"></audio>
     <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
         <div id="p-vinyl" class="p-vinyl" style="background-image: url('logo.png');"></div>
         <div style="flex:1; overflow:hidden;">
             <h4 id="p-title" style="margin:0; font-size:13px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">...</h4>
             <div id="p-time-display" style="font-size:10px; color:var(--gold); font-weight:900;">00:00 / 00:00</div>
         </div>
-        <button onclick="window.togglePlay()" id="p-play-btn" style="background:none; border:none; color:var(--gold); font-size:30px; cursor:pointer;">▶</button>
+        <button onclick="window.togglePlay()" id="p-play-btn" style="background:none; border:none; color:var(--gold); font-size:32px; cursor:pointer;">▶</button>
         <button onclick="window.cerrarPlayer()" style="background:none; border:none; color:#444; font-size:24px; margin-left:12px;">×</button>
     </div>
     <input type="range" id="seek-bar" value="0" min="0" step="1" style="width:100%;">
@@ -117,24 +120,28 @@
     const seekBar = document.getElementById('seek-bar');
     let programas = []; let idActual = null; let isAdmin = false;
 
-    // LOGIN
+    // LOGIN DE DIRECTOR
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value;
-        if(p === "ticoadmin" || p === "jtp2026") { localStorage.setItem('jazz_auth', p); location.reload(); } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jtp2026") { 
+            localStorage.setItem('jazz_auth', 'true'); 
+            location.reload(); 
+        } else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jazz_auth')) {
+
+    if(localStorage.getItem('jazz_auth') === 'true') {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
     }
 
-    // ABRIR PANEL
+    // ABRIR PANEL CON EL LOGO
     document.getElementById('logo-admin-trigger').onclick = () => {
         const panel = document.getElementById('admin-panel');
         panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
     };
 
-    // FUNCION EDITAR (CARGA DATOS)
+    // FUNCION PARA CARGAR DATOS EN EL PANEL PARA EDITAR
     window.prepararEdicion = (id) => {
         const p = programas.find(x => x.id === id);
         if(!p) return;
@@ -145,24 +152,21 @@
         document.getElementById('t-img').value = p.imagenUrl;
         document.getElementById('t-setlist').value = p.setlist || "";
         
-        document.getElementById('admin-label').innerText = "EDITANDO PROGRAMA";
-        document.getElementById('btn-subir-fb').innerText = "✅ ACTUALIZAR PROGRAMA";
+        document.getElementById('admin-label').innerText = "🖋️ EDITANDO: " + p.titulo;
         document.getElementById('admin-panel').style.display = 'block';
-        document.getElementById('app-content').scrollTo(0,0);
+        document.getElementById('app-content').scrollTo(0, 0);
     };
 
     window.cancelarEdicion = () => {
         document.getElementById('edit-id').value = "";
         document.getElementById('t-titulo').value = "";
-        document.getElementById('t-url').value = "";
         document.getElementById('t-setlist').value = "";
         document.getElementById('admin-label').innerText = "NUEVO PROGRAMA";
-        document.getElementById('btn-subir-fb').innerText = "📻 GUARDAR PROGRAMA";
         document.getElementById('admin-panel').style.display = 'none';
     };
 
-    // GUARDAR O ACTUALIZAR
-    document.getElementById('btn-subir-fb').onclick = async () => {
+    // GUARDAR O ACTUALIZAR FIREBASE
+    document.getElementById('btn-save').onclick = async () => {
         const id = document.getElementById('edit-id').value;
         const datos = {
             titulo: document.getElementById('t-titulo').value,
@@ -173,18 +177,21 @@
             fecha: new Date().getTime()
         };
 
-        if(id) {
-            await updateDoc(doc(db, "radio_programas", id), datos);
-            alert("¡Actualizado!");
-        } else {
-            await addDoc(collection(db, "radio_programas"), datos);
-            alert("¡Subido!");
-        }
-        cancelarEdicion();
+        try {
+            if(id) {
+                await updateDoc(doc(db, "radio_programas", id), datos);
+                alert("¡Programa actualizado!");
+            } else {
+                await addDoc(collection(db, "radio_programas"), datos);
+                alert("¡Programa subido!");
+            }
+            cancelarEdicion();
+        } catch (e) { alert("Error al guardar"); }
     };
 
-    window.borrarDoc = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "radio_programas", id)); };
+    window.borrarDoc = async (id) => { if(confirm("¿Eliminar para siempre?")) await deleteDoc(doc(db, "radio_programas", id)); };
 
+    // ESCUCHAR FIREBASE
     onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => {
         programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
     });
@@ -198,24 +205,27 @@
             div.className = `episode-card ${isPlaying ? 'is-playing' : ''}`;
             div.innerHTML = `
                 <div class="cover-art" style="background-image: url('${p.imagenUrl || 'logo.png'}')">
-                    <div class="cover-overlay"><button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo}', '${p.imagenUrl}')"></button></div>
+                    <div class="cover-overlay">
+                        <button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo}', '${p.imagenUrl}')">${isPlaying ? '||' : '▶'}</button>
+                    </div>
                 </div>
                 <div class="episode-info">
                     <span class="program-tag">${p.programa}</span>
                     <h3 class="episode-title">${p.titulo}</h3>
                     <button class="btn-ver-setlist" onclick="window.toggleSetlist('${p.id}')">📋 VER ARTISTAS Y CANCIONES</button>
                     <div id="set-${p.id}" class="setlist-box">${p.setlist || "Lista de canciones no disponible."}</div>
+                    
                     ${isAdmin ? `
-                    <div style="margin-top:20px; display:flex; gap:10px;">
-                        <button onclick="prepararEdicion('${p.id}')" style="background:#d4af37; color:black; border:none; padding:8px 15px; border-radius:5px; font-size:10px; font-weight:800; cursor:pointer;">🖋️ EDITAR</button>
-                        <button onclick="borrarDoc('${p.id}')" style="background:none; border:1px solid #ff4444; color:#ff4444; padding:8px 15px; border-radius:5px; font-size:10px; font-weight:800; cursor:pointer;">🗑️ BORRAR</button>
+                    <div class="dj-controls">
+                        <button class="btn-edit" onclick="prepararEdicion('${p.id}')">🖋️ EDITAR PROGRAMA</button>
+                        <button class="btn-delete" onclick="borrarDoc('${p.id}')">🗑️ BORRAR</button>
                     </div>` : ''}
                 </div>`;
             feed.appendChild(div);
         });
     }
 
-    // LOGICA REPRODUCTOR
+    // REPRODUCTOR
     window.gestionarReproduccion = (id, url, titulo, img) => {
         if (idActual === id) { window.togglePlay(); } 
         else {
