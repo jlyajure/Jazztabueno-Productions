@@ -11,8 +11,8 @@
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 
     <style>
-        /* COLOR ORO SATINADO ANTI-CHILLÓN */
-        :root { --gold: #927b44; --bg: #050505; --card: #121212; }
+        /* COLOR BRONCE TABACO - ESPECIAL PARA PANTALLAS MÓVILES */
+        :root { --gold: #8b753d; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
         html, body { margin: 0; background: var(--bg); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-y: auto !important; }
@@ -29,19 +29,30 @@
 
         .container { max-width: 550px; margin: auto; padding: 15px; padding-bottom: 280px; }
 
-        .channels-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 25px; padding: 10px 0; }
-        .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; cursor: pointer; }
-        .channel-item.active { opacity: 1; transform: scale(1.05); }
+        /* CANALES */
         .channel-logo { width: 42px; height: 42px; border-radius: 10px; border: 2px solid #333; margin: 0 auto 6px; background: #000; object-fit: contain; }
         .active .channel-logo { border-color: var(--gold); }
         .channel-name { font-size: 7px; color: #aaa; font-weight: 800; text-transform: uppercase; }
 
+        /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 25px; border: 1px solid #1a1a1a; overflow: hidden; }
         .cover-art { width: 100%; height: 160px; background-size: cover; background-position: center; position: relative; }
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
         
-        /* BOTÓN DE PLAY REFORZADO */
-        .btn-play-card { background: var(--gold) !important; border: none !important; width: 55px; height: 55px; border-radius: 50%; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; color: black !important; box-shadow: none !important; filter: none !important; }
+        /* BOTÓN DE PLAY MATE - SIN BRILLOS */
+        .btn-play-card { 
+            background: var(--gold) !important; 
+            border: none !important; 
+            width: 55px; height: 55px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            font-size: 22px; 
+            display: flex; align-items: center; justify-content: center; 
+            color: black !important; 
+            box-shadow: none !important; 
+            filter: none !important;
+            -webkit-filter: none !important;
+        }
 
         .episode-info { padding: 15px; }
         .episode-title { margin: 5px 0; font-size: 18px; font-weight: 800; color: #fff; }
@@ -53,11 +64,22 @@
         .btn-dj-edit { background: var(--gold); color: black; flex: 1; border: none; padding: 10px; border-radius: 8px; font-size: 9px; font-weight: 800; cursor: pointer; }
         .btn-dj-del { background: none; border: 1px solid #333; color: #444; flex: 1; padding: 10px; border-radius: 8px; font-size: 9px; font-weight: 800; cursor: pointer; }
 
+        /* PLAYER GLOBAL */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
         
-        #p-play-btn { background: none !important; border: none !important; color: var(--gold) !important; font-size: 35px; cursor: pointer; text-shadow: none !important; filter: none !important; }
+        /* BOTÓN DE REPRODUCTOR MATE */
+        #p-play-btn { 
+            background: none !important; 
+            border: none !important; 
+            color: var(--gold) !important; 
+            font-size: 35px; 
+            cursor: pointer; 
+            text-shadow: none !important; 
+            filter: none !important;
+        }
+        @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -92,11 +114,12 @@
                 <option value="OLD">OLD SCHOOL</option>
             </select>
             <input type="text" id="t-url" class="input-box" placeholder="URL MP3">
-            <input type="text" id="t-img" class="input-box" placeholder="URL Imagen">
+            <input type="text" id="t-img" class="input-box" placeholder="URL Portada">
             <textarea id="t-playlist" class="text-area" placeholder="Lista de ARTISTAS y CANCIONES"></textarea>
             <button id="btn-save" class="btn-gold-tico">💾 GUARDAR PROGRAMA</button>
         </div>
-        <div class="channels-container">
+
+        <div class="channels-container" id="channels">
             <div class="channel-item active" onclick="filtrar('Todo', this)"><img src="logo.png" class="channel-logo"><span class="channel-name">Todo</span></div>
             <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)"><img src="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png" class="channel-logo"><span class="channel-name">Jazztabueno</span></div>
             <div class="channel-item" onclick="filtrar('STUDIO', this)"><img src="https://i.postimg.cc/NKMDbYJB/S79.png" class="channel-logo"><span class="channel-name">Studio 79</span></div>
@@ -137,13 +160,11 @@
     const seekBar = document.getElementById('seek-bar');
     let programas = []; let idActual = null; let filtroActivo = 'Todo'; let isAdmin = false;
 
+    // CHROMECAST
     window.lastCastTime = 0;
     window['__onGCastApiAvailable'] = function(isAvailable) {
         if (isAvailable) {
-            cast.framework.CastContext.getInstance().setOptions({
-                receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-                autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
-            });
+            cast.framework.CastContext.getInstance().setOptions({ receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID, autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED });
             const player = new cast.framework.RemotePlayer();
             const controller = new cast.framework.RemotePlayerController(player);
             controller.addEventListener(cast.framework.RemotePlayerEventType.IS_CONNECTED_CHANGED, () => {
@@ -151,10 +172,7 @@
                 if (isConnected) {
                     document.getElementById('cast-label').style.color = "black";
                     document.getElementById('btn-cast-ui').style.background = "var(--gold)";
-                    if (idActual) {
-                        const p = programas.find(x => x.id === idActual);
-                        window.loadCastMedia(p.titulo, p.programa, p.mp3Url, p.imagenUrl);
-                    }
+                    if (idActual) { const p = programas.find(x => x.id === idActual); window.loadCastMedia(p.titulo, p.programa, p.mp3Url, p.imagenUrl); }
                 } else {
                     document.getElementById('cast-label').style.color = "var(--gold)";
                     document.getElementById('btn-cast-ui').style.background = "#111";
@@ -163,10 +181,7 @@
             });
             controller.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => {
                 if(player.currentTime > 0) window.lastCastTime = player.currentTime;
-                if(cast.framework.CastContext.getInstance().getCurrentSession()){
-                    seekBar.value = player.currentTime;
-                    document.getElementById('p-time').innerText = formatTime(player.currentTime) + " / " + formatTime(player.duration);
-                }
+                if(cast.framework.CastContext.getInstance().getCurrentSession()){ seekBar.value = player.currentTime; document.getElementById('p-time').innerText = formatTime(player.currentTime) + " / " + formatTime(player.duration); }
             });
         }
     };
@@ -186,16 +201,18 @@
         }
     };
 
+    // LOGIN
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_key_vfinal_x', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_final_4', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_auth_key_vfinal_x')) {
+    if(localStorage.getItem('jtp_auth_final_4')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
     }
 
+    // PANEL DJ
     let toques = 0; let tToque = 0;
     document.getElementById('admin-trigger').onclick = () => {
         const ahora = new Date().getTime();
@@ -231,10 +248,11 @@
         document.getElementById('t-img').value = p.imagenUrl;
         document.getElementById('t-playlist').value = p.playlist || "";
         document.getElementById('admin-panel').style.display = 'block';
+        document.getElementById('admin-label').innerText = "EDITANDO PROGRAMA";
         window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
-    window.borrarDoc = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "radio_programas", id)); };
+    window.borrarDoc = async (id) => { if(confirm("¿Borrar definitivamente?")) await deleteDoc(doc(db, "radio_programas", id)); };
 
     onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => {
         programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
@@ -245,7 +263,6 @@
         feed.innerHTML = "";
         const lista = programas.filter(p => filtroActivo === 'Todo' || p.programa === filtroActivo);
         lista.forEach(p => {
-            // VERIFICACIÓN REAL DE REPRODUCCIÓN PARA EL ICONO
             const isThisPlaying = idActual === p.id && !media.paused;
             const div = document.createElement('div');
             div.className = `episode-card ${isThisPlaying ? 'is-playing' : ''}`;
@@ -278,14 +295,13 @@
             document.getElementById('global-player').style.display = 'block';
             if(cast.framework.CastContext.getInstance().getCurrentSession() !== null) window.loadCastMedia(tit, "Jazztabueno", url, img);
         }
-        render(); // Forzamos actualización de iconos
+        render();
     };
 
     window.togglePlay = () => { 
-        if(cast.framework.CastContext.getInstance().getCurrentSession() !== null) {
-            new cast.framework.RemotePlayerController(new cast.framework.RemotePlayer()).playOrPause();
-        } else { if(media.paused) media.play(); else media.pause(); }
-        render(); // Forzamos actualización de iconos
+        if(cast.framework.CastContext.getInstance().getCurrentSession() !== null) { new cast.framework.RemotePlayerController(new cast.framework.RemotePlayer()).playOrPause(); }
+        else { if(media.paused) media.play(); else media.pause(); }
+        render();
     };
 
     window.cerrarPlayer = () => { media.pause(); document.getElementById('global-player').style.display='none'; idActual=null; render(); };
