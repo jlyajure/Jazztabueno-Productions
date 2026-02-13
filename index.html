@@ -36,15 +36,18 @@
         .episode-card { background: var(--card); border-radius: 18px; margin-bottom: 18px; overflow: hidden; border: 1px solid #222; }
         .cover-art { width: 100%; height: 210px; background-size: cover; background-position: center; position: relative; }
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
-        .btn-play-card { background: var(--gold); border: none; width: 62px; height: 62px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
+        .btn-play-card { background: var(--gold); border: none; width: 62px; height: 62px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
         .btn-play-card::before { content: '▶'; font-size: 24px; color: black; margin-left: 4px; }
-        .is-playing .btn-play-card { background: rgba(0, 0, 0, 0.7) !important; border: 2.5px solid var(--gold); }
-        .is-playing .btn-play-card::before { content: ''; width: 5px; height: 22px; background: var(--gold); box-shadow: 12px 0 0 var(--gold); margin-right: 12px; margin-left: 0; }
+        
+        /* ESTADO ACTIVO: SOLO CUANDO REALMENTE SUENA */
+        .is-actually-playing .btn-play-card { background: rgba(0, 0, 0, 0.7) !important; border: 2.5px solid var(--gold); }
+        .is-actually-playing .btn-play-card::before { content: ''; width: 5px; height: 22px; background: var(--gold); box-shadow: 12px 0 0 var(--gold); margin-right: 12px; margin-left: 0; }
 
         .program-tag { display: inline-block; font-size: 9px; color: black; padding: 4px 12px; border-radius: 50px; background: var(--gold); font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
         .episode-title { font-size: 17px; margin: 0; font-weight: 700; color: white; }
 
-        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #0a0a0a; border-top: 1px solid #222; padding: 12px 15px; display: none; z-index: 1000; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); }
+        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #0a0a0a; border-top: 1px solid #222; padding: 12px 15px; display: none; z-index: 1000; }
         .player-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
         .p-vinyl { width: 45px; height: 45px; border-radius: 50%; border: 1px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
@@ -141,9 +144,10 @@
             return p.programa.toUpperCase().replace(/\s/g, '').includes(filtroActivo.toUpperCase().replace(/\s/g, ''));
         });
         lista.forEach(p => {
-            const isPlaying = idActual === p.id;
+            // LÓGICA CORREGIDA: Solo es "is-actually-playing" si coincide el ID Y el audio NO está pausado
+            const isActuallyPlaying = (idActual === p.id && !audio.paused);
             const div = document.createElement('div');
-            div.className = `episode-card ${isPlaying ? 'is-playing' : ''}`;
+            div.className = `episode-card ${isActuallyPlaying ? 'is-actually-playing' : ''}`;
             div.innerHTML = `<div class="cover-art" style="background-image: url('${p.imagenUrl || 'logo.png'}')"><div class="cover-overlay"><button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo}', '${p.programa}', '${p.imagenUrl}')"></button></div></div><div class="episode-info"><span class="program-tag">${p.programa}</span><h3 class="episode-title">${p.titulo}</h3>${localStorage.getItem('jazz_auth') === 'ticoadmin' ? `<button onclick="window.iniciarEdicion('${p.id}')" style="background:#333; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:11px; cursor:pointer;">📝 Editar</button>` : ''}</div>`;
             feed.appendChild(div);
         });
@@ -158,10 +162,10 @@
             audio.src = url; const savedTime = localStorage.getItem(`time_${id}`);
             if(savedTime) audio.currentTime = parseFloat(savedTime); audio.play();
         }
-        render();
+        render(); // Forzamos redibujado para actualizar iconos
     };
 
-    window.togglePlay = () => { if (audio.paused) audio.play(); else audio.pause(); };
+    window.togglePlay = () => { if (audio.paused) audio.play(); else audio.pause(); render(); };
 
     function formatTime(s) {
         const h = Math.floor(s / 3600); const m = Math.floor((s % 3600) / 60); const sec = Math.floor(s % 60);
@@ -178,8 +182,10 @@
     };
     seekBar.oninput = () => { audio.currentTime = seekBar.value; };
 
+    // EVENTOS DE AUDIO: Ahora gatillan el render() para cambiar los iconos de las fotos
     audio.onplay = () => { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; render(); };
     audio.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; render(); };
+    
     window.cerrarPlayer = () => { audio.pause(); document.getElementById('global-player').style.display = 'none'; idActual = null; render(); };
     window.filtrar = (cat, el) => { filtroActivo = cat; document.querySelectorAll('.channel-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); render(); };
     window.toggleUpload = () => { document.getElementById('upload-form').style.display = (document.getElementById('upload-form').style.display === 'none') ? 'block' : 'none'; };
