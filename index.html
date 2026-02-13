@@ -24,12 +24,12 @@
         header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; }
         .header-logo { width: 35px; height: 35px; border-radius: 8px; }
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; }
-        .btn-salir-premium { background: transparent; border: 1.5px solid var(--gold); color: var(--gold); padding: 7px 15px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+        .btn-salir-premium { background: transparent; border: 1.5px solid var(--gold); color: var(--gold); padding: 7px 15px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 
         #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
-        /* CANALES V13.3 */
+        /* CANALES V13.4 */
         .channels-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 25px; padding: 10px 0; width: 100%; }
         .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; cursor: pointer; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
@@ -49,7 +49,7 @@
         /* REPRODUCTOR */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .player-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2.5px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
+        .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
         .p-info { flex: 1; overflow: hidden; }
         .p-info h4 { margin: 0; font-size: 13px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -65,21 +65,8 @@
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
         /* EL CABALLO DE TROYA: Reproductor Nativo de Chrome */
-        #main-media { 
-            width: 100%; 
-            height: 0px; 
-            opacity: 0; 
-            pointer-events: none; 
-            transition: all 0.3s ease-in-out;
-            border-radius: 10px;
-        }
-        /* Clase para mostrarlo y vencer el bloqueo */
-        .mostrar-nativo {
-            height: 50px !important;
-            opacity: 1 !important;
-            pointer-events: all !important;
-            margin-bottom: 15px !important;
-        }
+        #main-media { width: 100%; height: 0px; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; border-radius: 10px; }
+        .mostrar-nativo { height: 50px !important; opacity: 1 !important; pointer-events: all !important; margin-bottom: 15px !important; }
     </style>
 </head>
 <body>
@@ -127,7 +114,7 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button id="cast-btn-133" onclick="window.mostrarTrucoNativo()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR TV</button>
+        <button id="cast-btn-134" onclick="window.mostrarTrucoNativo()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR TV</button>
         <button onclick="window.refrescarImagenTV()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
         <button onclick="window.ocultarTrucoNativo()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
     </div>
@@ -140,7 +127,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
-    const castBtn = document.getElementById('cast-btn-133');
+    const castBtn = document.getElementById('cast-btn-134');
     let programas = []; let idActual = null; let filtroActivo = 'Todo';
 
     window.checkLogin = () => {
@@ -178,11 +165,22 @@
         });
     }
 
+    // EL TRUCO CONTRA LO NEGRO: FUNCIÓN PARA URL ABSOLUTA
+    function rutaAbsoluta(ruta) {
+        if (!ruta) return new URL('logo.png', window.location.href).href;
+        if (ruta.startsWith('http')) return ruta;
+        return new URL(ruta, window.location.href).href;
+    }
+
     function enviarDatosTV(titulo, prog, img) {
+        const urlSegura = rutaAbsoluta(img);
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: titulo, artist: prog, album: 'Jazztabueno Productions',
-                artwork: [{ src: img, sizes: '512x512', type: 'image/png' }]
+                artwork: [
+                    { src: urlSegura, sizes: '512x512', type: 'image/png' },
+                    { src: urlSegura, sizes: '1024x1024', type: 'image/png' }
+                ]
             });
         }
     }
@@ -190,22 +188,25 @@
     window.gestionarReproduccion = (id, url, titulo, prog, img) => {
         if (idActual === id) { window.togglePlay(); } 
         else {
-            idActual = id; media.src = url; 
-            media.setAttribute('poster', img || 'logo.png'); // Clave para quitar lo NEGRO
+            idActual = id; 
+            const imgSegura = rutaAbsoluta(img);
+            
+            media.src = url; 
+            media.setAttribute('poster', imgSegura); // Inyectamos la URL completa a la TV
+            
             document.getElementById('p-title').innerText = titulo;
-            document.getElementById('p-vinyl').style.backgroundImage = `url('${img || 'logo.png'}')`;
+            document.getElementById('p-vinyl').style.backgroundImage = `url('${imgSegura}')`;
             document.getElementById('global-player').style.display = 'block';
-            enviarDatosTV(titulo, prog, img || 'logo.png');
-            media.play().then(() => {
-                setTimeout(() => enviarDatosTV(titulo, prog, img || 'logo.png'), 2000);
-            });
+            
+            enviarDatosTV(titulo, prog, imgSegura);
+            media.play();
         }
         render();
     };
 
     window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
     
-    // --- V13.3: MOSTRAR EL REPRODUCTOR INFALIBLE DE GOOGLE ---
+    // CABALLO DE TROYA
     window.mostrarTrucoNativo = () => { 
         if (media.classList.contains('mostrar-nativo')) {
             window.ocultarTrucoNativo();
@@ -213,14 +214,13 @@
             media.classList.add('mostrar-nativo');
             castBtn.style.background = "var(--gold)";
             castBtn.style.color = "black";
-            alert("📡 EL TRUCO: Acaba de aparecer un reproductor arriba de los botones. Toca los 3 puntitos en ese reproductor para conectarte. ¡Ese NUNCA se bloquea!");
         }
     };
 
     window.refrescarImagenTV = () => {
         if(idActual) {
             const p = programas.find(x => x.id === idActual);
-            if(p) { enviarDatosTV(p.titulo, p.programa, p.imagenUrl); alert("📡 Imagen forzada a la TV."); }
+            if(p) { enviarDatosTV(p.titulo, p.programa, p.imagenUrl); alert("📡 Imagen forzada a la TV con URL Segura."); }
         }
     };
 
@@ -232,7 +232,6 @@
         alert("♻️ Visual limpia. ¡Música continua!");
     };
 
-    // Sensor de Estado de la TV
     setInterval(() => {
         if (media.remotePlayback && media.remotePlayback.state === 'connected') {
             castBtn.style.background = "var(--gold)"; castBtn.style.color = "black"; castBtn.innerText = "📡 TV CONECTADA";
