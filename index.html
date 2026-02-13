@@ -29,6 +29,7 @@
         #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
+        /* CANALES V13.3 */
         .channels-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 25px; padding: 10px 0; width: 100%; }
         .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; cursor: pointer; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
@@ -36,6 +37,7 @@
         .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.4); }
         .channel-name { font-size: 7px; color: #aaa; font-weight: 800; text-transform: uppercase; display: block; white-space: nowrap; overflow: hidden; }
 
+        /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; position: relative; overflow: hidden; }
         .cover-art { width: 100%; height: 210px; background-size: cover; background-position: center; position: relative; }
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
@@ -44,9 +46,10 @@
         .is-playing .btn-play-card { background: rgba(0,0,0,0.85) !important; border: 2.5px solid var(--gold); }
         .is-playing .btn-play-card::before { content: '||'; font-family: Arial; font-weight: bold; color: var(--gold); margin-left: 0; }
 
+        /* REPRODUCTOR */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .player-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
+        .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2.5px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
         .p-info { flex: 1; overflow: hidden; }
         .p-info h4 { margin: 0; font-size: 13px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -54,14 +57,29 @@
 
         .btn-p-main { background: none; border: none; color: var(--gold); font-size: 30px; cursor: pointer; }
         #seek-bar { width: 100%; -webkit-appearance: none; background: #222; height: 5px; border-radius: 3px; }
-        #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--gold); border-radius: 50%; border: 2px solid #000; }
+        #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: var(--gold); border-radius: 50%; border: 2px solid #000; cursor: pointer; }
 
         .tool-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 12px; margin-top: 5px; gap: 6px; }
-        .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 2px; border-radius: 8px; font-size: 8px; font-weight: 800; cursor: pointer; }
+        .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 2px; border-radius: 8px; font-size: 8px; font-weight: 800; cursor: pointer; transition: 0.3s; }
         
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        /* Motor oculto */
-        #main-media { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+        
+        /* EL CABALLO DE TROYA: Reproductor Nativo de Chrome */
+        #main-media { 
+            width: 100%; 
+            height: 0px; 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: all 0.3s ease-in-out;
+            border-radius: 10px;
+        }
+        /* Clase para mostrarlo y vencer el bloqueo */
+        .mostrar-nativo {
+            height: 50px !important;
+            opacity: 1 !important;
+            pointer-events: all !important;
+            margin-bottom: 15px !important;
+        }
     </style>
 </head>
 <body>
@@ -70,7 +88,7 @@
     <div class="login-card">
         <img src="logo.png" style="width:90px; margin-bottom:20px;">
         <h2 style="color:var(--gold); font-family:'Playfair Display';">JAZZTABUENO</h2>
-        <input type="password" id="passInput" placeholder="Clave">
+        <input type="password" id="passInput" placeholder="Introduce Clave">
         <button onclick="checkLogin()" class="btn-gold-tico">ENTRAR ▶</button>
     </div>
 </div>
@@ -97,7 +115,8 @@
 </div>
 
 <div id="global-player">
-    <video id="main-media" playsinline crossorigin="anonymous"></video>
+    <video id="main-media" playsinline crossorigin="anonymous" controls controlsList="nodownload"></video>
+    
     <div class="player-top">
         <div id="p-vinyl" class="p-vinyl" style="background-image: url('logo.png');"></div>
         <div class="p-info"><h4 id="p-title">...</h4><div id="p-time-display" class="p-time">00:00 / 00:00</div></div>
@@ -108,9 +127,9 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button id="btn-cast-v132" onclick="document.getElementById('main-media').remotePlayback.prompt()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR TV</button>
-        <button onclick="window.refrescarVisual()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
-        <button onclick="window.limpiarVisualSolo()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
+        <button id="cast-btn-133" onclick="window.mostrarTrucoNativo()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR TV</button>
+        <button onclick="window.refrescarImagenTV()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
+        <button onclick="window.ocultarTrucoNativo()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
     </div>
 </div>
 
@@ -121,7 +140,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
-    const castBtn = document.getElementById('btn-cast-v132');
+    const castBtn = document.getElementById('cast-btn-133');
     let programas = []; let idActual = null; let filtroActivo = 'Todo';
 
     window.checkLogin = () => {
@@ -159,7 +178,7 @@
         });
     }
 
-    function syncTV(titulo, prog, img) {
+    function enviarDatosTV(titulo, prog, img) {
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: titulo, artist: prog, album: 'Jazztabueno Productions',
@@ -172,37 +191,52 @@
         if (idActual === id) { window.togglePlay(); } 
         else {
             idActual = id; media.src = url; 
-            media.setAttribute('poster', img || 'logo.png');
+            media.setAttribute('poster', img || 'logo.png'); // Clave para quitar lo NEGRO
             document.getElementById('p-title').innerText = titulo;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img || 'logo.png'}')`;
             document.getElementById('global-player').style.display = 'block';
-            syncTV(titulo, prog, img || 'logo.png');
+            enviarDatosTV(titulo, prog, img || 'logo.png');
             media.play().then(() => {
-                setTimeout(() => syncTV(titulo, prog, img || 'logo.png'), 2000);
+                setTimeout(() => enviarDatosTV(titulo, prog, img || 'logo.png'), 2000);
             });
         }
         render();
     };
 
     window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
-
-    window.refrescarVisual = () => {
-        if(idActual) {
-            const p = programas.find(x => x.id === idActual);
-            if(p) { syncTV(p.titulo, p.programa, p.imagenUrl); alert("📡 Imagen re-enviada."); }
+    
+    // --- V13.3: MOSTRAR EL REPRODUCTOR INFALIBLE DE GOOGLE ---
+    window.mostrarTrucoNativo = () => { 
+        if (media.classList.contains('mostrar-nativo')) {
+            window.ocultarTrucoNativo();
+        } else {
+            media.classList.add('mostrar-nativo');
+            castBtn.style.background = "var(--gold)";
+            castBtn.style.color = "black";
+            alert("📡 EL TRUCO: Acaba de aparecer un reproductor arriba de los botones. Toca los 3 puntitos en ese reproductor para conectarte. ¡Ese NUNCA se bloquea!");
         }
     };
 
-    // BOTÓN ROJO CORREGIDO V13.2: 100% VISUAL
-    window.limpiarVisualSolo = () => { 
-        castBtn.style.background = "#1a1a1a"; castBtn.style.color = "#fff"; castBtn.innerText = "📡 TRANSMITIR TV";
-        alert("♻️ Reset Visual realizado. ¡La música sigue!");
+    window.refrescarImagenTV = () => {
+        if(idActual) {
+            const p = programas.find(x => x.id === idActual);
+            if(p) { enviarDatosTV(p.titulo, p.programa, p.imagenUrl); alert("📡 Imagen forzada a la TV."); }
+        }
     };
 
+    // BOTÓN ROJO: LIMPIA SIN APAGAR LA MÚSICA
+    window.ocultarTrucoNativo = () => { 
+        media.classList.remove('mostrar-nativo');
+        castBtn.style.background = "#1a1a1a"; 
+        castBtn.style.color = "#fff"; 
+        alert("♻️ Visual limpia. ¡Música continua!");
+    };
+
+    // Sensor de Estado de la TV
     setInterval(() => {
         if (media.remotePlayback && media.remotePlayback.state === 'connected') {
             castBtn.style.background = "var(--gold)"; castBtn.style.color = "black"; castBtn.innerText = "📡 TV CONECTADA";
-        } else if (media.remotePlayback && media.remotePlayback.state === 'disconnected') {
+        } else if (!media.classList.contains('mostrar-nativo')) {
             castBtn.style.background = "#1a1a1a"; castBtn.style.color = "#fff"; castBtn.innerText = "📡 TRANSMITIR TV";
         }
     }, 2500);
@@ -219,7 +253,7 @@
     media.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; render(); };
     media.ontimeupdate = () => { if(idActual) { seekBar.value = Math.floor(media.currentTime); timeDisplay.innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration); } };
     seekBar.oninput = () => { media.currentTime = seekBar.value; };
-    window.cerrarPlayer = () => { media.pause(); document.getElementById('global-player').style.display = 'none'; idActual = null; render(); };
+    window.cerrarPlayer = () => { media.pause(); document.getElementById('global-player').style.display = 'none'; media.classList.remove('mostrar-nativo'); idActual = null; render(); };
     function formatTime(s) { if (isNaN(s)) return "00:00"; const h = Math.floor(s / 3600); const m = Math.floor((s % 3600) / 60); const sec = Math.floor(s % 60); return (h > 0 ? h + ":" : "") + (m < 10 ? "0" + m : m) + ":" + (sec < 10 ? "0" + sec : sec); }
 </script>
 </body>
