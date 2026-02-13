@@ -11,8 +11,8 @@
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 
     <style>
-        /* COLOR BRONCE PROFUNDO - DISEÑADO PARA PANTALLAS OLED MÓVILES */
-        :root { --gold: #6e5a2f; --bg: #050505; --card: #121212; }
+        /* COLOR DORADO INTENSO - PARA QUE TODO RESALTE */
+        :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
         html, body { margin: 0; background: var(--bg); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-y: auto !important; }
@@ -26,12 +26,11 @@
         .header-logo { width: 35px; height: 35px; border-radius: 8px; cursor: pointer; }
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; line-height: 1.2; }
         
-        /* BOTÓN SALIR BRONCE */
         .btn-salir-premium { background: transparent; border: 1.5px solid var(--gold); color: var(--gold); padding: 7px 15px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 
         .container { max-width: 550px; margin: auto; padding: 15px; padding-bottom: 280px; }
 
-        /* --- FILA DE CANALES BLINDADA --- */
+        /* FILA DE CANALES - ESTABLE Y MÁS VIVA */
         .channels-container { 
             display: grid !important; 
             grid-template-columns: repeat(5, 1fr) !important; 
@@ -40,18 +39,17 @@
             padding: 10px 0; 
             width: 100%;
         }
-        .channel-item { text-align: center; opacity: 0.4; transition: 0.3s; cursor: pointer; }
+        .channel-item { text-align: center; opacity: 0.6; transition: 0.3s; cursor: pointer; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
         .channel-logo { width: 44px; height: 44px; border-radius: 12px; border: 2px solid #222; margin: 0 auto 6px; background: #000; object-fit: contain; }
         .active .channel-logo { border-color: var(--gold); }
-        .channel-name { font-size: 7px; color: #888; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .channel-name { font-size: 7px; color: #bbb; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* TARJETAS */
+        /* TARJETAS - SIN CAPAS QUE OPACAN LA IMAGEN */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 25px; border: 1px solid #1a1a1a; overflow: hidden; }
         .cover-art { width: 100%; height: 160px; background-size: cover; background-position: center; position: relative; }
-        .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
+        .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; }
         
-        /* BOTÓN DE PLAY MATE TOTAL */
         .btn-play-card { 
             background-color: var(--gold) !important; 
             border: none !important; 
@@ -60,19 +58,18 @@
             color: black !important; 
             font-size: 22px; 
             display: flex; align-items: center; justify-content: center;
-            box-shadow: none !important;
-            filter: grayscale(0.2) !important; /* Apaga el brillo */
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3) !important;
         }
 
         .episode-info { padding: 15px; }
         .episode-title { margin: 5px 0; font-size: 18px; font-weight: 800; color: #fff; }
         
-        .btn-ver-playlist { background: #111; border: 1px solid #222; color: #555; padding: 10px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; margin-top: 10px; width: 100%; text-transform: uppercase; }
-        .playlist-box { display: none; margin-top: 12px; padding: 15px; background: #080808; border-radius: 12px; border: 1px solid #1a1a1a; font-size: 13px; color: #999; line-height: 1.8; white-space: pre-wrap; max-height: 250px; overflow-y: auto; }
+        .btn-ver-playlist { background: #111; border: 1px solid #222; color: #888; padding: 10px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; margin-top: 10px; width: 100%; text-transform: uppercase; }
+        .playlist-box { display: none; margin-top: 12px; padding: 15px; background: #080808; border-radius: 12px; border: 1px solid #1a1a1a; font-size: 13px; color: #ccc; line-height: 1.8; white-space: pre-wrap; max-height: 250px; overflow-y: auto; }
 
         .dj-actions { display: flex; gap: 8px; margin-top: 15px; border-top: 1px solid #222; padding-top: 15px; }
         .btn-dj-edit { background: var(--gold); color: black; flex: 1; border: none; padding: 10px; border-radius: 8px; font-size: 9px; font-weight: 800; cursor: pointer; }
-        .btn-dj-del { background: none; border: 1px solid #333; color: #444; flex: 1; padding: 10px; border-radius: 8px; font-size: 9px; font-weight: 800; cursor: pointer; }
+        .btn-dj-del { background: none; border: 1px solid #333; color: #666; flex: 1; padding: 10px; border-radius: 8px; font-size: 9px; font-weight: 800; cursor: pointer; }
 
         /* PLAYER GLOBAL */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
@@ -163,9 +160,9 @@
     // LOGIN
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_final_6', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_final_rev', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_auth_final_6')) {
+    if(localStorage.getItem('jtp_auth_final_rev')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
