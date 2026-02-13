@@ -12,10 +12,9 @@
     <style>
         :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none !important; }
-        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
+        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow: hidden; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; }
         
-        /* LOGIN PREMIUM */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
@@ -23,28 +22,26 @@
 
         header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; }
         .header-logo { width: 35px; height: 35px; border-radius: 8px; }
-        .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 12px; text-transform: uppercase; }
-        .btn-salir-premium { background: transparent !important; border: 1.2px solid var(--gold) !important; color: var(--gold) !important; padding: 7px 15px !important; border-radius: 8px !important; font-size: 10px !important; font-weight: 800 !important; text-transform: uppercase !important; cursor: pointer; }
+        .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; }
+        .btn-salir-premium { background: transparent !important; border: 1.5px solid var(--gold) !important; color: var(--gold) !important; padding: 7px 15px !important; border-radius: 8px !important; font-size: 10px !important; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 
         #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
-        /* --- CATEGORÍAS V11.9 (DISTRIBUCIÓN REAL) --- */
+        /* --- CATEGORÍAS V12.1 (AJUSTE FIJO SIN SCROLL) --- */
         .channels-container { 
-            display: flex; 
-            justify-content: space-between; /* Esto los reparte en el ancho de la pantalla */
-            gap: 10px; 
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr); /* 5 columnas iguales */
+            gap: 5px; 
             margin-bottom: 25px; 
-            overflow-x: auto; 
-            padding: 10px 5px; 
-            scrollbar-width: none; 
-            -webkit-overflow-scrolling: touch;
+            padding: 10px 0; 
+            width: 100%;
         }
-        .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; min-width: 65px; cursor: pointer; }
+        .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; cursor: pointer; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
-        .channel-logo { width: 58px; height: 58px; border-radius: 12px; border: 2.5px solid #333; margin-bottom: 8px; background: #000; object-fit: contain; padding: 3px; }
+        .channel-logo { width: 48px; height: 48px; border-radius: 10px; border: 2px solid #333; margin: 0 auto 6px; background: #000; object-fit: contain; padding: 2px; display: block; }
         .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.4); }
-        .channel-name { font-size: 8px; color: #aaa; font-weight: 800; text-transform: uppercase; display: block; }
+        .channel-name { font-size: 7px; color: #aaa; font-weight: 800; text-transform: uppercase; display: block; white-space: nowrap; overflow: hidden; }
 
         /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; position: relative; overflow: hidden; }
@@ -55,8 +52,12 @@
         .is-playing .btn-play-card { background: rgba(0,0,0,0.85) !important; border: 2.5px solid var(--gold); }
         .is-playing .btn-play-card::before { content: '||'; font-family: Arial; font-weight: bold; color: var(--gold); margin-left: 0; }
 
+        .episode-info { padding: 20px; }
+        .program-tag { display: inline-block; font-size: 8px; color: black; padding: 4px 12px; border-radius: 50px; background: var(--gold); font-weight: 800; margin-bottom: 10px; }
+        .episode-title { font-size: 18px; font-weight: 700; color: white; line-height: 1.2; }
+
         /* REPRODUCTOR */
-        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; box-shadow: 0 -20px 40px rgba(0,0,0,1); }
+        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .player-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
         .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
@@ -68,12 +69,11 @@
         #seek-bar { width: 100%; -webkit-appearance: none; background: #222; height: 5px; border-radius: 3px; }
         #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--gold); border-radius: 50%; border: 2px solid #000; }
 
-        .tool-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 12px; margin-top: 5px; gap: 8px; }
-        .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 5px; border-radius: 8px; font-size: 8.5px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .tool-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 12px; margin-top: 5px; gap: 6px; }
+        .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 2px; border-radius: 8px; font-size: 8px; font-weight: 800; cursor: pointer; }
         
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        /* El reproductor nativo que Chrome NO puede bloquear */
-        #main-media { width: 100%; height: 50px; margin-top: 10px; display: none; filter: invert(1); border-radius: 8px; }
+        #main-media { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -93,7 +93,7 @@
             <img src="logo.png" class="header-logo">
             <div class="brand-title">Jazztabueno<br>Productions</div>
         </div>
-        <button onclick="window.reiniciarSesion()" class="btn-salir-premium">SALIR</button>
+        <button onclick="window.salirTotal()" class="btn-salir-premium">SALIR</button>
     </header>
 
     <div class="container">
@@ -109,7 +109,7 @@
 </div>
 
 <div id="global-player">
-    <video id="main-media" controls playsinline crossorigin="anonymous"></video>
+    <audio id="main-media" playsinline crossorigin="anonymous"></audio>
     <div class="player-top">
         <div id="p-vinyl" class="p-vinyl" style="background-image: url('logo.png');"></div>
         <div class="p-info"><h4 id="p-title">...</h4><div id="p-time-display" class="p-time">00:00 / 00:00</div></div>
@@ -120,9 +120,9 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button id="cast-btn-119" onclick="window.activarCastNativo()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR A TV</button>
-        <button onclick="window.forzarImagen()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
-        <button onclick="window.resetUI()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
+        <button id="btn-cast-121" onclick="window.activarCastV121()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR TV</button>
+        <button onclick="window.refrescarArteSolo()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
+        <button onclick="window.resetUI()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET UI</button>
     </div>
 </div>
 
@@ -133,7 +133,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
-    const castBtn = document.getElementById('cast-btn-119');
+    const castBtn = document.getElementById('btn-cast-121');
     let programas = []; let idActual = null; let filtroActivo = 'Todo';
 
     window.checkLogin = () => {
@@ -171,7 +171,7 @@
         });
     }
 
-    function syncMetadata(titulo, prog, img) {
+    function syncMetadataV121(titulo, prog, img) {
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: titulo, artist: prog, album: 'Jazztabueno Productions',
@@ -183,55 +183,62 @@
     window.gestionarReproduccion = (id, url, titulo, prog, img) => {
         if (idActual === id) { window.togglePlay(); } 
         else {
-            idActual = id; media.src = url; media.setAttribute('poster', img || 'logo.png');
+            idActual = id; media.src = url; 
             document.getElementById('p-title').innerText = titulo;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img || 'logo.png'}')`;
             document.getElementById('global-player').style.display = 'block';
-            syncMetadata(titulo, prog, img || 'logo.png');
-            media.play();
+            syncMetadataV121(titulo, prog, img || 'logo.png');
+            media.play().then(() => {
+                // Ráfaga de posters para forzar la imagen en Onn TV
+                setTimeout(() => syncMetadataV121(titulo, prog, img || 'logo.png'), 1500);
+                setTimeout(() => syncMetadataV121(titulo, prog, img || 'logo.png'), 4000);
+            });
         }
         render();
     };
 
     window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
     
-    // --- LÓGICA DE TRANSMISIÓN NATIVA V11.9 ---
-    window.activarCastNativo = () => { 
-        // Hacemos aparecer el reproductor de Google para usar su botón Cast interno
-        media.style.display = (media.style.display === 'block') ? 'none' : 'block';
-        alert("📡 Toca el icono de TRANSMITIR (el cuadrito con ondas) que apareció en el reproductor de abajo.");
-    };
-
-    window.forzarImagen = () => {
-        if(idActual) {
-            const p = programas.find(x => x.id === idActual);
-            if(p) syncMetadata(p.titulo, p.programa, p.imagenUrl);
-            alert("📡 Refrescando carátula...");
+    // --- NUEVO MOTOR DE TRANSMISIÓN DIRECTO V12.1 ---
+    window.activarCastV121 = () => { 
+        if(media.remotePlayback) {
+            // Un toque directo para que Chrome no lo bloquee
+            media.remotePlayback.prompt().then(() => {
+                console.log("Cast iniciado");
+            }).catch(() => {
+                alert("📡 Director: Chrome bloqueó el menú. Toca los 3 puntos de Chrome y selecciona 'Transmitir'.");
+            });
         }
     };
 
-    window.resetUI = () => { castBtn.classList.remove('is-casting'); media.pause(); media.src = ""; render(); alert("♻️ Icono Limpio."); };
+    window.refrescarArteSolo = () => {
+        if(idActual) {
+            const p = programas.find(x => x.id === idActual);
+            if(p) {
+                // Solo refresca metadatos visuales
+                syncMetadataV121(p.titulo, p.programa, p.imagenUrl);
+                alert("📡 Imagen re-enviada. Música continua.");
+            }
+        }
+    };
+
+    window.resetUI = () => { media.pause(); media.src = ""; render(); alert("♻️ UI Reiniciada."); };
 
     setInterval(() => {
         if (media.remotePlayback && media.remotePlayback.state === 'connected') {
-            castBtn.style.background = "var(--gold)";
-            castBtn.style.color = "black";
-            castBtn.innerText = "📡 TV CONECTADA";
+            castBtn.style.background = "var(--gold)"; castBtn.style.color = "black"; castBtn.innerText = "📡 TV CONECTADA";
         } else {
-            castBtn.style.background = "#1a1a1a";
-            castBtn.style.color = "#fff";
-            castBtn.innerText = "📡 TRANSMITIR A TV";
+            castBtn.style.background = "#1a1a1a"; castBtn.style.color = "#fff"; castBtn.innerText = "📡 TRANSMITIR TV";
         }
-    }, 2000);
+    }, 2500);
 
     window.filtrar = (cat, el) => {
         filtroActivo = cat;
         document.querySelectorAll('.channel-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-        render();
+        el.classList.add('active'); render();
     };
 
-    window.reiniciarSesion = () => { localStorage.clear(); location.reload(); };
+    window.salirTotal = () => { localStorage.clear(); location.reload(); };
     media.onloadedmetadata = () => { seekBar.max = Math.floor(media.duration); };
     media.onplay = () => { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; render(); };
     media.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; render(); };
