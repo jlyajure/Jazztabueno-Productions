@@ -21,17 +21,21 @@
 
         .container { max-width: 600px; margin: auto; padding: 15px; }
 
-        .channels-container { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; overflow-x: auto; padding: 10px 0; }
-        .channel-item { text-align: center; opacity: 0.6; transition: 0.3s; cursor: pointer; min-width: 65px; }
-        .channel-item.active { opacity: 1; transform: scale(1.1); }
-        .channel-logo { width: 55px; height: 55px; border-radius: 50%; border: 2px solid #333; }
+        /* CATEGORÍAS CON NOMBRES COMPLETOS */
+        .channels-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+        .channels-container::-webkit-scrollbar { display: none; }
+        .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; cursor: pointer; min-width: 75px; }
+        .channel-item.active { opacity: 1; transform: scale(1.05); }
+        .channel-logo { width: 55px; height: 55px; border-radius: 50%; border: 2px solid #333; margin-bottom: 5px; }
         .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.4); }
+        .channel-name { font-size: 9px; font-weight: 800; color: #888; text-transform: uppercase; display: block; white-space: nowrap; }
+        .active .channel-name { color: var(--gold); }
 
+        /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 20px; overflow: hidden; border: 1px solid #222; position: relative; }
         .cover-art { width: 100%; height: 220px; background-size: cover; background-position: center; position: relative; }
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; transition: 0.3s; }
         
-        /* Efecto cuando está sonando */
         .is-playing .cover-overlay { background: rgba(0,0,0,0.1); }
         .is-playing .btn-play-card { background: rgba(212, 175, 55, 0.2); color: transparent; border: 2px solid var(--gold); }
         .is-playing .btn-play-card::after { content: '||'; color: var(--gold); font-size: 20px; font-weight: bold; }
@@ -42,27 +46,25 @@
         .program-tag { display: inline-block; font-size: 10px; color: black; padding: 4px 14px; border-radius: 50px; background: var(--gold); font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
         .episode-title { font-size: 18px; margin: 0; font-weight: 700; color: white; }
 
+        /* REPRODUCTOR */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; border-top: 2px solid var(--gold); padding: 10px 20px; display: none; z-index: 1000; box-shadow: 0 -10px 30px rgba(0,0,0,0.8); }
         .player-flex { display: flex; align-items: center; gap: 15px; }
         .mini-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .mini-vinyl { animation-play-state: running; }
         .player-data { flex-grow: 1; }
-        .player-data h4 { margin: 0; font-size: 13px; color: var(--gold); }
+        .player-data h4 { margin: 0; font-size: 13px; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         audio { width: 100%; height: 35px; margin-top: 5px; filter: invert(100%) hue-rotate(180deg); }
 
-        .admin-controls { margin-top: 10px; display: flex; gap: 10px; }
-        .btn-edit { background: #333; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
-        
-        #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
         input { width: 100%; padding: 12px; margin-bottom: 10px; background: #222; border: 1px solid #444; color: white; border-radius: 8px; }
+        .btn-edit { background: #333; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-right: 5px; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <div class="login-card" style="text-align: center; width: 85%;">
+    <div class="login-card" style="text-align: center; width: 85%; margin: auto;">
         <img src="logo.png" style="width:100px; margin-bottom:20px;">
         <h2 style="color:var(--gold);">JAZZTABUENO</h2>
         <input type="password" id="passInput" placeholder="Clave de Acceso">
@@ -81,10 +83,10 @@
 
     <div class="container">
         <div id="admin-panel" style="display:none;">
-            <button onclick="toggleUpload()" id="btnMainAction" style="width:100%; padding:15px; background:var(--gold); border:none; border-radius:12px; font-weight:800; margin-bottom:20px;">📡 NUEVO PROGRAMA</button>
+            <button onclick="toggleUpload()" style="width:100%; padding:15px; background:var(--gold); border:none; border-radius:12px; font-weight:800; margin-bottom:20px;">📡 NUEVO PROGRAMA</button>
             <div id="upload-form" style="display:none; background:#1a1a1a; padding:20px; border-radius:15px; border:1px solid var(--gold); margin-bottom:20px;">
                 <input type="hidden" id="edit-id">
-                <input type="text" id="prog-name" placeholder="Categoría">
+                <input type="text" id="prog-name" placeholder="Categoría (JAZZTABUENO, SALSA BRAVA, etc)">
                 <input type="text" id="prog-title" placeholder="Título">
                 <input type="text" id="prog-mp3" placeholder="Link MP3">
                 <input type="text" id="prog-img" placeholder="Link Imagen">
@@ -93,11 +95,11 @@
         </div>
 
         <div class="channels-container">
-            <div class="channel-item active" onclick="filtrar('Todo', this)"><img src="logo.png" class="channel-logo"></div>
-            <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)"><img src="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png" class="channel-logo"></div>
-            <div class="channel-item" onclick="filtrar('STUDIO 79', this)"><img src="https://i.postimg.cc/NKMDbYJB/S79.png" class="channel-logo"></div>
-            <div class="channel-item" onclick="filtrar('SALSA BRAVA', this)"><img src="https://i.postimg.cc/75fchgyt/Salsa-Brava.png" class="channel-logo"></div>
-            <div class="channel-item" onclick="filtrar('OLD SCHOOL', this)"><img src="https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png" class="channel-logo"></div>
+            <div class="channel-item active" onclick="filtrar('Todo', this)"><img src="logo.png" class="channel-logo"><span class="channel-name">Todo</span></div>
+            <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)"><img src="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png" class="channel-logo"><span class="channel-name">Jazztabueno</span></div>
+            <div class="channel-item" onclick="filtrar('STUDIO', this)"><img src="https://i.postimg.cc/NKMDbYJB/S79.png" class="channel-logo"><span class="channel-name">Studio 79</span></div>
+            <div class="channel-item" onclick="filtrar('SALSA', this)"><img src="https://i.postimg.cc/75fchgyt/Salsa-Brava.png" class="channel-logo"><span class="channel-name">Salsa Brava</span></div>
+            <div class="channel-item" onclick="filtrar('OLD', this)"><img src="https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png" class="channel-logo"><span class="channel-name">Old School</span></div>
         </div>
 
         <div id="radio-feed"></div>
@@ -111,7 +113,7 @@
             <h4 id="p-title">Reproduciendo...</h4>
             <audio id="main-audio" controls></audio>
         </div>
-        <button onclick="cerrarPlayer()" style="background:none; border:none; color:#555; font-size:20px;">×</button>
+        <button onclick="cerrarPlayer()" style="background:none; border:none; color:#555; font-size:24px; padding: 0 10px;">×</button>
     </div>
 </div>
 
@@ -146,7 +148,14 @@
     function render() {
         const feed = document.getElementById('radio-feed');
         feed.innerHTML = "";
-        const lista = programas.filter(p => filtroActivo === 'Todo' || p.programa.toUpperCase().includes(filtroActivo.toUpperCase()));
+        
+        // Filtro inteligente (ignora espacios y mayúsculas)
+        const lista = programas.filter(p => {
+            if(filtroActivo === 'Todo') return true;
+            const pNorm = p.programa.toUpperCase().replace(/\s/g, '');
+            const fNorm = filtroActivo.toUpperCase().replace(/\s/g, '');
+            return pNorm.includes(fNorm);
+        });
 
         lista.forEach(p => {
             const isPlaying = idActual === p.id;
@@ -176,9 +185,9 @@
         });
     }
 
+    const audio = document.getElementById('main-audio');
+
     window.gestionarReproduccion = (id, url, titulo, prog, img) => {
-        const audio = document.getElementById('main-audio');
-        
         if (idActual === id) {
             if (audio.paused) audio.play();
             else audio.pause();
@@ -187,13 +196,9 @@
             document.getElementById('p-title').innerText = titulo;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img || 'logo.png'}')`;
             document.getElementById('global-player').style.display = 'block';
-            
             audio.src = url;
-            
-            // MEMORIA: Recuperar tiempo guardado
             const savedTime = localStorage.getItem(`time_${id}`);
             if(savedTime) audio.currentTime = parseFloat(savedTime);
-            
             audio.play();
             
             if ('mediaSession' in navigator) {
@@ -206,20 +211,9 @@
         render();
     };
 
-    // GUARDAR TIEMPO CADA 5 SEGUNDOS
-    const audio = document.getElementById('main-audio');
-    audio.ontimeupdate = () => {
-        if(idActual) localStorage.setItem(`time_${idActual}`, audio.currentTime);
-    };
-
-    audio.onplay = () => {
-        document.getElementById('global-player').classList.add('playing');
-        render();
-    };
-    audio.onpause = () => {
-        document.getElementById('global-player').classList.remove('playing');
-        render();
-    };
+    audio.ontimeupdate = () => { if(idActual) localStorage.setItem(`time_${idActual}`, audio.currentTime); };
+    audio.onplay = () => { document.getElementById('global-player').classList.add('playing'); render(); };
+    audio.onpause = () => { document.getElementById('global-player').classList.remove('playing'); render(); };
 
     window.cerrarPlayer = () => {
         audio.pause();
