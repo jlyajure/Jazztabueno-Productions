@@ -16,11 +16,17 @@
         html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 240px; }
         
-        /* LOGIN V8.7 - ESTILO PREMIUM */
+        /* LOGIN PREMIUM V8.8 - RESTAURADO */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
-        .login-card { width: 85%; max-width: 330px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; box-shadow: 0 15px 50px rgba(0,0,0,0.8); }
-        .login-card input { width: 100%; padding: 15px; margin-bottom: 20px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 15px; text-align: center; font-size: 16px; outline: none; }
-        .btn-enter-gold { background: var(--gold); border: none; padding: 16px; border-radius: 35px; font-weight: 800; cursor: pointer; width: 100%; color: black; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; }
+        .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
+        .login-card input { width: 100%; padding: 15px; margin-bottom: 20px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; outline: none; }
+        
+        .btn-enter-premium { 
+            background: var(--gold); border: none; padding: 16px; border-radius: 50px; 
+            font-weight: 800; cursor: pointer; width: 100%; color: black; 
+            text-transform: uppercase; letter-spacing: 1px; font-size: 14px;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
 
         header { background: rgba(0,0,0,0.98); padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
         .header-logo { width: 40px; height: 40px; border-radius: 8px; }
@@ -39,9 +45,7 @@
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; }
         .btn-play-card { background: var(--gold); border: none; width: 70px; height: 70px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-play-card::before { content: '▶'; font-size: 28px; color: black; margin-left: 6px; }
-        .is-actually-playing .btn-play-card { background: rgba(0, 0, 0, 0.8) !important; border: 3px solid var(--gold); }
-        .is-actually-playing .btn-play-card::before { content: ''; width: 6px; height: 26px; background: var(--gold); box-shadow: 16px 0 0 var(--gold); margin-right: 16px; margin-left: 0; }
-
+        
         .admin-float { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; z-index: 10; }
         .btn-mini { background: rgba(0,0,0,0.9); border: 1.5px solid #444; color: white; padding: 12px; border-radius: 12px; cursor: pointer; }
 
@@ -49,6 +53,7 @@
         .program-tag { display: inline-block; font-size: 9px; color: black; padding: 5px 14px; border-radius: 50px; background: var(--gold); font-weight: 800; text-transform: uppercase; margin-bottom: 12px; }
         .episode-title { font-size: 20px; margin: 0; font-weight: 700; color: white; line-height: 1.2; }
 
+        /* REPRODUCTOR */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 18px 20px; display: none; z-index: 1000; box-shadow: 0 -20px 50px rgba(0,0,0,1); }
         .player-top { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
         .p-vinyl { width: 55px; height: 55px; border-radius: 50%; border: 2.5px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
@@ -66,8 +71,7 @@
         .btn-tool { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 15px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; }
 
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        /* Oculto pero activo para Cast */
-        audio { width: 100%; height: 45px; display: none; }
+        audio { display: none !important; } /* Oculto para usar solo la consola dorada */
     </style>
 </head>
 <body>
@@ -77,7 +81,7 @@
         <img src="logo.png" style="width:100px; margin-bottom:20px;">
         <h2 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom: 25px;">JAZZTABUENO</h2>
         <input type="password" id="passInput" placeholder="Introduce tu Clave">
-        <button onclick="checkLogin()" class="btn-enter-gold">ENTRAR A LA CABINA ▶</button>
+        <button onclick="checkLogin()" class="btn-enter-premium">ENTRAR A LA CABINA ▶</button>
     </div>
 </div>
 
@@ -124,7 +128,7 @@
         <button onclick="window.cambiarVelocidad()" id="btn-speed" class="btn-tool">1.0x</button>
         <button onclick="window.toggleMute()" id="btn-mute" class="btn-tool">🔊 VOL</button>
     </div>
-    <audio id="main-audio" controls controlsList="nodownload"></audio>
+    <audio id="main-audio"></audio>
 </div>
 
 <script type="module">
@@ -154,21 +158,14 @@
 
     function render() {
         const feed = document.getElementById('radio-feed'); feed.innerHTML = "";
-        const lista = programas.filter(p => {
-            if(filtroActivo === 'Todo') return true;
-            return p.programa.toUpperCase().replace(/\s/g, '').includes(filtroActivo.toUpperCase().replace(/\s/g, ''));
-        });
+        const lista = programas.filter(p => filtroActivo === 'Todo' || p.programa.toUpperCase().replace(/\s/g, '').includes(filtroActivo.toUpperCase().replace(/\s/g, '')));
         lista.forEach(p => {
-            const isActuallyPlaying = (idActual === p.id && !audio.paused);
-            const isAdmin = localStorage.getItem('jazz_auth') === 'ticoadmin';
+            const isPlaying = (idActual === p.id && !audio.paused);
             const div = document.createElement('div');
-            div.className = `episode-card ${isActuallyPlaying ? 'is-actually-playing' : ''}`;
+            div.className = `episode-card ${isPlaying ? 'is-actually-playing' : ''}`;
             div.innerHTML = `
                 <div class="cover-art" style="background-image: url('${p.imagenUrl || 'logo.png'}')">
-                    ${isAdmin ? `<div class="admin-float">
-                        <button class="btn-mini" onclick="window.iniciarEdicion('${p.id}')">📝</button>
-                        <button class="btn-mini" style="color:#ff4444;" onclick="window.borrar('${p.id}')">🗑️</button>
-                    </div>` : ''}
+                    ${localStorage.getItem('jazz_auth') === 'ticoadmin' ? `<div class="admin-float"><button class="btn-mini" onclick="window.iniciarEdicion('${p.id}')">📝</button><button class="btn-mini" style="color:#ff4444;" onclick="window.borrar('${p.id}')">🗑️</button></div>` : ''}
                     <div class="cover-overlay"><button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo}', '${p.programa}', '${p.imagenUrl}')"></button></div>
                 </div>
                 <div class="episode-info"><span class="program-tag">${p.programa}</span><h3 class="episode-title">${p.titulo}</h3></div>`;
@@ -176,17 +173,14 @@
         });
     }
 
-    // --- ACTUALIZADOR DE METADATOS V8.7 ---
-    function enviarImagenATV(titulo, artista, img) {
+    // --- REFUERZO DE IMAGEN V8.8 ---
+    function syncMetadata(titulo, prog, img) {
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
-                title: titulo,
-                artist: artista,
-                album: 'Jazztabueno Productions',
-                artwork: [
-                    { src: img, sizes: '512x512', type: 'image/png' }
-                ]
+                title: titulo, artist: prog, album: 'Jazztabueno Productions',
+                artwork: [{ src: img, sizes: '512x512', type: 'image/png' }]
             });
+            navigator.mediaSession.playbackState = 'playing';
         }
     }
 
@@ -198,27 +192,20 @@
             document.getElementById('p-title').innerText = titulo;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${artworkUrl}')`;
             document.getElementById('global-player').style.display = 'block';
-            
             audio.src = url; 
-            const savedTime = localStorage.getItem(`time_${id}`);
-            if(savedTime) audio.currentTime = parseFloat(savedTime); 
             
-            // Intento 1 de imagen
-            enviarImagenATV(titulo, prog, artworkUrl);
-            
+            // Triple aviso para la TV
+            syncMetadata(titulo, prog, artworkUrl);
             audio.play().then(() => {
-                // Intento 2 (Refuerzo 2 segundos después para TVs lentas)
-                setTimeout(() => enviarImagenATV(titulo, prog, artworkUrl), 2500);
+                setTimeout(() => syncMetadata(titulo, prog, artworkUrl), 1000);
+                setTimeout(() => syncMetadata(titulo, prog, artworkUrl), 3000);
             });
         }
         render();
     };
 
     window.togglePlay = () => { if (audio.paused) audio.play(); else audio.pause(); render(); };
-    window.activarCastNativo = () => { 
-        audio.style.display = (audio.style.display === 'block') ? 'none' : 'block';
-        if(audio.remotePlayback) audio.remotePlayback.prompt().catch(() => {});
-    };
+    window.activarCastNativo = () => { if(audio.remotePlayback) audio.remotePlayback.prompt().catch(() => {}); };
     window.cambiarVelocidad = () => {
         const speeds = [1.0, 1.25, 1.5, 2.0, 0.5];
         audio.playbackRate = speeds[(speeds.indexOf(audio.playbackRate) + 1) % speeds.length];
@@ -232,7 +219,7 @@
     seekBar.oninput = () => { audio.currentTime = seekBar.value; };
     audio.onplay = () => { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; render(); };
     audio.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; render(); };
-    window.cerrarPlayer = () => { audio.pause(); document.getElementById('global-player').style.display = 'none'; audio.style.display = 'none'; idActual = null; render(); };
+    window.cerrarPlayer = () => { audio.pause(); document.getElementById('global-player').style.display = 'none'; idActual = null; render(); };
     window.filtrar = (cat, el) => { filtroActivo = cat; document.querySelectorAll('.channel-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); render(); };
     window.toggleUpload = () => { document.getElementById('upload-form').style.display = (document.getElementById('upload-form').style.display === 'none') ? 'block' : 'none'; };
     window.iniciarEdicion = (id) => {
