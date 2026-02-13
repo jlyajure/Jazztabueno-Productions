@@ -9,13 +9,14 @@
     <link rel="apple-touch-icon" href="logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     
+    <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+
     <style>
         :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow: hidden; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; }
         
-        /* LOGIN */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
@@ -29,7 +30,6 @@
         #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
-        /* CANALES V13.5 */
         .channels-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 25px; padding: 10px 0; width: 100%; }
         .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; cursor: pointer; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
@@ -37,7 +37,6 @@
         .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.4); }
         .channel-name { font-size: 7px; color: #aaa; font-weight: 800; text-transform: uppercase; display: block; white-space: nowrap; overflow: hidden; }
 
-        /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; position: relative; overflow: hidden; }
         .cover-art { width: 100%; height: 210px; background-size: cover; background-position: center; position: relative; }
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
@@ -46,7 +45,6 @@
         .is-playing .btn-play-card { background: rgba(0,0,0,0.85) !important; border: 2.5px solid var(--gold); }
         .is-playing .btn-play-card::before { content: '||'; font-family: Arial; font-weight: bold; color: var(--gold); margin-left: 0; }
 
-        /* REPRODUCTOR */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .player-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
         .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
@@ -57,16 +55,13 @@
 
         .btn-p-main { background: none; border: none; color: var(--gold); font-size: 30px; cursor: pointer; }
         #seek-bar { width: 100%; -webkit-appearance: none; background: #222; height: 5px; border-radius: 3px; }
-        #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: var(--gold); border-radius: 50%; border: 2px solid #000; cursor: pointer; }
+        #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--gold); border-radius: 50%; border: 2px solid #000; cursor: pointer; }
 
         .tool-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 12px; margin-top: 5px; gap: 6px; }
-        .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 2px; border-radius: 8px; font-size: 8px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 2px; border-radius: 8px; font-size: 9px; font-weight: 800; cursor: pointer; transition: 0.3s; }
         
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        /* EL CABALLO DE TROYA: Ahora es un reproductor de Audio Oficial */
-        #main-media { width: 100%; height: 0px; opacity: 0; pointer-events: none; transition: all 0.3s ease-in-out; border-radius: 10px; }
-        .mostrar-nativo { height: 54px !important; opacity: 1 !important; pointer-events: all !important; margin-bottom: 15px !important; }
+        #main-media { display: none; }
     </style>
 </head>
 <body>
@@ -102,8 +97,7 @@
 </div>
 
 <div id="global-player">
-    <audio id="main-media" playsinline crossorigin="anonymous" controls controlsList="nodownload"></audio>
-    
+    <audio id="main-media" playsinline crossorigin="anonymous"></audio>
     <div class="player-top">
         <div id="p-vinyl" class="p-vinyl" style="background-image: url('logo.png');"></div>
         <div class="p-info"><h4 id="p-title">...</h4><div id="p-time-display" class="p-time">00:00 / 00:00</div></div>
@@ -114,9 +108,12 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button id="cast-btn-135" onclick="window.mostrarTrucoNativo()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR TV</button>
-        <button onclick="window.refrescarImagenTV()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
-        <button onclick="window.ocultarTrucoNativo()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
+        <div id="btn-cast-box" class="btn-tool" style="border-color: var(--gold); display: flex; align-items: center; justify-content: center; gap: 5px;">
+            <google-cast-launcher style="width: 18px; height: 18px; --connected-color: black; --disconnected-color: #d4af37; cursor: pointer;"></google-cast-launcher>
+            <span id="cast-text" style="color: var(--gold);">TV</span>
+        </div>
+        <button onclick="window.cambiarVelocidad()" id="btn-speed" class="btn-tool">1.0x</button>
+        <button onclick="window.toggleMute()" id="btn-mute" class="btn-tool">🔊 VOL</button>
     </div>
 </div>
 
@@ -127,13 +124,91 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
-    const castBtn = document.getElementById('cast-btn-135');
     let programas = []; let idActual = null; let filtroActivo = 'Todo';
+
+    // --- INICIALIZACIÓN OFICIAL DE GOOGLE CAST ---
+    window.player = null;
+    window.playerController = null;
+
+    window['__onGCastApiAvailable'] = function(isAvailable) {
+        if (isAvailable) {
+            cast.framework.CastContext.getInstance().setOptions({
+                receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+                autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+            });
+            
+            window.player = new cast.framework.RemotePlayer();
+            window.playerController = new cast.framework.RemotePlayerController(window.player);
+            
+            // SENSOR DE CONEXIÓN Y SINCRONIZACIÓN DE TIEMPO
+            window.playerController.addEventListener(cast.framework.RemotePlayerEventType.IS_CONNECTED_CHANGED, function() {
+                var isConnected = cast.framework.CastContext.getInstance().getCurrentSession() !== null;
+                if (isConnected) {
+                    document.getElementById('cast-text').style.color = "black";
+                    document.getElementById('btn-cast-box').style.background = "var(--gold)";
+                    
+                    // Si estaba sonando en el celular, lo mandamos a la TV
+                    if (idActual && !media.paused) {
+                        var p = programas.find(x => x.id === idActual);
+                        if(p) window.loadCastMedia(p.titulo, p.programa, p.mp3Url, p.imagenUrl);
+                    }
+                } else {
+                    document.getElementById('cast-text').style.color = "var(--gold)";
+                    document.getElementById('btn-cast-box').style.background = "#1a1a1a";
+                    
+                    // ¡EL TRUCO DEL TIEMPO! Rescatamos el minuto exacto de la TV
+                    if (idActual) {
+                        media.currentTime = window.player.currentTime;
+                        media.play(); // Continúa en el celular sin perder ni un segundo
+                    }
+                }
+            });
+
+            // Sensor de barra de tiempo en TV
+            window.playerController.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, function() {
+                if (cast.framework.CastContext.getInstance().getCurrentSession() && idActual) {
+                    seekBar.value = Math.floor(window.player.currentTime);
+                    timeDisplay.innerText = formatTime(window.player.currentTime) + " / " + formatTime(window.player.duration);
+                }
+            });
+        }
+    };
+
+    function rutaAbsoluta(ruta) {
+        if (!ruta) return new URL('logo.png', window.location.href).href;
+        if (ruta.startsWith('http')) return ruta;
+        return new URL(ruta, window.location.href).href;
+    }
+
+    // CARGA AL CHROMECAST OFICIAL
+    window.loadCastMedia = (titulo, prog, url, img) => {
+        var castSession = cast.framework.CastContext.getInstance().getCurrentSession();
+        if (castSession) {
+            var mediaInfo = new chrome.cast.media.MediaInfo(url, 'audio/mpeg');
+            var metadata = new chrome.cast.media.MusicTrackMediaMetadata();
+            metadata.title = titulo;
+            metadata.artist = prog;
+            metadata.images = [new chrome.cast.Image(rutaAbsoluta(img))];
+            mediaInfo.metadata = metadata;
+            
+            var request = new chrome.cast.media.LoadRequest(mediaInfo);
+            request.currentTime = media.currentTime || 0; // Mandamos el tiempo actual a la TV
+            
+            media.pause(); // Pausamos el celular
+            
+            castSession.loadMedia(request).then(
+                function() { 
+                    document.getElementById('global-player').classList.add('playing');
+                    document.getElementById('p-play-btn').innerText = '||';
+                },
+                function(error) { console.log('Error Cast: ' + error); }
+            );
+        }
+    };
 
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value;
-        if(p === "jazz2026" || p === "ticoadmin") { localStorage.setItem('jazz_auth', p); location.reload(); }
-        else { alert("Clave Incorrecta"); }
+        if(p === "jazz2026" || p === "ticoadmin") { localStorage.setItem('jazz_auth', p); location.reload(); } else { alert("Clave Incorrecta"); }
     };
 
     if(localStorage.getItem('jazz_auth')) {
@@ -153,7 +228,10 @@
             return p.programa.toUpperCase().replace(/\s/g, '').includes(filtroActivo.toUpperCase().replace(/\s/g, ''));
         });
         lista.forEach(p => {
-            const isPlaying = (idActual === p.id && !media.paused);
+            const isCastPlaying = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() && window.player && !window.player.isPaused;
+            const isLocalPlaying = !media.paused;
+            const isPlaying = idActual === p.id && (isCastPlaying || isLocalPlaying);
+            
             const div = document.createElement('div');
             div.className = `episode-card ${isPlaying ? 'is-playing' : ''}`;
             div.innerHTML = `
@@ -165,86 +243,45 @@
         });
     }
 
-    // ASEGURAMOS QUE LA RUTA SEA ABSOLUTA PARA EL ONN TV
-    function rutaAbsoluta(ruta) {
-        if (!ruta) return new URL('logo.png', window.location.href).href;
-        if (ruta.startsWith('http')) return ruta;
-        return new URL(ruta, window.location.href).href;
-    }
-
-    // V13.5: EL MENÚ DE TALLAS PARA VENCER LO NEGRO
-    function enviarDatosTV(titulo, prog, img) {
-        const urlSegura = rutaAbsoluta(img);
-        if ('mediaSession' in navigator) {
-            navigator.mediaSession.metadata = new MediaMetadata({
-                title: titulo, artist: prog, album: 'Jazztabueno Productions',
-                artwork: [
-                    { src: urlSegura, sizes: '96x96', type: 'image/png' },
-                    { src: urlSegura, sizes: '128x128', type: 'image/png' },
-                    { src: urlSegura, sizes: '192x192', type: 'image/png' },
-                    { src: urlSegura, sizes: '256x256', type: 'image/png' },
-                    { src: urlSegura, sizes: '384x384', type: 'image/png' },
-                    { src: urlSegura, sizes: '512x512', type: 'image/png' },
-                    { src: urlSegura, sizes: '1024x1024', type: 'image/png' }
-                ]
-            });
-        }
-    }
-
     window.gestionarReproduccion = (id, url, titulo, prog, img) => {
         if (idActual === id) { window.togglePlay(); } 
         else {
             idActual = id; 
             const imgSegura = rutaAbsoluta(img);
             
-            media.src = url; 
-            media.setAttribute('type', 'audio/mpeg'); // GRITAMOS "¡SOY AUDIO!"
-            
             document.getElementById('p-title').innerText = titulo;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${imgSegura}')`;
             document.getElementById('global-player').style.display = 'block';
             
-            enviarDatosTV(titulo, prog, imgSegura);
-            media.play();
+            var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
+            
+            if (isConnected) {
+                window.loadCastMedia(titulo, prog, url, img);
+            } else {
+                media.src = url; 
+                media.play();
+            }
         }
         render();
     };
 
-    window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
-    
-    // CABALLO DE TROYA V13.5
-    window.mostrarTrucoNativo = () => { 
-        if (media.classList.contains('mostrar-nativo')) {
-            window.ocultarTrucoNativo();
+    window.togglePlay = () => { 
+        var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
+        if (isConnected) {
+            window.playerController.playOrPause();
+            setTimeout(() => {
+                document.getElementById('p-play-btn').innerText = window.player.isPaused ? '▶' : '||';
+                if(window.player.isPaused) document.getElementById('global-player').classList.remove('playing');
+                else document.getElementById('global-player').classList.add('playing');
+                render();
+            }, 200);
         } else {
-            media.classList.add('mostrar-nativo');
-            castBtn.style.background = "var(--gold)";
-            castBtn.style.color = "black";
+            if (media.paused) media.play(); else media.pause(); render(); 
         }
     };
-
-    window.refrescarImagenTV = () => {
-        if(idActual) {
-            const p = programas.find(x => x.id === idActual);
-            if(p) { enviarDatosTV(p.titulo, p.programa, p.imagenUrl); alert("📡 Ráfaga de fotos enviada a la TV."); }
-        }
-    };
-
-    // BOTÓN ROJO BLINDADO
-    window.ocultarTrucoNativo = () => { 
-        media.classList.remove('mostrar-nativo');
-        castBtn.style.background = "#1a1a1a"; 
-        castBtn.style.color = "#fff"; 
-        alert("♻️ Visual limpia. ¡Música continua!");
-    };
-
-    setInterval(() => {
-        if (media.remotePlayback && media.remotePlayback.state === 'connected') {
-            castBtn.style.background = "var(--gold)"; castBtn.style.color = "black"; castBtn.innerText = "📡 TV CONECTADA";
-        } else if (!media.classList.contains('mostrar-nativo')) {
-            castBtn.style.background = "#1a1a1a"; castBtn.style.color = "#fff"; castBtn.innerText = "📡 TRANSMITIR TV";
-        }
-    }, 2500);
+    
+    window.cambiarVelocidad = () => { const speeds = [1.0, 1.25, 1.5, 2.0]; media.playbackRate = speeds[(speeds.indexOf(media.playbackRate) + 1) % speeds.length]; document.getElementById('btn-speed').innerText = media.playbackRate + "x"; };
+    window.toggleMute = () => { media.muted = !media.muted; document.getElementById('btn-mute').innerText = media.muted ? "🔇 MUTE" : "🔊 VOL"; };
 
     window.filtrar = (cat, el) => {
         filtroActivo = cat;
@@ -253,12 +290,35 @@
     };
 
     window.salirTotal = () => { localStorage.clear(); location.reload(); };
-    media.onloadedmetadata = () => { seekBar.max = Math.floor(media.duration); };
+    
+    // Controles de tiempo (Sincronizados)
+    media.onloadedmetadata = () => { if(!cast.framework || !cast.framework.CastContext.getInstance().getCurrentSession()){ seekBar.max = Math.floor(media.duration); } };
     media.onplay = () => { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; render(); };
     media.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; render(); };
-    media.ontimeupdate = () => { if(idActual) { seekBar.value = Math.floor(media.currentTime); timeDisplay.innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration); } };
-    seekBar.oninput = () => { media.currentTime = seekBar.value; };
-    window.cerrarPlayer = () => { media.pause(); document.getElementById('global-player').style.display = 'none'; media.classList.remove('mostrar-nativo'); idActual = null; render(); };
+    
+    media.ontimeupdate = () => { 
+        if(idActual && (!cast.framework || !cast.framework.CastContext.getInstance().getCurrentSession())) { 
+            seekBar.value = Math.floor(media.currentTime); 
+            timeDisplay.innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration); 
+        } 
+    };
+    
+    seekBar.oninput = () => { 
+        var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
+        if (isConnected) {
+            window.player.currentTime = seekBar.value;
+            window.playerController.seek();
+        } else {
+            media.currentTime = seekBar.value; 
+        }
+    };
+    
+    window.cerrarPlayer = () => { 
+        var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
+        if(isConnected) window.playerController.stop();
+        media.pause(); document.getElementById('global-player').style.display = 'none'; idActual = null; render(); 
+    };
+    
     function formatTime(s) { if (isNaN(s)) return "00:00"; const h = Math.floor(s / 3600); const m = Math.floor((s % 3600) / 60); const sec = Math.floor(s % 60); return (h > 0 ? h + ":" : "") + (m < 10 ? "0" + m : m) + ":" + (sec < 10 ? "0" + sec : sec); }
 </script>
 </body>
