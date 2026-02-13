@@ -12,7 +12,7 @@
     <style>
         :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow: hidden; }
+        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; }
         
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
@@ -59,7 +59,7 @@
         .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 2px; border-radius: 8px; font-size: 8px; font-weight: 800; cursor: pointer; }
         
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        /* Motor ultra-ligero */
+        /* Motor oculto */
         #main-media { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
     </style>
 </head>
@@ -69,7 +69,7 @@
     <div class="login-card">
         <img src="logo.png" style="width:90px; margin-bottom:20px;">
         <h2 style="color:var(--gold); font-family:'Playfair Display';">JAZZTABUENO</h2>
-        <input type="password" id="passInput" placeholder="Clave">
+        <input type="password" id="passInput" placeholder="Introduce Clave">
         <button onclick="checkLogin()" class="btn-gold-tico">ENTRAR ▶</button>
     </div>
 </div>
@@ -96,7 +96,7 @@
 </div>
 
 <div id="global-player">
-    <audio id="main-media" playsinline crossorigin="anonymous"></audio>
+    <video id="main-media" playsinline crossorigin="anonymous"></video>
     <div class="player-top">
         <div id="p-vinyl" class="p-vinyl" style="background-image: url('logo.png');"></div>
         <div class="p-info"><h4 id="p-title">...</h4><div id="p-time-display" class="p-time">00:00 / 00:00</div></div>
@@ -107,9 +107,9 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button id="btn-cast-v13" onclick="window.castDirecto()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR TV</button>
-        <button onclick="window.reFreshVisuals()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
-        <button onclick="window.resetUIVisual()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
+        <button id="btn-cast-v131" onclick="media.remotePlayback.prompt()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR TV</button>
+        <button onclick="window.refreshVisual()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
+        <button onclick="window.resetVisualSolo()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
     </div>
 </div>
 
@@ -120,7 +120,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
-    const castBtn = document.getElementById('btn-cast-v13');
+    const castBtn = document.getElementById('btn-cast-v131');
     let programas = []; let idActual = null; let filtroActivo = 'Todo';
 
     window.checkLogin = () => {
@@ -158,7 +158,7 @@
         });
     }
 
-    function pushTV(titulo, prog, img) {
+    function syncTV(titulo, prog, img) {
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: titulo, artist: prog, album: 'Jazztabueno Productions',
@@ -171,44 +171,40 @@
         if (idActual === id) { window.togglePlay(); } 
         else {
             idActual = id; media.src = url; 
+            media.setAttribute('poster', img || 'logo.png');
             document.getElementById('p-title').innerText = titulo;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img || 'logo.png'}')`;
             document.getElementById('global-player').style.display = 'block';
-            pushTV(titulo, prog, img || 'logo.png');
-            media.play();
+            syncTV(titulo, prog, img || 'logo.png');
+            media.play().then(() => {
+                setTimeout(() => syncTV(titulo, prog, img || 'logo.png'), 2000);
+            });
         }
         render();
     };
 
     window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
-    
-    // --- FUNCIÓN LIMPIA PARA VENCER EL BLOQUEO ---
-    window.castDirecto = () => { 
-        if(media.remotePlayback) {
-            media.remotePlayback.prompt();
-        }
-    };
 
-    window.reFreshVisuals = () => {
+    window.refreshVisual = () => {
         if(idActual) {
             const p = programas.find(x => x.id === idActual);
-            if(p) { pushTV(p.titulo, p.programa, p.imagenUrl); alert("📡 Imagen refrescada."); }
+            if(p) { syncTV(p.titulo, p.programa, p.imagenUrl); alert("📡 Imagen re-enviada."); }
         }
     };
 
-    // BOTÓN ROJO CORREGIDO: MÚSICA SIGUE SONANDO
-    window.resetUIVisual = () => { 
+    // BOTÓN ROJO CORREGIDO FINAL: SOLO LIMPIA COLORES
+    window.resetVisualSolo = () => { 
         castBtn.style.background = "#1a1a1a"; castBtn.style.color = "#fff"; castBtn.innerText = "📡 TRANSMITIR TV";
-        alert("♻️ Visual reseteada. ¡La música no se detiene!"); 
+        alert("♻️ Visual limpia. ¡Música continúa!");
     };
 
     setInterval(() => {
         if (media.remotePlayback && media.remotePlayback.state === 'connected') {
             castBtn.style.background = "var(--gold)"; castBtn.style.color = "black"; castBtn.innerText = "📡 TV CONECTADA";
-        } else {
+        } else if (media.remotePlayback && media.remotePlayback.state === 'disconnected') {
             castBtn.style.background = "#1a1a1a"; castBtn.style.color = "#fff"; castBtn.innerText = "📡 TRANSMITIR TV";
         }
-    }, 2000);
+    }, 2500);
 
     window.filtrar = (cat, el) => {
         filtroActivo = cat;
