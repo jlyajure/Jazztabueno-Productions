@@ -11,11 +11,10 @@
     
     <style>
         :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow: hidden; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; }
         
-        /* LOGIN */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
@@ -29,7 +28,6 @@
         #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
-        /* CANALES V12.9 */
         .channels-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 25px; padding: 10px 0; width: 100%; }
         .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; cursor: pointer; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
@@ -37,7 +35,6 @@
         .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.4); }
         .channel-name { font-size: 7px; color: #aaa; font-weight: 800; text-transform: uppercase; display: block; white-space: nowrap; overflow: hidden; }
 
-        /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; position: relative; overflow: hidden; }
         .cover-art { width: 100%; height: 210px; background-size: cover; background-position: center; position: relative; }
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
@@ -46,7 +43,6 @@
         .is-playing .btn-play-card { background: rgba(0,0,0,0.85) !important; border: 2.5px solid var(--gold); }
         .is-playing .btn-play-card::before { content: '||'; font-family: Arial; font-weight: bold; color: var(--gold); margin-left: 0; }
 
-        /* REPRODUCTOR */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .player-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
         .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
@@ -63,7 +59,7 @@
         .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 2px; border-radius: 8px; font-size: 8px; font-weight: 800; cursor: pointer; }
         
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        /* MOTOR OCULTO */
+        /* Motor ultra-ligero */
         #main-media { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
     </style>
 </head>
@@ -73,7 +69,7 @@
     <div class="login-card">
         <img src="logo.png" style="width:90px; margin-bottom:20px;">
         <h2 style="color:var(--gold); font-family:'Playfair Display';">JAZZTABUENO</h2>
-        <input type="password" id="passInput" placeholder="Introduce Clave">
+        <input type="password" id="passInput" placeholder="Clave">
         <button onclick="checkLogin()" class="btn-gold-tico">ENTRAR ▶</button>
     </div>
 </div>
@@ -84,7 +80,7 @@
             <img src="logo.png" class="header-logo">
             <div class="brand-title">Jazztabueno<br>Productions</div>
         </div>
-        <button onclick="window.salirFinal()" class="btn-salir-premium">SALIR</button>
+        <button onclick="window.salirTotal()" class="btn-salir-premium">SALIR</button>
     </header>
 
     <div class="container">
@@ -100,7 +96,7 @@
 </div>
 
 <div id="global-player">
-    <video id="main-media" playsinline crossorigin="anonymous"></video>
+    <audio id="main-media" playsinline crossorigin="anonymous"></audio>
     <div class="player-top">
         <div id="p-vinyl" class="p-vinyl" style="background-image: url('logo.png');"></div>
         <div class="p-info"><h4 id="p-title">...</h4><div id="p-time-display" class="p-time">00:00 / 00:00</div></div>
@@ -111,9 +107,9 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button id="cast-btn-129" onclick="window.activarCastLlaveMaestra()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR TV</button>
+        <button id="btn-cast-v13" onclick="window.castDirecto()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR TV</button>
         <button onclick="window.reFreshVisuals()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
-        <button onclick="window.resetSoloVisual()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
+        <button onclick="window.resetUIVisual()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
     </div>
 </div>
 
@@ -124,7 +120,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
-    const castBtn = document.getElementById('cast-btn-129');
+    const castBtn = document.getElementById('btn-cast-v13');
     let programas = []; let idActual = null; let filtroActivo = 'Todo';
 
     window.checkLogin = () => {
@@ -162,7 +158,7 @@
         });
     }
 
-    function syncTV(titulo, prog, img) {
+    function pushTV(titulo, prog, img) {
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: titulo, artist: prog, album: 'Jazztabueno Productions',
@@ -175,24 +171,20 @@
         if (idActual === id) { window.togglePlay(); } 
         else {
             idActual = id; media.src = url; 
-            media.setAttribute('poster', img || 'logo.png');
             document.getElementById('p-title').innerText = titulo;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img || 'logo.png'}')`;
             document.getElementById('global-player').style.display = 'block';
-            syncTV(titulo, prog, img || 'logo.png');
-            media.play().then(() => {
-                setTimeout(() => syncTV(titulo, prog, img || 'logo.png'), 2000);
-            });
+            pushTV(titulo, prog, img || 'logo.png');
+            media.play();
         }
         render();
     };
 
     window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
     
-    // --- BYPASS V12.9: ORDEN DIRECTA SIN INTERMEDIARIOS ---
-    window.activarCastLlaveMaestra = () => { 
+    // --- FUNCIÓN LIMPIA PARA VENCER EL BLOQUEO ---
+    window.castDirecto = () => { 
         if(media.remotePlayback) {
-            // El truco es que esto sea lo ÚNICO que pase al hacer clic
             media.remotePlayback.prompt();
         }
     };
@@ -200,20 +192,20 @@
     window.reFreshVisuals = () => {
         if(idActual) {
             const p = programas.find(x => x.id === idActual);
-            if(p) { syncTV(p.titulo, p.programa, p.imagenUrl); alert("📡 Imagen re-enviada."); }
+            if(p) { pushTV(p.titulo, p.programa, p.imagenUrl); alert("📡 Imagen refrescada."); }
         }
     };
 
-    // BOTÓN ROJO PROTEGIDO: LIMPIA LA UI PERO NO APAGA LA MÚSICA
-    window.resetSoloVisual = () => { 
+    // BOTÓN ROJO CORREGIDO: MÚSICA SIGUE SONANDO
+    window.resetUIVisual = () => { 
         castBtn.style.background = "#1a1a1a"; castBtn.style.color = "#fff"; castBtn.innerText = "📡 TRANSMITIR TV";
-        alert("♻️ Visual reseteada. ¡La música continúa!"); 
+        alert("♻️ Visual reseteada. ¡La música no se detiene!"); 
     };
 
     setInterval(() => {
         if (media.remotePlayback && media.remotePlayback.state === 'connected') {
             castBtn.style.background = "var(--gold)"; castBtn.style.color = "black"; castBtn.innerText = "📡 TV CONECTADA";
-        } else if (media.remotePlayback && media.remotePlayback.state === 'disconnected') {
+        } else {
             castBtn.style.background = "#1a1a1a"; castBtn.style.color = "#fff"; castBtn.innerText = "📡 TRANSMITIR TV";
         }
     }, 2000);
@@ -224,7 +216,7 @@
         el.classList.add('active'); render();
     };
 
-    window.salirFinal = () => { localStorage.clear(); location.reload(); };
+    window.salirTotal = () => { localStorage.clear(); location.reload(); };
     media.onloadedmetadata = () => { seekBar.max = Math.floor(media.duration); };
     media.onplay = () => { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; render(); };
     media.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; render(); };
