@@ -13,62 +13,97 @@
     <style>
         :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: #e2e8f0; padding-bottom: 140px; }
         
-        header { background: rgba(0,0,0,0.9); padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
+        /* Aseguramos que el cuerpo ocupe toda la pantalla */
+        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 140px; }
+        
+        /* LOGIN TOTALMENTE CENTRADO */
+        #login-screen { 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: black; 
+            z-index: 2000; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .login-card { 
+            width: 90%; 
+            max-width: 360px; /* Evita que las barras sean infinitas en la web */
+            text-align: center; 
+            padding: 20px;
+        }
+        .login-card input { 
+            width: 100%; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            background: #1a1a1a; 
+            border: 1px solid #333; 
+            border-bottom: 2px solid var(--gold);
+            color: white; 
+            border-radius: 10px; 
+            text-align: center;
+            font-size: 16px;
+        }
+
+        header { background: rgba(0,0,0,0.95); padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
         .header-logo { width: 40px; height: 40px; border-radius: 8px; }
-        .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 14px; text-transform: uppercase; }
+        .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 13px; text-transform: uppercase; }
+        
+        /* BOTÓN SALIR - Ahora más visible */
+        .btn-logout { background: transparent; border: 1px solid var(--gold); color: white; font-size: 10px; padding: 6px 12px; border-radius: 5px; font-weight: bold; cursor: pointer; }
 
         .container { max-width: 600px; margin: auto; padding: 15px; }
 
-        /* CATEGORÍAS CON NOMBRES COMPLETOS */
-        .channels-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+        /* CATEGORÍAS - Corregido el corte de pantalla */
+        .channels-container { 
+            display: flex; 
+            justify-content: flex-start; /* Permite scroll natural */
+            gap: 15px; 
+            margin-bottom: 25px; 
+            overflow-x: auto; 
+            padding: 10px 5px; 
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
         .channels-container::-webkit-scrollbar { display: none; }
-        .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; cursor: pointer; min-width: 75px; }
+        .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; min-width: 85px; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
-        .channel-logo { width: 55px; height: 55px; border-radius: 50%; border: 2px solid #333; margin-bottom: 5px; }
+        .channel-logo { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #333; margin-bottom: 5px; object-fit: cover; }
         .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.4); }
-        .channel-name { font-size: 9px; font-weight: 800; color: #888; text-transform: uppercase; display: block; white-space: nowrap; }
+        .channel-name { font-size: 10px; font-weight: 800; color: #aaa; text-transform: uppercase; display: block; }
         .active .channel-name { color: var(--gold); }
 
-        /* TARJETAS */
-        .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 20px; overflow: hidden; border: 1px solid #222; position: relative; }
-        .cover-art { width: 100%; height: 220px; background-size: cover; background-position: center; position: relative; }
-        .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-        
-        .is-playing .cover-overlay { background: rgba(0,0,0,0.1); }
-        .is-playing .btn-play-card { background: rgba(212, 175, 55, 0.2); color: transparent; border: 2px solid var(--gold); }
+        /* TARJETAS DE PROGRAMAS */
+        .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 20px; overflow: hidden; border: 1px solid #222; }
+        .cover-art { width: 100%; height: 230px; background-size: cover; background-position: center; position: relative; }
+        .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
         .is-playing .btn-play-card::after { content: '||'; color: var(--gold); font-size: 20px; font-weight: bold; }
+        .btn-play-card { background: var(--gold); border: none; width: 65px; height: 65px; border-radius: 50%; font-size: 24px; cursor: pointer; box-shadow: 0 5px 20px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; }
 
-        .btn-play-card { background: var(--gold); border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 24px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
-
-        .episode-info { padding: 15px; }
-        .program-tag { display: inline-block; font-size: 10px; color: black; padding: 4px 14px; border-radius: 50px; background: var(--gold); font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
-        .episode-title { font-size: 18px; margin: 0; font-weight: 700; color: white; }
-
-        /* REPRODUCTOR */
-        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; border-top: 2px solid var(--gold); padding: 10px 20px; display: none; z-index: 1000; box-shadow: 0 -10px 30px rgba(0,0,0,0.8); }
+        /* REPRODUCTOR FIJO */
+        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #0a0a0a; border-top: 2px solid var(--gold); padding: 12px 20px; display: none; z-index: 1000; }
         .player-flex { display: flex; align-items: center; gap: 15px; }
-        .mini-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
+        .mini-vinyl { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .mini-vinyl { animation-play-state: running; }
-        .player-data { flex-grow: 1; }
+        .player-data { flex-grow: 1; overflow: hidden; }
         .player-data h4 { margin: 0; font-size: 13px; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        audio { width: 100%; height: 35px; margin-top: 5px; filter: invert(100%) hue-rotate(180deg); }
-
-        input { width: 100%; padding: 12px; margin-bottom: 10px; background: #222; border: 1px solid #444; color: white; border-radius: 8px; }
-        .btn-edit { background: #333; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-right: 5px; }
+        audio { width: 100%; height: 35px; margin-top: 8px; filter: invert(100%) hue-rotate(180deg) brightness(1.5); }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <div class="login-card" style="text-align: center; width: 85%; margin: auto;">
-        <img src="logo.png" style="width:100px; margin-bottom:20px;">
-        <h2 style="color:var(--gold);">JAZZTABUENO</h2>
-        <input type="password" id="passInput" placeholder="Clave de Acceso">
-        <button onclick="checkLogin()" style="background:var(--gold); border:none; padding:15px 40px; border-radius:30px; font-weight:800; cursor:pointer; width:100%;">ENTRAR ▶</button>
+    <div class="login-card">
+        <img src="logo.png" style="width:110px; margin-bottom:20px;">
+        <h2 style="color:var(--gold); font-family:'Playfair Display'; letter-spacing: 2px;">JAZZTABUENO</h2>
+        <p style="font-size: 10px; color: #666; margin-bottom: 20px;">PRODUCTIONS</p>
+        <input type="password" id="passInput" placeholder="Introduce tu clave">
+        <button onclick="checkLogin()" style="background:var(--gold); border:none; padding:15px; border-radius:30px; font-weight:800; cursor:pointer; width:100%; color: black;">ENTRAR ▶</button>
     </div>
 </div>
 
@@ -76,17 +111,17 @@
     <header>
         <div style="display:flex; align-items:center; gap:10px;">
             <img src="logo.png" class="header-logo">
-            <div class="brand-title">Jazztabueno Productions</div>
+            <div class="brand-title">Jazztabueno<br>Productions</div>
         </div>
-        <button onclick="localStorage.clear(); location.reload();" style="background:transparent; border:1px solid #444; color:#888; font-size:10px; padding:5px; border-radius:5px;">SALIR</button>
+        <button onclick="localStorage.clear(); location.reload();" class="btn-logout">SALIR</button>
     </header>
 
     <div class="container">
         <div id="admin-panel" style="display:none;">
-            <button onclick="toggleUpload()" style="width:100%; padding:15px; background:var(--gold); border:none; border-radius:12px; font-weight:800; margin-bottom:20px;">📡 NUEVO PROGRAMA</button>
+            <button onclick="toggleUpload()" style="width:100%; padding:15px; background:var(--gold); border:none; border-radius:12px; font-weight:800; margin-bottom:20px; color: black;">📡 NUEVO PROGRAMA</button>
             <div id="upload-form" style="display:none; background:#1a1a1a; padding:20px; border-radius:15px; border:1px solid var(--gold); margin-bottom:20px;">
                 <input type="hidden" id="edit-id">
-                <input type="text" id="prog-name" placeholder="Categoría (JAZZTABUENO, SALSA BRAVA, etc)">
+                <input type="text" id="prog-name" placeholder="Categoría">
                 <input type="text" id="prog-title" placeholder="Título">
                 <input type="text" id="prog-mp3" placeholder="Link MP3">
                 <input type="text" id="prog-img" placeholder="Link Imagen">
@@ -113,7 +148,7 @@
             <h4 id="p-title">Reproduciendo...</h4>
             <audio id="main-audio" controls></audio>
         </div>
-        <button onclick="cerrarPlayer()" style="background:none; border:none; color:#555; font-size:24px; padding: 0 10px;">×</button>
+        <button onclick="cerrarPlayer()" style="background:none; border:none; color:#777; font-size:28px; padding: 0 10px;">×</button>
     </div>
 </div>
 
@@ -148,20 +183,15 @@
     function render() {
         const feed = document.getElementById('radio-feed');
         feed.innerHTML = "";
-        
-        // Filtro inteligente (ignora espacios y mayúsculas)
         const lista = programas.filter(p => {
             if(filtroActivo === 'Todo') return true;
-            const pNorm = p.programa.toUpperCase().replace(/\s/g, '');
-            const fNorm = filtroActivo.toUpperCase().replace(/\s/g, '');
-            return pNorm.includes(fNorm);
+            return p.programa.toUpperCase().replace(/\s/g, '').includes(filtroActivo.toUpperCase().replace(/\s/g, ''));
         });
 
         lista.forEach(p => {
             const isPlaying = idActual === p.id;
             const div = document.createElement('div');
             div.className = `episode-card ${isPlaying ? 'is-playing' : ''}`;
-            div.id = `card-${p.id}`;
             div.innerHTML = `
                 <div class="cover-art" style="background-image: url('${p.imagenUrl || 'logo.png'}')">
                     <div class="cover-overlay">
@@ -174,9 +204,9 @@
                     <span class="program-tag">${p.programa}</span>
                     <h3 class="episode-title">${p.titulo}</h3>
                     ${localStorage.getItem('jazz_auth') === 'ticoadmin' ? `
-                        <div class="admin-controls">
-                            <button class="btn-edit" onclick="iniciarEdicion('${p.id}')">📝 Editar</button>
-                            <button class="btn-edit" style="color:red" onclick="borrar('${p.id}')">🗑️</button>
+                        <div style="margin-top:10px;">
+                            <button style="background:#333; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:12px;" onclick="iniciarEdicion('${p.id}')">📝 Editar</button>
+                            <button style="background:#420b0b; color:#ff4444; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:12px; margin-left:5px;" onclick="borrar('${p.id}')">🗑️</button>
                         </div>
                     ` : ''}
                 </div>
@@ -186,7 +216,6 @@
     }
 
     const audio = document.getElementById('main-audio');
-
     window.gestionarReproduccion = (id, url, titulo, prog, img) => {
         if (idActual === id) {
             if (audio.paused) audio.play();
@@ -200,7 +229,6 @@
             const savedTime = localStorage.getItem(`time_${id}`);
             if(savedTime) audio.currentTime = parseFloat(savedTime);
             audio.play();
-            
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: titulo, artist: prog, album: 'Jazztabueno Productions',
@@ -214,13 +242,7 @@
     audio.ontimeupdate = () => { if(idActual) localStorage.setItem(`time_${idActual}`, audio.currentTime); };
     audio.onplay = () => { document.getElementById('global-player').classList.add('playing'); render(); };
     audio.onpause = () => { document.getElementById('global-player').classList.remove('playing'); render(); };
-
-    window.cerrarPlayer = () => {
-        audio.pause();
-        document.getElementById('global-player').style.display = 'none';
-        idActual = null;
-        render();
-    };
+    window.cerrarPlayer = () => { audio.pause(); document.getElementById('global-player').style.display = 'none'; idActual = null; render(); };
 
     window.filtrar = (cat, el) => {
         filtroActivo = cat;
@@ -229,11 +251,7 @@
         render();
     };
 
-    window.toggleUpload = () => {
-        const f = document.getElementById('upload-form');
-        f.style.display = f.style.display === 'none' ? 'block' : 'none';
-    };
-
+    window.toggleUpload = () => { document.getElementById('upload-form').style.display = (document.getElementById('upload-form').style.display === 'none') ? 'block' : 'none'; };
     window.iniciarEdicion = (id) => {
         const p = programas.find(x => x.id === id);
         document.getElementById('edit-id').value = id;
@@ -247,13 +265,7 @@
 
     window.guardarPrograma = async () => {
         const id = document.getElementById('edit-id').value;
-        const data = {
-            programa: document.getElementById('prog-name').value,
-            titulo: document.getElementById('prog-title').value,
-            mp3Url: document.getElementById('prog-mp3').value,
-            imagenUrl: document.getElementById('prog-img').value,
-            fecha: new Date()
-        };
+        const data = { programa: document.getElementById('prog-name').value, titulo: document.getElementById('prog-title').value, mp3Url: document.getElementById('prog-mp3').value, imagenUrl: document.getElementById('prog-img').value, fecha: new Date() };
         if(id) await updateDoc(doc(db, "radio_programas", id), data);
         else await addDoc(collection(db, "radio_programas"), data);
         location.reload();
