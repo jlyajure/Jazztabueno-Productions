@@ -11,8 +11,8 @@
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 
     <style>
-        /* COLOR DORADO ELÉCTRICO - MÁXIMA INTENSIDAD */
-        :root { --gold: #ffcc33; --bg: #050505; --card: #121212; }
+        /* COLOR BRONCE MATE - ADIÓS AL AMARILLO NEÓN */
+        :root { --gold: #a68a44; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
         html, body { margin: 0; background: var(--bg); color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-y: auto !important; }
@@ -25,28 +25,55 @@
         header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
         .header-logo { width: 35px; height: 35px; border-radius: 8px; cursor: pointer; }
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; line-height: 1.2; }
-        
-        .btn-salir-premium { background: transparent; border: 2px solid var(--gold); color: var(--gold); padding: 7px 15px; border-radius: 8px; font-size: 10px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
+        .btn-salir-premium { background: transparent; border: 2.5px solid var(--gold); color: var(--gold); padding: 7px 15px; border-radius: 8px; font-size: 10px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
 
         .container { max-width: 550px; margin: auto; padding: 15px; padding-bottom: 280px; }
 
-        /* CANALES - VISIBILIDAD TOTAL */
-        .channels-container { 
-            display: grid !important; 
-            grid-template-columns: repeat(5, 1fr) !important; 
-            gap: 10px; 
+        /* --- DISEÑO DEL PANEL DJ CORREGIDO --- */
+        #admin-panel { 
+            display: none; 
+            background: #111; 
+            padding: 25px; 
+            border-radius: 25px; 
+            border: 2px solid var(--gold); 
             margin-bottom: 30px; 
-            padding: 10px 0; 
-            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
+        .admin-row { display: flex; gap: 10px; margin-bottom: 12px; }
+        .input-box, .select-box { 
+            flex: 1; 
+            width: 100%; 
+            padding: 14px; 
+            background: #000; 
+            border: 1px solid #333; 
+            color: white; 
+            border-radius: 10px; 
+            font-size: 14px;
+        }
+        .text-area { 
+            width: 100%; 
+            height: 180px; /* MUCHO MÁS GRANDE PARA EL SETLIST */
+            padding: 14px; 
+            background: #000; 
+            border: 1px solid var(--gold); 
+            color: white; 
+            border-radius: 10px; 
+            font-size: 14px; 
+            resize: none;
+            margin-bottom: 15px;
+            font-family: inherit;
+        }
+
+        /* CANALES ESTABLES */
+        .channels-container { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: 8px; margin-bottom: 25px; padding: 10px 0; width: 100%; }
         .channel-item { text-align: center; opacity: 0.9; transition: 0.3s; cursor: pointer; }
         .channel-item.active { opacity: 1; transform: scale(1.1); }
-        .channel-logo { width: 48px; height: 48px; border-radius: 12px; border: 2.5px solid #333; margin: 0 auto 8px; background: #000; object-fit: contain; }
-        .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 10px rgba(255, 204, 51, 0.4); }
-        .channel-name { font-size: 8px; color: #ffffff; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
+        .channel-logo { width: 44px; height: 44px; border-radius: 12px; border: 2.5px solid #222; margin: 0 auto 6px; background: #000; object-fit: contain; }
+        .active .channel-logo { border-color: var(--gold); }
+        .channel-name { font-size: 7px; color: #ffffff; font-weight: 800; text-transform: uppercase; }
 
-        /* TARJETAS - NITIDEZ MÁXIMA */
-        .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        /* TARJETAS COMPACTAS */
+        .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #1a1a1a; overflow: hidden; }
         .cover-art { width: 100%; height: 160px; background-size: cover; background-position: center; position: relative; }
         .cover-overlay { position: absolute; inset: 0; background: transparent; display: flex; align-items: center; justify-content: center; }
         
@@ -58,25 +85,24 @@
             color: black !important; 
             font-size: 24px; 
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 5px 20px rgba(255, 204, 51, 0.5) !important;
         }
 
         .episode-info { padding: 20px; }
-        .program-tag { color: var(--gold); font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; }
         .episode-title { margin: 8px 0; font-size: 19px; font-weight: 800; color: #ffffff; }
         
-        .btn-ver-playlist { background: #1a1a1a; border: 1.5px solid #333; color: #ffffff; padding: 12px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; margin-top: 15px; width: 100%; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-ver-playlist { background: #1a1a1a; border: 1.5px solid #333; color: #ffffff; padding: 12px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; margin-top: 15px; width: 100%; text-transform: uppercase; }
         .playlist-box { display: none; margin-top: 15px; padding: 20px; background: #080808; border-radius: 15px; border: 1px solid #222; font-size: 14px; color: #ffffff; line-height: 1.8; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
 
         .dj-actions { display: flex; gap: 10px; margin-top: 20px; border-top: 1px solid #222; padding-top: 20px; }
-        .btn-dj-edit { background: var(--gold); color: black; flex: 1; border: none; padding: 12px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        .btn-dj-del { background: none; border: 2px solid #ff4444; color: #ff4444; flex: 1; padding: 12px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .btn-dj-edit { background: var(--gold); color: black; flex: 1; border: none; padding: 12px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; }
+        .btn-dj-del { background: none; border: 1.5px solid #ff4444; color: #ff4444; flex: 1; padding: 12px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; }
 
         /* PLAYER GLOBAL */
-        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 3px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; box-shadow: 0 -10px 30px rgba(0,0,0,0.9); }
+        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 3px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .p-vinyl { width: 55px; height: 55px; border-radius: 50%; border: 2.5px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
         #p-play-btn { background: none !important; border: none !important; color: var(--gold) !important; font-size: 40px; cursor: pointer; }
+        @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -100,20 +126,26 @@
     </header>
 
     <div class="container">
-        <div id="admin-panel" style="display:none; background: #111; padding: 25px; border-radius: 25px; border: 2px solid var(--gold); margin-bottom: 30px;">
-            <h4 id="admin-label" style="color:var(--gold); text-align:center; font-size:14px; margin-bottom:20px; text-transform:uppercase;">Panel DJ</h4>
+        <div id="admin-panel">
+            <h4 id="admin-label" style="color:var(--gold); text-align:center; font-size:14px; margin-bottom:20px; text-transform:uppercase; letter-spacing:2px;">Panel DJ</h4>
             <input type="hidden" id="edit-id">
-            <input type="text" id="t-titulo" class="input-box" placeholder="Título">
-            <select id="t-programa" class="select-box">
-                <option value="JAZZTABUENO">JAZZTABUENO</option>
-                <option value="STUDIO">STUDIO 79</option>
-                <option value="SALSA">SALSA BRAVA</option>
-                <option value="OLD">OLD SCHOOL</option>
-            </select>
-            <input type="text" id="t-url" class="input-box" placeholder="URL MP3">
-            <input type="text" id="t-img" class="input-box" placeholder="URL Imagen">
-            <textarea id="t-playlist" class="text-area" placeholder="Lista de ARTISTAS y CANCIONES"></textarea>
-            <button id="btn-save" class="btn-gold-tico">💾 GUARDAR PROGRAMA</button>
+            <div class="admin-row">
+                <input type="text" id="t-titulo" class="input-box" placeholder="Título del Episodio">
+                <select id="t-programa" class="select-box">
+                    <option value="JAZZTABUENO">JAZZTABUENO</option>
+                    <option value="STUDIO">STUDIO 79</option>
+                    <option value="SALSA">SALSA BRAVA</option>
+                    <option value="OLD">OLD SCHOOL</option>
+                </select>
+            </div>
+            <div class="admin-row">
+                <input type="text" id="t-url" class="input-box" placeholder="URL del Audio (MP3)">
+            </div>
+            <div class="admin-row">
+                <input type="text" id="t-img" class="input-box" placeholder="URL de la Portada">
+            </div>
+            <textarea id="t-playlist" class="text-area" placeholder="Escribe aquí la lista de ARTISTAS y CANCIONES (puedes usar números o guiones)"></textarea>
+            <button id="btn-save" class="btn-gold-tico">💾 GUARDAR PROGRAMA EN FIREBASE</button>
         </div>
 
         <div class="channels-container">
@@ -157,18 +189,16 @@
     const seekBar = document.getElementById('seek-bar');
     let programas = []; let idActual = null; let filtroActivo = 'Todo'; let isAdmin = false;
 
-    // LOGIN
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_final_rev_2', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_sat', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_auth_final_rev_2')) {
+    if(localStorage.getItem('jtp_auth_sat')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
     }
 
-    // PANEL DJ
     let toques = 0; let tToque = 0;
     document.getElementById('admin-trigger').onclick = () => {
         const ahora = new Date().getTime();
@@ -204,10 +234,11 @@
         document.getElementById('t-img').value = p.imagenUrl;
         document.getElementById('t-playlist').value = p.playlist || "";
         document.getElementById('admin-panel').style.display = 'block';
+        document.getElementById('admin-label').innerText = "EDITANDO PROGRAMA";
         window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
-    window.borrarDoc = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "radio_programas", id)); };
+    window.borrarDoc = async (id) => { if(confirm("¿Borrar definitivamente?")) await deleteDoc(doc(db, "radio_programas", id)); };
 
     onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => {
         programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
@@ -228,10 +259,10 @@
                     </div>
                 </div>
                 <div class="episode-info">
-                    <span class="program-tag">${p.programa}</span>
+                    <span class="program-tag" style="color:var(--gold); font-size:9px; font-weight:900;">${p.programa}</span>
                     <h3 class="episode-title">${p.titulo}</h3>
                     <button class="btn-ver-playlist" onclick="window.togglePlaylist('${p.id}')">📋 VER PROGRAMACIÓN MUSICAL</button>
-                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Próximamente detalles musicales."}</div>
+                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Detalles musicales pronto."}</div>
                     ${isAdmin ? `<div class="dj-actions">
                         <button class="btn-dj-edit" onclick="prepararEdicion('${p.id}')">🖋️ EDITAR</button>
                         <button class="btn-dj-del" onclick="borrarDoc('${p.id}')">🗑️ BORRAR</button>
