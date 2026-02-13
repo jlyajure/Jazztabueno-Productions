@@ -3,323 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
-    <title>Jazztabueno Productions</title>
+    <title>Jazztabueno - JTP</title>
     <meta name="theme-color" content="#000000">
-    <link rel="icon" type="image/png" href="logo.png">
-    <link rel="apple-touch-icon" href="logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    
+    <link rel="icon" type="image/png" href="logo.png?v=2">
+    <link rel="apple-touch-icon" href="logo.png?v=2">
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <style>
         :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow: hidden; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; }
+        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
         
-        #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
-        .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
-        .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
-        .btn-gold-tico { display: block !important; width: 100% !important; background: linear-gradient(145deg, #d4af37, #b8962d) !important; color: black !important; border: none !important; padding: 18px !important; border-radius: 50px !important; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+        header { background: rgba(0,0,0,0.98); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 100; }
+        .header-logo { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--gold); object-fit: cover; }
+        .brand-title { color: var(--gold); font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
 
-        header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; }
-        .header-logo { width: 35px; height: 35px; border-radius: 8px; }
-        .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; }
-        .btn-salir-premium { background: transparent; border: 1.5px solid var(--gold); color: var(--gold); padding: 7px 15px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+        /* PANEL ADMIN */
+        #admin-panel { display: none; background: #111; padding: 20px; border-radius: 15px; margin: 15px; border: 1px dashed var(--gold); }
+        .input-box, .select-box, .text-area { width: 100%; padding: 12px; margin-bottom: 10px; background: #0a0a0a; border: 1px solid #333; color: white; border-radius: 8px; font-family: inherit; }
+        .text-area { height: 100px; resize: none; font-size: 13px; }
+        .btn-subir { width: 100%; background: var(--gold); color: black; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; }
 
-        #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; }
-        .container { max-width: 550px; margin: auto; padding: 15px; }
-
-        .channels-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 25px; padding: 10px 0; width: 100%; }
-        .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; cursor: pointer; }
-        .channel-item.active { opacity: 1; transform: scale(1.05); }
-        .channel-logo { width: 48px; height: 48px; border-radius: 10px; border: 2px solid #333; margin: 0 auto 6px; background: #000; object-fit: contain; padding: 2px; display: block; }
-        .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.4); }
-        .channel-name { font-size: 7px; color: #aaa; font-weight: 800; text-transform: uppercase; display: block; white-space: nowrap; overflow: hidden; }
-
-        .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; position: relative; overflow: hidden; }
-        .cover-art { width: 100%; height: 210px; background-size: cover; background-position: center; position: relative; }
-        .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
-        .btn-play-card { background: var(--gold); border: none; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .btn-play-card::before { content: '▶'; font-size: 26px; color: black; margin-left: 5px; }
-        .is-playing .btn-play-card { background: rgba(0,0,0,0.85) !important; border: 2.5px solid var(--gold); }
-        .is-playing .btn-play-card::before { content: '||'; font-family: Arial; font-weight: bold; color: var(--gold); margin-left: 0; }
-
-        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
-        .player-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
-        .playing .p-vinyl { animation-play-state: running; }
-        .p-info { flex: 1; overflow: hidden; }
-        .p-info h4 { margin: 0; font-size: 13px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .p-time { font-size: 10px; color: var(--gold); font-weight: 900; }
-
-        .btn-p-main { background: none; border: none; color: var(--gold); font-size: 30px; cursor: pointer; }
-        #seek-bar { width: 100%; -webkit-appearance: none; background: #222; height: 5px; border-radius: 3px; }
-        #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--gold); border-radius: 50%; border: 2px solid #000; cursor: pointer; }
-
-        .tool-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 12px; margin-top: 5px; gap: 6px; }
-        .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 2px; border-radius: 8px; font-size: 9px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        /* LISTA DE PROGRAMAS */
+        .container { max-width: 600px; margin: auto; padding-bottom: 160px; }
+        .track-card { background: var(--card); border-radius: 18px; margin: 15px; padding: 15px; border: 1px solid #222; position: relative; }
+        .track-main { display: flex; align-items: center; gap: 15px; }
+        .track-img { width: 70px; height: 70px; border-radius: 12px; background-size: cover; background-position: center; flex-shrink: 0; border: 1px solid #333; }
+        .track-info { flex: 1; overflow: hidden; }
+        .track-title { font-size: 16px; font-weight: 900; color: white; margin: 0; }
+        .track-artist { font-size: 12px; color: var(--gold); margin: 3px 0; font-weight: 700; text-transform: uppercase; }
         
-        @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        #main-media { display: none; }
+        /* BOTÓN DETALLES (SETLIST) */
+        .btn-detalles { background: #1a1a1a; border: 1px solid #333; color: #888; font-size: 10px; padding: 5px 12px; border-radius: 20px; cursor: pointer; margin-top: 10px; font-weight: 800; transition: 0.3s; }
+        .btn-detalles:hover { color: var(--gold); border-color: var(--gold); }
+        
+        .setlist-content { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #222; font-size: 13px; color: #bbb; line-height: 1.6; white-space: pre-wrap; }
+
+        .btn-play-mini { width: 45px; height: 45px; border-radius: 50%; background: var(--gold); border: none; font-size: 20px; cursor: pointer; }
+
+        /* REPRODUCTOR GLOBAL */
+        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px; display: none; z-index: 1000; }
+        #seek-bar { width: 100%; -webkit-appearance: none; background: #222; height: 5px; border-radius: 3px; margin-bottom: 10px; }
+        #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--gold); border-radius: 50%; }
+
+        #login-screen { position: fixed; inset: 0; background: black; z-index: 3000; display: none; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <div class="login-card">
-        <img src="logo.png" style="width:90px; margin-bottom:20px;">
-        <h2 style="color:var(--gold); font-family:'Playfair Display';">JAZZTABUENO</h2>
-        <input type="password" id="passInput" placeholder="Clave de Director">
-        <button onclick="checkLogin()" class="btn-gold-tico">ENTRAR ▶</button>
+    <div style="width:85%; max-width:320px; text-align:center; background:#111; padding:30px; border-radius:25px; border:1px solid var(--gold);">
+        <h2 style="color:var(--gold); margin:0 0 20px 0;">JTP ADMIN</h2>
+        <input type="password" id="passInput" class="input-box" placeholder="Clave JTP">
+        <button id="btn-entrar-login" class="btn-subir">ENTRAR</button>
     </div>
 </div>
 
-<div id="app-content" style="display:none;">
-    <header>
-        <div style="display:flex; align-items:center; gap:10px;">
-            <img src="logo.png" class="header-logo">
-            <div class="brand-title">Jazztabueno<br>Productions</div>
-        </div>
-        <button onclick="window.salirTotal()" class="btn-salir-premium">SALIR</button>
-    </header>
-
-    <div class="container">
-        <div class="channels-container">
-            <div class="channel-item active" onclick="filtrar('Todo', this)"><img src="logo.png" class="channel-logo"><span class="channel-name">Todo</span></div>
-            <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)"><img src="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png" class="channel-logo"><span class="channel-name">Jazztabueno</span></div>
-            <div class="channel-item" onclick="filtrar('STUDIO', this)"><img src="https://i.postimg.cc/NKMDbYJB/S79.png" class="channel-logo"><span class="channel-name">Studio 79</span></div>
-            <div class="channel-item" onclick="filtrar('SALSA', this)"><img src="https://i.postimg.cc/75fchgyt/Salsa-Brava.png" class="channel-logo"><span class="channel-name">Salsa Brava</span></div>
-            <div class="channel-item" onclick="filtrar('OLD', this)"><img src="https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png" class="channel-logo"><span class="channel-name">Old School</span></div>
-        </div>
-        <div id="radio-feed"></div>
+<header>
+    <div id="sensor-btn" style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+        <img src="logo.png?v=2" class="header-logo" onerror="this.src='https://i.postimg.cc/zX8P0Xp3/jazz-logo.jpg'">
+        <div class="brand-title">JAZZTABUENO</div>
     </div>
+    <div style="font-size:10px; color:var(--gold); font-weight:800;">PROGRAMAS</div>
+</header>
+
+<div class="container">
+    <div id="admin-panel">
+        <h3 style="color:var(--gold); text-align:center; font-size:14px; margin-bottom:15px;">SUBIR NUEVO PROGRAMA</h3>
+        <input type="text" id="t-titulo" class="input-box" placeholder="Título del Programa">
+        <input type="text" id="t-artista" class="input-box" placeholder="Artista Destacado">
+        <input type="text" id="t-url" class="input-box" placeholder="Link del Audio (MP3)">
+        <input type="text" id="t-img" class="input-box" placeholder="Link de Portada">
+        <textarea id="t-setlist" class="text-area" placeholder="Lista de canciones y artistas (Escribe aquí los detalles...)"></textarea>
+        
+        <button id="btn-guardar" class="btn-subir">📻 SUBIR A JTP</button>
+        <button id="btn-cerrar-admin" style="width:100%; background:none; color:#ff4444; border:none; padding:10px; cursor:pointer; font-weight:800;">CERRAR PANEL</button>
+    </div>
+    <div id="tracks-feed"></div>
 </div>
 
 <div id="global-player">
-    <audio id="main-media" playsinline crossorigin="anonymous"></audio>
-    <div class="player-top">
-        <div id="p-vinyl" class="p-vinyl" style="background-image: url('logo.png');"></div>
-        <div class="p-info"><h4 id="p-title">...</h4><div id="p-time-display" class="p-time">00:00 / 00:00</div></div>
-        <div style="display:flex; align-items:center;">
-            <button onclick="window.togglePlay()" id="p-play-btn" class="btn-p-main">▶</button>
-            <button onclick="window.cerrarPlayer()" class="btn-p-main" style="color:#444; font-size:24px; margin-left:12px;">×</button>
+    <audio id="main-media" crossorigin="anonymous"></audio>
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+        <div id="p-art" style="width:45px; height:45px; border-radius:8px; background-size:cover;"></div>
+        <div style="flex:1; overflow:hidden;">
+            <h4 id="p-title" style="margin:0; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:white;">...</h4>
+            <div id="p-time" style="font-size:10px; color:var(--gold); font-weight:900;">00:00 / 00:00</div>
         </div>
+        <button id="p-play-btn" style="background:none; border:none; color:var(--gold); font-size:32px; cursor:pointer;">▶</button>
+        <button id="p-close-btn" style="background:none; border:none; color:#444; font-size:24px;">×</button>
     </div>
-    <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
-    <div class="tool-row">
-        <div id="btn-cast-box" class="btn-tool" style="border-color: var(--gold); display: flex; align-items: center; justify-content: center; gap: 5px;">
-            <google-cast-launcher style="width: 18px; height: 18px; --connected-color: black; --disconnected-color: #d4af37; cursor: pointer;"></google-cast-launcher>
-            <span id="cast-text" style="color: var(--gold);">TV</span>
-        </div>
-        <button onclick="window.cambiarVelocidad()" id="btn-speed" class="btn-tool">1.0x</button>
-        <button onclick="window.toggleMute()" id="btn-mute" class="btn-tool">🔊 VOL</button>
+    <input type="range" id="seek-bar" value="0" min="0" step="1">
+    <div style="display:flex; justify-content:center;">
+        <google-cast-launcher style="width:25px; height:25px; --disconnected-color:var(--gold);"></google-cast-launcher>
     </div>
 </div>
 
 <script type="module">
-    import { db } from "./firebase.js";
-    import { collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI",
+      authDomain: "familia-yajure-app.firebaseapp.com",
+      projectId: "familia-yajure-app",
+      storageBucket: "familia-yajure-app.firebasestorage.app",
+      messagingSenderId: "692035727386",
+      appId: "1:692035727386:web:dfa3e39a481d56368a61a3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const coleccionDB = "jazztabueno_programas"; // Colección específica para JTP
+
+    let canciones = [];
+    let idActual = null;
+    let modoAdmin = false;
 
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
-    const timeDisplay = document.getElementById('p-time-display');
-    let programas = []; let idActual = null; let filtroActivo = 'Todo';
 
-    // --- INICIALIZACIÓN OFICIAL DE GOOGLE CAST CON MEMORIA DE TIEMPO ---
-    window.player = null;
-    window.playerController = null;
-    window.lastCastTime = 0; // LA MEMORIA SECRETA DEL TIEMPO
-
-    window['__onGCastApiAvailable'] = function(isAvailable) {
-        if (isAvailable) {
-            cast.framework.CastContext.getInstance().setOptions({
-                receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-                autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
-            });
-            
-            window.player = new cast.framework.RemotePlayer();
-            window.playerController = new cast.framework.RemotePlayerController(window.player);
-            
-            // SENSOR DE CONEXIÓN
-            window.playerController.addEventListener(cast.framework.RemotePlayerEventType.IS_CONNECTED_CHANGED, function() {
-                var isConnected = cast.framework.CastContext.getInstance().getCurrentSession() !== null;
-                if (isConnected) {
-                    document.getElementById('cast-text').style.color = "black";
-                    document.getElementById('btn-cast-box').style.background = "var(--gold)";
-                    
-                    if (idActual && !media.paused) {
-                        var p = programas.find(x => x.id === idActual);
-                        if(p) window.loadCastMedia(p.titulo, p.programa, p.mp3Url, p.imagenUrl);
-                    }
-                } else {
-                    document.getElementById('cast-text').style.color = "var(--gold)";
-                    document.getElementById('btn-cast-box').style.background = "#1a1a1a";
-                    
-                    // AL DESCONECTAR: USAMOS LA MEMORIA SECRETA DEL TIEMPO
-                    if (idActual) {
-                        media.currentTime = window.lastCastTime;
-                        media.play(); 
-                    }
-                }
-            });
-
-            // SENSOR CONTINUO DE TIEMPO EN TV (Llena la memoria secreta cada segundo)
-            window.playerController.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, function() {
-                if (cast.framework.CastContext.getInstance().getCurrentSession() && idActual) {
-                    window.lastCastTime = window.player.currentTime; // Guardando el tiempo...
-                    seekBar.value = Math.floor(window.player.currentTime);
-                    timeDisplay.innerText = formatTime(window.player.currentTime) + " / " + formatTime(window.player.duration);
-                }
-            });
-        }
+    // SENSOR SECRETO JTP
+    let toques = 0; let tiempoToque = 0;
+    document.getElementById('sensor-btn').onclick = () => {
+        const ahora = new Date().getTime();
+        if (ahora - tiempoToque > 1000) toques = 0;
+        tiempoToque = ahora; toques++;
+        if (toques === 3) { toques = 0; document.getElementById('login-screen').style.display = 'flex'; }
     };
 
-    function rutaAbsoluta(ruta) {
-        if (!ruta) return new URL('logo.png', window.location.href).href;
-        if (ruta.startsWith('http')) return ruta;
-        return new URL(ruta, window.location.href).href;
-    }
-
-    // CARGA AL CHROMECAST OFICIAL
-    window.loadCastMedia = (titulo, prog, url, img) => {
-        var castSession = cast.framework.CastContext.getInstance().getCurrentSession();
-        if (castSession) {
-            var mediaInfo = new chrome.cast.media.MediaInfo(url, 'audio/mpeg');
-            var metadata = new chrome.cast.media.MusicTrackMediaMetadata();
-            metadata.title = titulo;
-            metadata.artist = prog;
-            metadata.images = [new chrome.cast.Image(rutaAbsoluta(img))];
-            mediaInfo.metadata = metadata;
-            
-            var request = new chrome.cast.media.LoadRequest(mediaInfo);
-            request.currentTime = media.currentTime || 0; // Mandamos el tiempo actual a la TV
-            
-            media.pause(); // Pausamos el celular
-            
-            castSession.loadMedia(request).then(
-                function() { 
-                    document.getElementById('global-player').classList.add('playing');
-                    document.getElementById('p-play-btn').innerText = '||';
-                },
-                function(error) { console.log('Error Cast: ' + error); }
-            );
-        }
+    document.getElementById('btn-entrar-login').onclick = () => {
+        if(document.getElementById('passInput').value === "jtp2026") {
+            modoAdmin = true; document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'block';
+            render();
+        } else { alert("Clave Incorrecta"); }
     };
 
-    window.checkLogin = () => {
-        const p = document.getElementById('passInput').value;
-        if(p === "jazz2026" || p === "ticoadmin") { localStorage.setItem('jazz_auth', p); location.reload(); } else { alert("Clave Incorrecta"); }
+    document.getElementById('btn-cerrar-admin').onclick = () => { modoAdmin = false; document.getElementById('admin-panel').style.display = 'none'; render(); };
+
+    document.getElementById('btn-guardar').onclick = async () => {
+        const btn = document.getElementById('btn-guardar');
+        btn.disabled = true; btn.innerText = "Sintonizando...";
+        try {
+            await addDoc(collection(db, coleccionDB), {
+                titulo: document.getElementById('t-titulo').value,
+                artista: document.getElementById('t-artista').value,
+                mp3Url: document.getElementById('t-url').value,
+                imagenUrl: document.getElementById('t-img').value || "logo.png",
+                setlist: document.getElementById('t-setlist').value, // GUARDAMOS LA LISTA
+                fecha: new Date().getTime()
+            });
+            alert("¡Programa al aire en JTP!");
+            document.getElementById('t-titulo').value = ""; document.getElementById('t-setlist').value = "";
+        } catch(e) { alert("Error al subir"); }
+        btn.disabled = false; btn.innerText = "📻 SUBIR A JTP";
     };
 
-    if(localStorage.getItem('jazz_auth')) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-content').style.display = 'block';
-    }
+    window.borrarPrograma = async (id) => { if(confirm("¿Eliminar programa?")) await deleteDoc(doc(db, coleccionDB, id)); };
 
-    onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => {
-        programas = []; snap.forEach(d => { programas.push({id: d.id, ...d.data()}); }); render();
+    onSnapshot(query(collection(db, coleccionDB), orderBy("fecha", "desc")), (snap) => {
+        canciones = []; snap.forEach(d => canciones.push({id: d.id, ...d.data()}));
+        render();
     });
 
     function render() {
-        const feed = document.getElementById('radio-feed'); if(!feed) return;
+        const feed = document.getElementById('tracks-feed');
         feed.innerHTML = "";
-        const lista = programas.filter(p => {
-            if(filtroActivo === 'Todo') return true;
-            return p.programa.toUpperCase().replace(/\s/g, '').includes(filtroActivo.toUpperCase().replace(/\s/g, ''));
-        });
-        lista.forEach(p => {
-            const isCastPlaying = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() && window.player && !window.player.isPaused;
-            const isLocalPlaying = !media.paused;
-            const isPlaying = idActual === p.id && (isCastPlaying || isLocalPlaying);
-            
+        canciones.forEach(c => {
+            const isPlaying = idActual === c.id;
             const div = document.createElement('div');
-            div.className = `episode-card ${isPlaying ? 'is-playing' : ''}`;
+            div.className = `track-card ${isPlaying ? 'is-playing' : ''}`;
+            
             div.innerHTML = `
-                <div class="cover-art" style="background-image: url('${p.imagenUrl || 'logo.png'}')">
-                    <div class="cover-overlay"><button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo}', '${p.programa}', '${p.imagenUrl}')"></button></div>
+                <div class="track-main">
+                    <div class="track-img" style="background-image: url('${c.imagenUrl}')"></div>
+                    <div class="track-info">
+                        <h3 class="track-title">${c.titulo}</h3>
+                        <p class="track-artist">${c.artista}</p>
+                        <button class="btn-detalles" onclick="toggleSetlist('${c.id}')">📋 VER CANCIONES</button>
+                    </div>
+                    <button class="btn-play-mini" onclick="window.gestionarPlay('${c.id}','${c.mp3Url}','${c.titulo}','${c.imagenUrl}')">${isPlaying ? '||' : '▶'}</button>
                 </div>
-                <div class="episode-info"><span class="program-tag">${p.programa}</span><h3 class="episode-title">${p.titulo}</h3></div>`;
+                <div id="setlist-${c.id}" class="setlist-content">${c.setlist || "No hay detalles para este programa."}</div>
+                ${modoAdmin ? `<button onclick="borrarPrograma('${c.id}')" style="margin-top:10px; background:none; border:1px solid #444; color:#ff4444; font-size:10px; padding:5px; border-radius:5px;">🗑️ BORRAR PROGRAMA</button>` : ''}
+            `;
             feed.appendChild(div);
         });
     }
 
-    window.gestionarReproduccion = (id, url, titulo, prog, img) => {
-        if (idActual === id) { window.togglePlay(); } 
-        else {
-            idActual = id; 
-            const imgSegura = rutaAbsoluta(img);
-            
-            document.getElementById('p-title').innerText = titulo;
-            document.getElementById('p-vinyl').style.backgroundImage = `url('${imgSegura}')`;
+    window.toggleSetlist = (id) => {
+        const el = document.getElementById(`setlist-${id}`);
+        const isVisible = el.style.display === 'block';
+        el.style.display = isVisible ? 'none' : 'block';
+    };
+
+    window.gestionarPlay = (id, url, tit, img) => {
+        if(idActual === id) {
+            if(media.paused) media.play(); else media.pause();
+        } else {
+            idActual = id;
+            document.getElementById('p-title').innerText = tit;
+            document.getElementById('p-art').style.backgroundImage = `url('${img}')`;
             document.getElementById('global-player').style.display = 'block';
-            
-            var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
-            
-            if (isConnected) {
-                window.loadCastMedia(titulo, prog, url, img);
-            } else {
-                media.src = url; 
-                media.play();
-            }
+            media.src = url;
+            media.play();
         }
         render();
     };
 
-    window.togglePlay = () => { 
-        var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
-        if (isConnected) {
-            window.playerController.playOrPause();
-            setTimeout(() => {
-                document.getElementById('p-play-btn').innerText = window.player.isPaused ? '▶' : '||';
-                if(window.player.isPaused) document.getElementById('global-player').classList.remove('playing');
-                else document.getElementById('global-player').classList.add('playing');
-                render();
-            }, 200);
-        } else {
-            if (media.paused) media.play(); else media.pause(); render(); 
-        }
-    };
-    
-    window.cambiarVelocidad = () => { const speeds = [1.0, 1.25, 1.5, 2.0]; media.playbackRate = speeds[(speeds.indexOf(media.playbackRate) + 1) % speeds.length]; document.getElementById('btn-speed').innerText = media.playbackRate + "x"; };
-    window.toggleMute = () => { media.muted = !media.muted; document.getElementById('btn-mute').innerText = media.muted ? "🔇 MUTE" : "🔊 VOL"; };
+    document.getElementById('p-play-btn').onclick = () => { if(media.paused) media.play(); else media.pause(); };
+    document.getElementById('p-close-btn').onclick = () => { media.pause(); document.getElementById('global-player').style.display='none'; idActual=null; render(); };
 
-    window.filtrar = (cat, el) => {
-        filtroActivo = cat;
-        document.querySelectorAll('.channel-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active'); render();
-    };
-
-    window.salirTotal = () => { localStorage.clear(); location.reload(); };
-    
-    media.onloadedmetadata = () => { if(!cast.framework || !cast.framework.CastContext.getInstance().getCurrentSession()){ seekBar.max = Math.floor(media.duration); } };
-    media.onplay = () => { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; render(); };
-    media.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; render(); };
-    
+    media.onplay = () => { document.getElementById('p-play-btn').innerText = '||'; render(); };
+    media.onpause = () => { document.getElementById('p-play-btn').innerText = '▶'; render(); };
     media.ontimeupdate = () => { 
-        if(idActual && (!cast.framework || !cast.framework.CastContext.getInstance().getCurrentSession())) { 
-            seekBar.value = Math.floor(media.currentTime); 
-            timeDisplay.innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration); 
-        } 
+        seekBar.max = media.duration || 0;
+        seekBar.value = media.currentTime;
+        document.getElementById('p-time').innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration);
     };
-    
-    seekBar.oninput = () => { 
-        var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
-        if (isConnected) {
-            window.player.currentTime = seekBar.value;
-            window.playerController.seek();
-        } else {
-            media.currentTime = seekBar.value; 
-        }
-    };
-    
-    window.cerrarPlayer = () => { 
-        var isConnected = cast.framework && cast.framework.CastContext.getInstance().getCurrentSession() !== null;
-        if(isConnected) window.playerController.stop();
-        media.pause(); document.getElementById('global-player').style.display = 'none'; idActual = null; render(); 
-    };
-    
-    function formatTime(s) { if (isNaN(s)) return "00:00"; const h = Math.floor(s / 3600); const m = Math.floor((s % 3600) / 60); const sec = Math.floor(s % 60); return (h > 0 ? h + ":" : "") + (m < 10 ? "0" + m : m) + ":" + (sec < 10 ? "0" + sec : sec); }
+    seekBar.oninput = () => { media.currentTime = seekBar.value; };
+
+    function formatTime(s) { if(isNaN(s)) return "00:00"; const m=Math.floor(s/60), sec=Math.floor(s%60); return (m<10?"0":"")+m+":"+(sec<10?"0":"")+sec; }
 </script>
 </body>
 </html>
