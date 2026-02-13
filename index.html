@@ -21,21 +21,43 @@
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
         .btn-gold-tico { display: block !important; width: 100% !important; background: linear-gradient(145deg, #d4af37, #b8962d) !important; color: black !important; border: none !important; padding: 18px !important; border-radius: 50px !important; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 
-        header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; }
+        header { background: rgba(0,0,0,0.98); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; }
         .header-logo { width: 35px; height: 35px; border-radius: 8px; }
-        .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; }
-        .btn-salir-oficial { background: transparent; border: 1.5px solid var(--gold); color: var(--gold); padding: 8px 16px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 12px; text-transform: uppercase; }
+        
+        /* BOTÓN SALIR ESTILO CABINA */
+        .btn-salir-premium { 
+            background: transparent !important; 
+            border: 1.5px solid var(--gold) !important; 
+            color: var(--gold) !important; 
+            padding: 8px 18px !important; 
+            border-radius: 10px !important; 
+            font-size: 11px !important; 
+            font-weight: 800 !important; 
+            text-transform: uppercase !important; 
+            cursor: pointer !important;
+        }
 
         #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
-        /* CATEGORÍAS V11.4 - SIN RECORTES */
-        .channels-container { display: flex; gap: 12px; margin-bottom: 25px; overflow-x: auto; padding: 10px 50px 10px 10px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-        .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; min-width: 70px; cursor: pointer; }
+        /* --- CATEGORÍAS V11.5 (AJUSTE DE SCROLL) --- */
+        .channels-container { 
+            display: flex; 
+            gap: 15px; 
+            margin-bottom: 25px; 
+            overflow-x: auto; 
+            padding: 10px 0; 
+            scrollbar-width: none; 
+            -webkit-overflow-scrolling: touch;
+        }
+        .channels-container::after { content: ''; min-width: 40px; } /* Espacio para que el último icono no se pegue al borde */
+        
+        .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; min-width: 75px; cursor: pointer; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
-        .channel-logo { width: 62px; height: 62px; border-radius: 12px; border: 2px solid #333; margin-bottom: 8px; background: #000; object-fit: contain; padding: 4px; }
+        .channel-logo { width: 62px; height: 62px; border-radius: 12px; border: 2px solid #333; margin-bottom: 8px; background: #000; object-fit: contain; padding: 3px; }
         .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.4); }
-        .channel-name { font-size: 8px; color: #999; font-weight: 800; text-transform: uppercase; display: block; }
+        .channel-name { font-size: 8.5px; color: #aaa; font-weight: 800; text-transform: uppercase; display: block; }
 
         /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; position: relative; overflow: hidden; }
@@ -63,12 +85,13 @@
         #seek-bar { width: 100%; -webkit-appearance: none; background: #222; height: 5px; border-radius: 3px; }
         #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--gold); border-radius: 50%; border: 2px solid #000; }
 
-        .tool-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 12px; margin-top: 5px; gap: 6px; }
+        .tool-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 12px; margin-top: 5px; gap: 8px; }
         .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 5px; border-radius: 8px; font-size: 8.5px; font-weight: 800; cursor: pointer; transition: 0.2s; }
-        .is-casting { background: var(--gold) !important; color: black !important; }
+        
+        .is-casting-ui { background: var(--gold) !important; color: black !important; }
 
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        /* El reproductor nativo oculto pero funcional */
+        /* El reproductor nativo que usaremos de rescate */
         #main-media { width: 100%; height: 40px; margin-top: 10px; display: none; filter: invert(1); }
     </style>
 </head>
@@ -89,7 +112,7 @@
             <img src="logo.png" class="header-logo">
             <div class="brand-title">Jazztabueno<br>Productions</div>
         </div>
-        <button onclick="window.resetApp()" class="btn-salir-oficial">SALIR</button>
+        <button onclick="window.limpiarSesion()" class="btn-salir-premium">SALIR</button>
     </header>
 
     <div class="container">
@@ -116,9 +139,9 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button id="cast-btn-final" onclick="window.activarCastFinal()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR A TV</button>
-        <button onclick="window.forzarArte()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
-        <button onclick="window.resetUI()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
+        <button id="cast-btn-115" onclick="window.dispararCastV115()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR A TV</button>
+        <button onclick="window.refrescarTV()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
+        <button onclick="window.resetBoton()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
     </div>
 </div>
 
@@ -129,7 +152,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
-    const castBtn = document.getElementById('cast-btn-final');
+    const castBtn = document.getElementById('cast-btn-115');
     let programas = []; let idActual = null; let filtroActivo = 'Todo';
 
     window.checkLogin = () => {
@@ -167,7 +190,7 @@
         });
     }
 
-    function pushMetadata(titulo, prog, img) {
+    function sendToTV(titulo, prog, img) {
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: titulo, artist: prog, album: 'Jazztabueno Productions',
@@ -185,7 +208,7 @@
             document.getElementById('p-title').innerText = titulo;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img || 'logo.png'}')`;
             document.getElementById('global-player').style.display = 'block';
-            pushMetadata(titulo, prog, img || 'logo.png');
+            sendToTV(titulo, prog, img || 'logo.png');
             media.play();
         }
         render();
@@ -193,43 +216,41 @@
 
     window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
     
-    // --- NUEVO MOTOR DE TRANSMISIÓN FINAL V11.4 ---
-    window.activarCastFinal = () => { 
-        // Primero intentamos el prompt nativo
+    // --- LÓGICA DE TRANSMISIÓN "PLAN B" V11.5 ---
+    window.dispararCastV115 = () => { 
         if(media.remotePlayback) {
             media.remotePlayback.prompt().then(() => {
-                castBtn.classList.add('is-casting');
+                castBtn.classList.add('is-casting-ui');
             }).catch(() => {
-                // Si Chrome bloquea, hacemos aparecer el reproductor nativo gris
-                media.style.display = (media.style.display === 'block') ? 'none' : 'block';
-                alert("📡 Toca los 3 Puntos del reproductor gris que apareció y selecciona 'Transmitir'.");
+                // FALLBACK: Si Chrome bloquea, mostramos los controles nativos para usar sus 3 puntos
+                media.style.display = 'block';
+                alert("📡 Director: Chrome bloqueó el menú. Toca los 3 puntos del reproductor gris que apareció abajo y selecciona 'Transmitir'.");
             });
         }
     };
 
-    window.forzarArte = () => {
+    window.refrescarTV = () => {
         if(idActual) {
             const p = programas.find(x => x.id === idActual);
-            if(p) pushMetadata(p.titulo, p.programa, p.imagenUrl);
-            alert("📡 Refrescando carátula en TV...");
+            if(p) sendToTV(p.titulo, p.programa, p.imagenUrl);
+            alert("📡 Refrescando carátula...");
         }
     };
 
-    window.resetUI = () => {
-        castBtn.classList.remove('is-casting');
-        media.pause(); media.src = ""; render();
-        alert("♻️ Icono Limpio.");
+    window.resetBoton = () => {
+        castBtn.classList.remove('is-casting-ui');
+        alert("♻️ Icono Restaurado.");
     };
 
     setInterval(() => {
         if (media.remotePlayback && media.remotePlayback.state === 'connected') {
-            castBtn.classList.add('is-casting');
+            castBtn.classList.add('is-casting-ui');
             castBtn.innerText = "📡 TV CONECTADA";
-        } else {
-            castBtn.classList.remove('is-casting');
-            castBtn.innerText = "📡 TRANSMITIR TV";
+        } else if (media.remotePlayback && media.remotePlayback.state === 'disconnected') {
+            castBtn.classList.remove('is-casting-ui');
+            castBtn.innerText = "📡 TRANSMITIR A TV";
         }
-    }, 2500);
+    }, 2000);
 
     window.filtrar = (cat, el) => {
         filtroActivo = cat;
@@ -238,7 +259,7 @@
         render();
     };
 
-    window.resetApp = () => { localStorage.clear(); location.reload(); };
+    window.limpiarSesion = () => { localStorage.clear(); location.reload(); };
     media.onloadedmetadata = () => { seekBar.max = Math.floor(media.duration); };
     media.onplay = () => { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; render(); };
     media.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; render(); };
