@@ -14,13 +14,12 @@
         :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 220px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 230px; }
         
-        /* LOGIN CENTRADO Y ELEGANTE */
+        /* LOGIN CENTRADO */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 30px; border-radius: 20px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 20px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; font-weight: bold; }
-        .btn-enter { background: var(--gold); border: none; padding: 15px; border-radius: 30px; font-weight: 800; cursor: pointer; width: 100%; color: black; }
 
         header { background: rgba(0,0,0,0.98); padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
         .header-logo { width: 40px; height: 40px; border-radius: 8px; }
@@ -28,7 +27,6 @@
         .btn-logout { background: transparent; border: 1.5px solid var(--gold); color: white; font-size: 10px; padding: 6px 14px; border-radius: 6px; font-weight: 800; cursor: pointer; }
 
         .container { max-width: 550px; margin: auto; padding: 15px; }
-
         .channels-container { display: flex; gap: 15px; margin-bottom: 25px; overflow-x: auto; padding: 10px 5px; scrollbar-width: none; }
         .channel-item { text-align: center; opacity: 0.4; transition: 0.3s; min-width: 85px; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
@@ -38,13 +36,11 @@
         .episode-card { background: var(--card); border-radius: 22px; margin-bottom: 35px; overflow: hidden; border: 1px solid #222; position: relative; }
         .cover-art { width: 100%; height: 220px; background-size: cover; background-position: center; position: relative; }
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; }
-        
         .btn-play-card { background: var(--gold); border: none; width: 70px; height: 70px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-play-card::before { content: '▶'; font-size: 28px; color: black; margin-left: 6px; }
         .is-actually-playing .btn-play-card { background: rgba(0, 0, 0, 0.8) !important; border: 3px solid var(--gold); }
         .is-actually-playing .btn-play-card::before { content: ''; width: 6px; height: 26px; background: var(--gold); box-shadow: 16px 0 0 var(--gold); margin-right: 16px; margin-left: 0; }
 
-        /* ADMIN EN LA ESQUINA */
         .admin-float { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; z-index: 10; }
         .btn-mini { background: rgba(0,0,0,0.9); border: 1.5px solid #444; color: white; padding: 12px; border-radius: 12px; cursor: pointer; }
 
@@ -52,7 +48,6 @@
         .program-tag { display: inline-block; font-size: 9px; color: black; padding: 5px 14px; border-radius: 50px; background: var(--gold); font-weight: 800; text-transform: uppercase; margin-bottom: 12px; }
         .episode-title { font-size: 20px; margin: 0; font-weight: 700; color: white; line-height: 1.2; }
 
-        /* CONSOLA DORADA (REPRODUCTOR) */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 18px 20px; display: none; z-index: 1000; box-shadow: 0 -20px 50px rgba(0,0,0,1); }
         .player-top { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
         .p-vinyl { width: 55px; height: 55px; border-radius: 50%; border: 2.5px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
@@ -62,7 +57,6 @@
         .p-time { font-size: 11px; color: var(--gold); font-weight: 900; margin-top: 5px; }
 
         .btn-p-main { background: none; border: none; color: var(--gold); font-size: 32px; cursor: pointer; padding: 5px; }
-
         .seek-container { width: 100%; padding: 8px 0; }
         #seek-bar { width: 100%; -webkit-appearance: none; background: #222; height: 6px; border-radius: 3px; outline: none; }
         #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: var(--gold); border-radius: 50%; cursor: pointer; border: 3px solid #000; }
@@ -71,8 +65,7 @@
         .btn-tool { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 15px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; }
 
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        /* EL REPRODUCTOR DE GOOGLE QUE NO FALLA */
+        /* Ocultamos audio pero lo usaremos para el Cast nativo */
         audio { width: 100%; height: 45px; margin-top: 15px; display: none; filter: invert(100%) hue-rotate(180deg) brightness(1.5); }
     </style>
 </head>
@@ -186,35 +179,44 @@
         if (idActual === id) { window.togglePlay(); } 
         else {
             idActual = id; document.getElementById('p-title').innerText = titulo;
-            document.getElementById('p-vinyl').style.backgroundImage = `url('${img || 'logo.png'}')`;
+            const artworkUrl = img || 'logo.png';
+            document.getElementById('p-vinyl').style.backgroundImage = `url('${artworkUrl}')`;
             document.getElementById('global-player').style.display = 'block';
-            audio.src = url; const savedTime = localStorage.getItem(`time_${id}`);
-            if(savedTime) audio.currentTime = parseFloat(savedTime); audio.play();
+            audio.src = url; 
+            const savedTime = localStorage.getItem(`time_${id}`);
+            if(savedTime) audio.currentTime = parseFloat(savedTime); 
+            
+            // --- ACTUALIZAR IMAGEN PARA LA TV (MediaSession) ---
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: titulo,
+                    artist: prog,
+                    album: 'Jazztabueno Productions',
+                    artwork: [
+                        { src: artworkUrl, sizes: '96x96',   type: 'image/png' },
+                        { src: artworkUrl, sizes: '128x128', type: 'image/png' },
+                        { src: artworkUrl, sizes: '192x192', type: 'image/png' },
+                        { src: artworkUrl, sizes: '256x256', type: 'image/png' },
+                        { src: artworkUrl, sizes: '384x384', type: 'image/png' },
+                        { src: artworkUrl, sizes: '512x512', type: 'image/png' },
+                    ]
+                });
+            }
+            audio.play();
         }
         render();
     };
 
     window.togglePlay = () => { if (audio.paused) audio.play(); else audio.pause(); render(); };
-    
-    // --- LA SOLUCIÓN DEFINITIVA V8.4 ---
     window.activarCastNativo = () => { 
-        // Mostramos el reproductor gris de Google
-        if(audio.style.display === 'block') {
-            audio.style.display = 'none';
-        } else {
-            audio.style.display = 'block';
-            // Intentamos disparar el menú, pero si no abre, ya el usuario tiene el botón a la mano
-            if(audio.remotePlayback) audio.remotePlayback.prompt().catch(() => {});
-        }
+        audio.style.display = (audio.style.display === 'block') ? 'none' : 'block';
+        if(audio.remotePlayback) audio.remotePlayback.prompt().catch(() => {});
     };
-
     window.cambiarVelocidad = () => {
         const speeds = [1.0, 1.25, 1.5, 2.0, 0.5];
-        let current = speeds.indexOf(audio.playbackRate);
-        audio.playbackRate = speeds[(current + 1) % speeds.length];
+        audio.playbackRate = speeds[(speeds.indexOf(audio.playbackRate) + 1) % speeds.length];
         document.getElementById('btn-speed').innerText = audio.playbackRate + "x";
     };
-
     window.toggleMute = () => { audio.muted = !audio.muted; document.getElementById('btn-mute').innerText = audio.muted ? "🔇 MUTE" : "🔊 VOL"; };
 
     function formatTime(s) { if (isNaN(s)) return "00:00"; const h = Math.floor(s / 3600); const m = Math.floor((s % 3600) / 60); const sec = Math.floor(s % 60); return (h > 0 ? h + ":" : "") + (m < 10 ? "0" + m : m) + ":" + (sec < 10 ? "0" + sec : sec); }
