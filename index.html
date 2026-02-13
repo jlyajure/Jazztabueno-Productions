@@ -15,7 +15,7 @@
         html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; }
         
-        /* LOGIN */
+        /* LOGIN PREMIUM */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
@@ -24,27 +24,27 @@
         header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; }
         .header-logo { width: 35px; height: 35px; border-radius: 8px; }
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 12px; text-transform: uppercase; }
-        .btn-salir-premium { background: transparent !important; border: 1.5px solid var(--gold) !important; color: var(--gold) !important; padding: 7px 15px !important; border-radius: 8px !important; font-size: 11px !important; font-weight: 800 !important; text-transform: uppercase !important; cursor: pointer; }
+        .btn-salir-premium { background: transparent !important; border: 1.2px solid var(--gold) !important; color: var(--gold) !important; padding: 7px 15px !important; border-radius: 8px !important; font-size: 10px !important; font-weight: 800 !important; text-transform: uppercase !important; cursor: pointer; }
 
         #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
-        /* --- CATEGORÍAS MAGNÉTICAS V11.7 --- */
+        /* --- CATEGORÍAS V11.8 (EL SECRETO DEL SCROLL) --- */
+        .channels-wrapper { width: 100%; overflow: hidden; position: relative; margin-bottom: 20px; }
         .channels-container { 
             display: flex; 
-            gap: 12px; 
-            margin-bottom: 25px; 
+            gap: 15px; 
             overflow-x: auto; 
-            padding: 10px 20px; 
+            padding: 10px 40vw; /* Espacio gigante a los lados para centrar lo que sea */
             scrollbar-width: none; 
-            scroll-snap-type: x mandatory; /* El truco del imán */
+            scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
         }
-        .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; min-width: 75px; cursor: pointer; scroll-snap-align: center; }
-        .channel-item.active { opacity: 1; transform: scale(1.05); }
-        .channel-logo { width: 62px; height: 62px; border-radius: 12px; border: 2px solid #333; margin-bottom: 8px; background: #000; object-fit: contain; padding: 4px; }
-        .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.4); }
-        .channel-name { font-size: 8.5px; color: #aaa; font-weight: 800; text-transform: uppercase; display: block; }
+        .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; min-width: 70px; cursor: pointer; scroll-snap-align: center; }
+        .channel-item.active { opacity: 1; transform: scale(1.1); }
+        .channel-logo { width: 62px; height: 62px; border-radius: 12px; border: 2.5px solid #333; margin-bottom: 8px; background: #000; object-fit: contain; padding: 3px; }
+        .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.4); }
+        .channel-name { font-size: 8px; color: #aaa; font-weight: 800; text-transform: uppercase; display: block; letter-spacing: 0.5px; }
 
         /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; position: relative; overflow: hidden; }
@@ -70,11 +70,11 @@
 
         .tool-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 12px; margin-top: 5px; gap: 8px; }
         .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 5px; border-radius: 8px; font-size: 8.5px; font-weight: 800; cursor: pointer; transition: 0.2s; }
-        
-        .is-casting-ui { background: var(--gold) !important; color: black !important; border-color: white !important; }
+        .is-casting { background: var(--gold) !important; color: black !important; }
 
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        #main-media { width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+        /* El reproductor nativo que usaremos de rescate */
+        #main-media { width: 100%; height: 45px; margin-top: 10px; display: none; filter: invert(1); border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -83,7 +83,7 @@
     <div class="login-card">
         <img src="logo.png" style="width:90px; margin-bottom:20px;">
         <h2 style="color:var(--gold); font-family:'Playfair Display';">JAZZTABUENO</h2>
-        <input type="password" id="passInput" placeholder="Clave">
+        <input type="password" id="passInput" placeholder="Clave de Director">
         <button onclick="checkLogin()" class="btn-gold-tico">ENTRAR ▶</button>
     </div>
 </div>
@@ -94,23 +94,25 @@
             <img src="logo.png" class="header-logo">
             <div class="brand-title">Jazztabueno<br>Productions</div>
         </div>
-        <button onclick="window.limpiarTodo()" class="btn-salir-premium">SALIR</button>
+        <button onclick="window.reiniciarSesion()" class="btn-salir-premium">SALIR</button>
     </header>
 
     <div class="container">
-        <div class="channels-container">
-            <div class="channel-item active" onclick="filtrar('Todo', this)"><img src="logo.png" class="channel-logo"><span class="channel-name">Todo</span></div>
-            <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)"><img src="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png" class="channel-logo"><span class="channel-name">Jazztabueno</span></div>
-            <div class="channel-item" onclick="filtrar('STUDIO', this)"><img src="https://i.postimg.cc/NKMDbYJB/S79.png" class="channel-logo"><span class="channel-name">Studio 79</span></div>
-            <div class="channel-item" onclick="filtrar('SALSA', this)"><img src="https://i.postimg.cc/75fchgyt/Salsa-Brava.png" class="channel-logo"><span class="channel-name">Salsa Brava</span></div>
-            <div class="channel-item" onclick="filtrar('OLD', this)"><img src="https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png" class="channel-logo"><span class="channel-name">Old School</span></div>
+        <div class="channels-wrapper">
+            <div class="channels-container">
+                <div class="channel-item active" onclick="filtrar('Todo', this)"><img src="logo.png" class="channel-logo"><span class="channel-name">Todo</span></div>
+                <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)"><img src="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png" class="channel-logo"><span class="channel-name">Jazztabueno</span></div>
+                <div class="channel-item" onclick="filtrar('STUDIO', this)"><img src="https://i.postimg.cc/NKMDbYJB/S79.png" class="channel-logo"><span class="channel-name">Studio 79</span></div>
+                <div class="channel-item" onclick="filtrar('SALSA', this)"><img src="https://i.postimg.cc/75fchgyt/Salsa-Brava.png" class="channel-logo"><span class="channel-name">Salsa Brava</span></div>
+                <div class="channel-item" onclick="filtrar('OLD', this)"><img src="https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png" class="channel-logo"><span class="channel-name">Old School</span></div>
+            </div>
         </div>
         <div id="radio-feed"></div>
     </div>
 </div>
 
 <div id="global-player">
-    <video id="main-media" playsinline crossorigin="anonymous"></video>
+    <video id="main-media" controls playsinline crossorigin="anonymous"></video>
     <div class="player-top">
         <div id="p-vinyl" class="p-vinyl" style="background-image: url('logo.png');"></div>
         <div class="p-info"><h4 id="p-title">...</h4><div id="p-time-display" class="p-time">00:00 / 00:00</div></div>
@@ -121,9 +123,9 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button id="cast-btn-117" onclick="window.lanzarCastV117()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 CONECTAR A TV</button>
-        <button onclick="window.refrescarTV()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
-        <button onclick="window.resetIcono()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
+        <button id="cast-btn-118" onclick="window.gestionarCastV118()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 CONECTAR TV</button>
+        <button onclick="window.refrescarArte()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
+        <button onclick="window.limpiarBoton()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
     </div>
 </div>
 
@@ -134,7 +136,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
-    const castBtn = document.getElementById('cast-btn-117');
+    const castBtn = document.getElementById('cast-btn-118');
     let programas = []; let idActual = null; let filtroActivo = 'Todo';
 
     window.checkLogin = () => {
@@ -172,12 +174,13 @@
         });
     }
 
-    function sendMetadata(titulo, prog, img) {
+    function pushTV(titulo, prog, img) {
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: titulo, artist: prog, album: 'Jazztabueno Productions',
                 artwork: [{ src: img, sizes: '512x512', type: 'image/png' }]
             });
+            navigator.mediaSession.playbackState = media.paused ? 'paused' : 'playing';
         }
     }
 
@@ -188,7 +191,7 @@
             document.getElementById('p-title').innerText = titulo;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img || 'logo.png'}')`;
             document.getElementById('global-player').style.display = 'block';
-            sendMetadata(titulo, prog, img || 'logo.png');
+            pushTV(titulo, prog, img || 'logo.png');
             media.play();
         }
         render();
@@ -196,35 +199,35 @@
 
     window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
     
-    // --- LÓGICA DE TRANSMISIÓN V11.7 ---
-    window.lanzarCastV117 = () => { 
+    // --- LÓGICA DE TRANSMISIÓN SIN FILTROS V11.8 ---
+    window.gestionarCastV118 = () => { 
         if(media.remotePlayback) {
-            // "Disparo de pulso" para Chrome
+            // Intentamos el prompt oficial
             media.remotePlayback.prompt().then(() => {
-                castBtn.classList.add('is-casting-ui');
+                castBtn.classList.add('is-casting');
             }).catch(() => {
-                // Fallback automático
-                media.style.display = 'block';
-                setTimeout(() => { media.style.display = 'none'; }, 5000);
+                // Si Chrome bloquea, activamos el reproductor nativo como salvavidas
+                media.style.display = (media.style.display === 'block') ? 'none' : 'block';
+                alert("📡 Toca los 3 PUNTOS del reproductor que apareció abajo y dale a 'Transmitir'.");
             });
         }
     };
 
-    window.refreshTV = () => {
+    window.refrescarArte = () => {
         if(idActual) {
             const p = programas.find(x => x.id === idActual);
-            if(p) sendMetadata(p.titulo, p.programa, p.imagenUrl);
+            if(p) pushTV(p.titulo, p.programa, p.imagenUrl);
         }
     };
 
-    window.resetIcono = () => { castBtn.classList.remove('is-casting-ui'); castBtn.innerText = "📡 CONECTAR A TV"; };
+    window.limpiarBoton = () => { castBtn.classList.remove('is-casting'); castBtn.innerText = "📡 CONECTAR A TV"; };
 
     setInterval(() => {
         if (media.remotePlayback && media.remotePlayback.state === 'connected') {
-            castBtn.classList.add('is-casting-ui');
+            castBtn.classList.add('is-casting');
             castBtn.innerText = "📡 TV CONECTADA";
         } else if (media.remotePlayback && media.remotePlayback.state === 'disconnected') {
-            castBtn.classList.remove('is-casting-ui');
+            castBtn.classList.remove('is-casting');
             castBtn.innerText = "📡 CONECTAR A TV";
         }
     }, 2000);
@@ -236,7 +239,7 @@
         render();
     };
 
-    window.limpiarTodo = () => { localStorage.clear(); location.reload(); };
+    window.reiniciarSesion = () => { localStorage.clear(); location.reload(); };
     media.onloadedmetadata = () => { seekBar.max = Math.floor(media.duration); };
     media.onplay = () => { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; render(); };
     media.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; render(); };
