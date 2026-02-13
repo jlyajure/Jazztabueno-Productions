@@ -29,26 +29,26 @@
         #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
-        /* --- CATEGORÍAS V11.8 (EL SECRETO DEL SCROLL) --- */
-        .channels-wrapper { width: 100%; overflow: hidden; position: relative; margin-bottom: 20px; }
+        /* --- CATEGORÍAS V11.9 (DISTRIBUCIÓN REAL) --- */
         .channels-container { 
             display: flex; 
-            gap: 15px; 
+            justify-content: space-between; /* Esto los reparte en el ancho de la pantalla */
+            gap: 10px; 
+            margin-bottom: 25px; 
             overflow-x: auto; 
-            padding: 10px 40vw; /* Espacio gigante a los lados para centrar lo que sea */
+            padding: 10px 5px; 
             scrollbar-width: none; 
-            scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
         }
-        .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; min-width: 70px; cursor: pointer; scroll-snap-align: center; }
-        .channel-item.active { opacity: 1; transform: scale(1.1); }
-        .channel-logo { width: 62px; height: 62px; border-radius: 12px; border: 2.5px solid #333; margin-bottom: 8px; background: #000; object-fit: contain; padding: 3px; }
-        .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.4); }
-        .channel-name { font-size: 8px; color: #aaa; font-weight: 800; text-transform: uppercase; display: block; letter-spacing: 0.5px; }
+        .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; min-width: 65px; cursor: pointer; }
+        .channel-item.active { opacity: 1; transform: scale(1.05); }
+        .channel-logo { width: 58px; height: 58px; border-radius: 12px; border: 2.5px solid #333; margin-bottom: 8px; background: #000; object-fit: contain; padding: 3px; }
+        .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.4); }
+        .channel-name { font-size: 8px; color: #aaa; font-weight: 800; text-transform: uppercase; display: block; }
 
         /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; position: relative; overflow: hidden; }
-        .cover-art { width: 100%; height: 220px; background-size: cover; background-position: center; position: relative; }
+        .cover-art { width: 100%; height: 210px; background-size: cover; background-position: center; position: relative; }
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
         .btn-play-card { background: var(--gold); border: none; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-play-card::before { content: '▶'; font-size: 26px; color: black; margin-left: 5px; }
@@ -70,11 +70,10 @@
 
         .tool-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 12px; margin-top: 5px; gap: 8px; }
         .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 5px; border-radius: 8px; font-size: 8.5px; font-weight: 800; cursor: pointer; transition: 0.2s; }
-        .is-casting { background: var(--gold) !important; color: black !important; }
-
+        
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        /* El reproductor nativo que usaremos de rescate */
-        #main-media { width: 100%; height: 45px; margin-top: 10px; display: none; filter: invert(1); border-radius: 8px; }
+        /* El reproductor nativo que Chrome NO puede bloquear */
+        #main-media { width: 100%; height: 50px; margin-top: 10px; display: none; filter: invert(1); border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -98,14 +97,12 @@
     </header>
 
     <div class="container">
-        <div class="channels-wrapper">
-            <div class="channels-container">
-                <div class="channel-item active" onclick="filtrar('Todo', this)"><img src="logo.png" class="channel-logo"><span class="channel-name">Todo</span></div>
-                <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)"><img src="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png" class="channel-logo"><span class="channel-name">Jazztabueno</span></div>
-                <div class="channel-item" onclick="filtrar('STUDIO', this)"><img src="https://i.postimg.cc/NKMDbYJB/S79.png" class="channel-logo"><span class="channel-name">Studio 79</span></div>
-                <div class="channel-item" onclick="filtrar('SALSA', this)"><img src="https://i.postimg.cc/75fchgyt/Salsa-Brava.png" class="channel-logo"><span class="channel-name">Salsa Brava</span></div>
-                <div class="channel-item" onclick="filtrar('OLD', this)"><img src="https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png" class="channel-logo"><span class="channel-name">Old School</span></div>
-            </div>
+        <div class="channels-container">
+            <div class="channel-item active" onclick="filtrar('Todo', this)"><img src="logo.png" class="channel-logo"><span class="channel-name">Todo</span></div>
+            <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)"><img src="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png" class="channel-logo"><span class="channel-name">Jazztabueno</span></div>
+            <div class="channel-item" onclick="filtrar('STUDIO', this)"><img src="https://i.postimg.cc/NKMDbYJB/S79.png" class="channel-logo"><span class="channel-name">Studio 79</span></div>
+            <div class="channel-item" onclick="filtrar('SALSA', this)"><img src="https://i.postimg.cc/75fchgyt/Salsa-Brava.png" class="channel-logo"><span class="channel-name">Salsa Brava</span></div>
+            <div class="channel-item" onclick="filtrar('OLD', this)"><img src="https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png" class="channel-logo"><span class="channel-name">Old School</span></div>
         </div>
         <div id="radio-feed"></div>
     </div>
@@ -123,9 +120,9 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button id="cast-btn-118" onclick="window.gestionarCastV118()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 CONECTAR TV</button>
-        <button onclick="window.refrescarArte()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
-        <button onclick="window.limpiarBoton()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
+        <button id="cast-btn-119" onclick="window.activarCastNativo()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR A TV</button>
+        <button onclick="window.forzarImagen()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
+        <button onclick="window.resetUI()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
     </div>
 </div>
 
@@ -136,7 +133,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
-    const castBtn = document.getElementById('cast-btn-118');
+    const castBtn = document.getElementById('cast-btn-119');
     let programas = []; let idActual = null; let filtroActivo = 'Todo';
 
     window.checkLogin = () => {
@@ -174,13 +171,12 @@
         });
     }
 
-    function pushTV(titulo, prog, img) {
+    function syncMetadata(titulo, prog, img) {
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: titulo, artist: prog, album: 'Jazztabueno Productions',
                 artwork: [{ src: img, sizes: '512x512', type: 'image/png' }]
             });
-            navigator.mediaSession.playbackState = media.paused ? 'paused' : 'playing';
         }
     }
 
@@ -191,7 +187,7 @@
             document.getElementById('p-title').innerText = titulo;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img || 'logo.png'}')`;
             document.getElementById('global-player').style.display = 'block';
-            pushTV(titulo, prog, img || 'logo.png');
+            syncMetadata(titulo, prog, img || 'logo.png');
             media.play();
         }
         render();
@@ -199,36 +195,32 @@
 
     window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
     
-    // --- LÓGICA DE TRANSMISIÓN SIN FILTROS V11.8 ---
-    window.gestionarCastV118 = () => { 
-        if(media.remotePlayback) {
-            // Intentamos el prompt oficial
-            media.remotePlayback.prompt().then(() => {
-                castBtn.classList.add('is-casting');
-            }).catch(() => {
-                // Si Chrome bloquea, activamos el reproductor nativo como salvavidas
-                media.style.display = (media.style.display === 'block') ? 'none' : 'block';
-                alert("📡 Toca los 3 PUNTOS del reproductor que apareció abajo y dale a 'Transmitir'.");
-            });
-        }
+    // --- LÓGICA DE TRANSMISIÓN NATIVA V11.9 ---
+    window.activarCastNativo = () => { 
+        // Hacemos aparecer el reproductor de Google para usar su botón Cast interno
+        media.style.display = (media.style.display === 'block') ? 'none' : 'block';
+        alert("📡 Toca el icono de TRANSMITIR (el cuadrito con ondas) que apareció en el reproductor de abajo.");
     };
 
-    window.refrescarArte = () => {
+    window.forzarImagen = () => {
         if(idActual) {
             const p = programas.find(x => x.id === idActual);
-            if(p) pushTV(p.titulo, p.programa, p.imagenUrl);
+            if(p) syncMetadata(p.titulo, p.programa, p.imagenUrl);
+            alert("📡 Refrescando carátula...");
         }
     };
 
-    window.limpiarBoton = () => { castBtn.classList.remove('is-casting'); castBtn.innerText = "📡 CONECTAR A TV"; };
+    window.resetUI = () => { castBtn.classList.remove('is-casting'); media.pause(); media.src = ""; render(); alert("♻️ Icono Limpio."); };
 
     setInterval(() => {
         if (media.remotePlayback && media.remotePlayback.state === 'connected') {
-            castBtn.classList.add('is-casting');
+            castBtn.style.background = "var(--gold)";
+            castBtn.style.color = "black";
             castBtn.innerText = "📡 TV CONECTADA";
-        } else if (media.remotePlayback && media.remotePlayback.state === 'disconnected') {
-            castBtn.classList.remove('is-casting');
-            castBtn.innerText = "📡 CONECTAR A TV";
+        } else {
+            castBtn.style.background = "#1a1a1a";
+            castBtn.style.color = "#fff";
+            castBtn.innerText = "📡 TRANSMITIR A TV";
         }
     }, 2000);
 
