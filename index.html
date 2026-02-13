@@ -12,19 +12,17 @@
     <style>
         :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
+        html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow: hidden; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 240px; }
         
-        /* --- LOGIN PREMIUM V9.1 (PROTEGIDO) --- */
+        /* LOGIN PREMIUM V9.2 - BLINDADO CONTRA CHROME */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
-        .login-card { width: 85%; max-width: 330px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 2px solid #222; }
-        .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 15px; text-align: center; font-size: 16px; outline: none; }
+        .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
+        .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; outline: none; }
         
-        /* Botón con estilo forzado para que Chrome no lo cambie */
-        .btn-entrar-tico { 
+        .btn-premium-tico { 
             display: block !important;
             width: 100% !important;
-            background: #d4af37 !important; 
             background: linear-gradient(145deg, #d4af37, #b8962d) !important;
             color: black !important;
             border: none !important;
@@ -35,7 +33,8 @@
             text-transform: uppercase !important;
             letter-spacing: 1px !important;
             cursor: pointer !important;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.5) !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+            -webkit-appearance: none !important;
         }
 
         header { background: rgba(0,0,0,0.98); padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
@@ -45,14 +44,17 @@
 
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
-        /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 22px; margin-bottom: 35px; overflow: hidden; border: 1px solid #222; position: relative; }
         .cover-art { width: 100%; height: 220px; background-size: cover; background-position: center; position: relative; }
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; }
         .btn-play-card { background: var(--gold); border: none; width: 70px; height: 70px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-play-card::before { content: '▶'; font-size: 28px; color: black; margin-left: 6px; }
 
-        /* REPRODUCTOR */
+        .episode-info { padding: 22px; }
+        .program-tag { display: inline-block; font-size: 9px; color: black; padding: 5px 14px; border-radius: 50px; background: var(--gold); font-weight: 800; text-transform: uppercase; margin-bottom: 12px; }
+        .episode-title { font-size: 20px; margin: 0; font-weight: 700; color: white; line-height: 1.2; }
+
+        /* CONSOLA DE MANDO */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 18px 20px; display: none; z-index: 1000; box-shadow: 0 -20px 50px rgba(0,0,0,1); }
         .player-top { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
         .p-vinyl { width: 55px; height: 55px; border-radius: 50%; border: 2.5px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
@@ -71,8 +73,8 @@
 
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
-        /* REPRODUCTOR GOOGLE (OCULTO PERO ACTIVO) */
-        #main-audio { width: 100%; height: 45px; display: none; }
+        /* AUDIO OCULTO - REFORZADO PARA GOOGLE TV */
+        audio { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -80,9 +82,9 @@
 <div id="login-screen">
     <div class="login-card">
         <img src="logo.png" style="width:100px; margin-bottom:20px;">
-        <h2 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom: 30px;">PRODUCCIONES TICO</h2>
+        <h2 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom: 25px;">JAZZTABUENO</h2>
         <input type="password" id="passInput" placeholder="Introduce Clave">
-        <button onclick="checkLogin()" class="btn-entrar-tico">ENTRAR A LA CABINA ▶</button>
+        <button onclick="checkLogin()" class="btn-premium-tico">ENTRAR A LA CABINA ▶</button>
     </div>
 </div>
 
@@ -101,8 +103,6 @@
 </div>
 
 <div id="global-player">
-    <audio id="main-audio" controls controlsList="nodownload"></audio>
-
     <div class="player-top">
         <div id="p-vinyl" class="p-vinyl" style="background-image: url('logo.png');"></div>
         <div class="p-info"><h4 id="p-title">...</h4><div id="p-time-display" class="p-time">00:00 / 00:00</div></div>
@@ -113,10 +113,11 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button onclick="window.forzarCastV9()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 CONECTAR A LA TV</button>
+        <button onclick="window.activarOnnTV()" class="btn-tool" style="border-color: var(--gold); color: var(--gold); padding: 10px 20px;">📡 CONECTAR A ONN TV</button>
         <button onclick="window.cambiarVelocidad()" id="btn-speed" class="btn-tool">1.0x</button>
         <button onclick="window.toggleMute()" id="btn-mute" class="btn-tool">🔊 VOL</button>
     </div>
+    <audio id="main-audio" crossOrigin="anonymous"></audio>
 </div>
 
 <script type="module">
@@ -166,35 +167,33 @@
             document.getElementById('p-vinyl').style.backgroundImage = `url('${artworkUrl}')`;
             document.getElementById('global-player').style.display = 'block';
             
-            // EL SECRETO PARA LA TV: Ponemos la imagen como 'poster' nativo
-            audio.setAttribute('poster', artworkUrl);
-            audio.src = url; 
-
+            // PRIMERO: Preparar la imagen para el receptor de Google TV
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
-                    title: titulo, artist: prog, album: 'Jazztabueno Productions',
-                    artwork: [{ src: artworkUrl, sizes: '512x512', type: 'image/png' }]
+                    title: titulo,
+                    artist: prog,
+                    album: 'Jazztabueno Productions',
+                    artwork: [
+                        { src: artworkUrl, sizes: '512x512', type: 'image/png' }
+                    ]
                 });
             }
+            
+            // SEGUNDO: Cargar el audio
+            audio.src = url; 
             audio.play();
         }
     };
 
     window.togglePlay = () => { if (audio.paused) audio.play(); else audio.pause(); };
     
-    // --- FUNCIÓN GOLPE MAESTRO V9.1 ---
-    window.forzarCastV9 = () => { 
-        // Primero hacemos aparecer el reproductor de Google para "engañar" al sistema
-        audio.style.display = 'block';
-        
-        // Lanzamos la orden de transmitir
-        if(audio.remotePlayback) {
-            // Intentamos disparar el menú oficial del televisor
+    // FUNCIÓN ESPECÍFICA PARA ONN TV / GOOGLE TV
+    window.activarOnnTV = () => { 
+        if (audio.remotePlayback) {
             audio.remotePlayback.prompt().then(() => {
-                console.log("Menú abierto");
+                console.log("Conectando a Onn TV...");
             }).catch(() => {
-                // Si Chrome se pone rebelde, mostramos el menú de los 3 puntos automáticamente
-                alert("📡 Director Tico: Chrome está bloqueando el acceso. Toca los 3 PUNTITOS que acaban de aparecer abajo para 'Transmitir' a tu TV.");
+                alert("📡 Director Tico: Desliza tu dedo hacia abajo en el celular y usa la opción oficial 'EMITIR' o 'SMART VIEW'. ¡Tu Onn TV aparecerá ahí al instante!");
             });
         }
     };
@@ -212,7 +211,7 @@
     seekBar.oninput = () => { audio.currentTime = seekBar.value; };
     audio.onplay = () => { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; };
     audio.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; };
-    window.cerrarPlayer = () => { audio.pause(); document.getElementById('global-player').style.display = 'none'; audio.style.display = 'none'; idActual = null; };
+    window.cerrarPlayer = () => { audio.pause(); document.getElementById('global-player').style.display = 'none'; idActual = null; };
 </script>
 </body>
 </html>
