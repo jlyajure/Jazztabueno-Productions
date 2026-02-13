@@ -15,7 +15,7 @@
         html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; }
         
-        /* LOGIN PREMIUM BLINDADO */
+        /* LOGIN PREMIUM */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 330px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
@@ -29,24 +29,13 @@
         #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
-        /* --- CATEGORÍAS CUADRADAS SIN RECORTES (RESTAURADAS) --- */
+        /* CATEGORÍAS (CUADRADAS PERFECTAS) */
         .channels-container { display: flex; gap: 15px; margin-bottom: 25px; overflow-x: auto; padding: 10px 5px; scrollbar-width: none; }
         .channel-item { text-align: center; opacity: 0.4; transition: 0.3s; min-width: 75px; cursor: pointer; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
-        
-        .channel-logo { 
-            width: 70px; height: 70px; 
-            border-radius: 12px; 
-            border: 2px solid #333; 
-            margin-bottom: 8px; 
-            background: #1a1a1a; /* Fondo para logos no cuadrados */
-            object-fit: contain; /* Muestra el logo completo sin recortar */
-            padding: 4px; 
-            background-color: #000;
-        }
+        .channel-logo { width: 70px; height: 70px; border-radius: 12px; border: 2px solid #333; margin-bottom: 8px; background: #000; object-fit: contain; padding: 4px; }
         .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.3); }
         .channel-name { font-size: 9px; color: #888; font-weight: 800; text-transform: uppercase; display: block; white-space: nowrap; }
-        .active .channel-name { color: var(--gold); }
 
         /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 22px; margin-bottom: 35px; overflow: hidden; border: 1px solid #222; position: relative; }
@@ -56,6 +45,10 @@
         .btn-play-card::before { content: '▶'; font-size: 28px; color: black; margin-left: 6px; }
         .is-playing .btn-play-card { background: rgba(0, 0, 0, 0.8) !important; border: 3px solid var(--gold); }
         .is-playing .btn-play-card::before { content: ''; width: 6px; height: 26px; background: var(--gold); box-shadow: 16px 0 0 var(--gold); margin-right: 16px; margin-left: 0; }
+
+        .episode-info { padding: 22px; }
+        .program-tag { display: inline-block; font-size: 9px; color: black; padding: 5px 14px; border-radius: 50px; background: var(--gold); font-weight: 800; text-transform: uppercase; margin-bottom: 12px; }
+        .episode-title { font-size: 20px; margin: 0; font-weight: 700; color: white; line-height: 1.2; }
 
         /* REPRODUCTOR */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 18px 20px; display: none; z-index: 1000; box-shadow: 0 -20px 50px rgba(0,0,0,1); }
@@ -72,10 +65,10 @@
         #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: var(--gold); border-radius: 50%; cursor: pointer; border: 3px solid #000; }
 
         .tool-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 15px; margin-top: 5px; }
-        .btn-tool { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 15px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; transition: background 0.3s; }
+        .btn-tool { background: #1a1a1a; border: 1.5px solid #333; color: #fff; padding: 8px 15px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; transition: all 0.3s ease; }
         
-        /* ESTADO ACTIVO CAST CON RESET MANUAL */
-        .casting-ready { background: var(--gold) !important; color: black !important; }
+        /* ESTADO ACTIVO TRANSMISIÓN (Dorado Brillante) */
+        .btn-tool.is-casting { background: var(--gold) !important; color: black !important; border-color: white !important; box-shadow: 0 0 10px var(--gold); }
 
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         #main-media { width: 100%; height: 50px; display: none; background: #000; }
@@ -87,7 +80,7 @@
     <div class="login-card">
         <img src="logo.png" style="width:100px; margin-bottom:20px;">
         <h2 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom: 25px;">JAZZTABUENO</h2>
-        <input type="password" id="passInput" placeholder="Clave de Director">
+        <input type="password" id="passInput" placeholder="Introduce Clave">
         <button onclick="checkLogin()" class="btn-gold-premium">ENTRAR ▶</button>
     </div>
 </div>
@@ -98,7 +91,7 @@
             <img src="logo.png" class="header-logo">
             <div class="brand-title">Jazztabueno<br>Productions</div>
         </div>
-        <button onclick="window.resetForzado()" class="btn-exit">SALIR</button>
+        <button onclick="window.reiniciarTodo()" class="btn-exit">SALIR</button>
     </header>
 
     <div class="container">
@@ -125,7 +118,7 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button id="cast-trigger" onclick="window.activarCastOnn()" class="btn-tool" style="border-color: var(--gold); color: var(--gold); padding: 10px 18px;">📡 TRANSMITIR A TV</button>
+        <button id="btn-cast-main" onclick="window.activarCastV108()" class="btn-tool" style="border-color: var(--gold); color: var(--gold); padding: 10px 18px;">📡 CONECTAR A TV</button>
         <button onclick="window.cambiarVelocidad()" id="btn-speed" class="btn-tool">1.0x</button>
         <button onclick="window.toggleMute()" id="btn-mute" class="btn-tool">🔊 VOL</button>
     </div>
@@ -138,7 +131,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
-    const castBtn = document.getElementById('cast-trigger');
+    const castBtn = document.getElementById('btn-cast-main');
     let programas = []; let idActual = null; let filtroActivo = 'Todo';
 
     window.checkLogin = () => {
@@ -176,11 +169,12 @@
         });
     }
 
-    function syncTV(titulo, prog, img) {
+    // --- REFUERZO DE METADATOS V10.8 ---
+    function syncCastMetadata(titulo, prog, img) {
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: titulo, artist: prog, album: 'Jazztabueno Productions',
-                artwork: [{ src: img, sizes: '512x512', type: 'image/png' }]
+                artwork: [{ src: img, sizes: '512x512', type: 'image/png' }, { src: img, sizes: '1024x1024', type: 'image/png' }]
             });
             navigator.mediaSession.playbackState = media.paused ? 'paused' : 'playing';
         }
@@ -197,9 +191,10 @@
             
             media.src = url; 
             media.setAttribute('poster', artworkUrl);
-            syncTV(titulo, prog, artworkUrl);
+            syncCastMetadata(titulo, prog, artworkUrl);
             media.play().then(() => {
-                setTimeout(() => syncTV(titulo, prog, artworkUrl), 3000);
+                // Doble aviso para forzar la imagen en Onn TV
+                setTimeout(() => syncCastMetadata(titulo, prog, artworkUrl), 2000);
             });
         }
         render();
@@ -207,27 +202,26 @@
 
     window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
     
-    // --- LÓGICA DE TRANSMISIÓN CON RESET DE COLOR V10.7 ---
-    window.activarCastOnn = () => { 
+    // --- LÓGICA DE BOTÓN INTELIGENTE V10.8 ---
+    window.activarCastV108 = () => { 
         media.style.display = (media.style.display === 'block') ? 'none' : 'block';
         if(media.remotePlayback) {
             media.remotePlayback.prompt().then(() => {
-                // Si el usuario abre el menú, el botón brilla
-                castBtn.classList.add('casting-ready');
-            }).catch(() => {
-                castBtn.classList.remove('casting-ready');
-            });
+                // Intento exitoso de abrir el menú
+            }).catch(() => {});
         }
     };
 
-    // SENSOR PERMANENTE: Si no hay TV conectada, apagar el botón cada segundo
+    // SENSOR REAL: Detecta si la TV está conectada de verdad
     setInterval(() => {
         if (media.remotePlayback && media.remotePlayback.state === 'connected') {
-            castBtn.classList.add('casting-ready');
+            castBtn.classList.add('is-casting');
+            castBtn.innerText = "📡 TV CONECTADA";
         } else {
-            castBtn.classList.remove('casting-ready');
+            castBtn.classList.remove('is-casting');
+            castBtn.innerText = "📡 CONECTAR A TV";
         }
-    }, 2000);
+    }, 1500);
 
     window.filtrar = (cat, el) => {
         filtroActivo = cat;
@@ -236,7 +230,7 @@
         render();
     };
 
-    window.resetForzado = () => { localStorage.clear(); location.reload(); };
+    window.reiniciarTodo = () => { localStorage.clear(); location.reload(); };
     window.cambiarVelocidad = () => { const speeds = [1.0, 1.25, 1.5, 2.0]; media.playbackRate = speeds[(speeds.indexOf(media.playbackRate) + 1) % speeds.length]; document.getElementById('btn-speed').innerText = media.playbackRate + "x"; };
     window.toggleMute = () => { media.muted = !media.muted; document.getElementById('btn-mute').innerText = media.muted ? "🔇 MUTE" : "🔊 VOL"; };
 
