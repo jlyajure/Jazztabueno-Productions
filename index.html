@@ -14,7 +14,6 @@
         :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
-        /* FIX SCROLL PC */
         html, body { margin: 0; background: var(--bg); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-y: auto !important; }
         
         #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: flex; align-items: center; justify-content: center; }
@@ -28,12 +27,10 @@
 
         .container { max-width: 550px; margin: auto; padding: 15px; padding-bottom: 280px; }
 
-        /* PANEL ADMIN MEJORADO */
         #admin-panel { display: none; background: #111; padding: 20px; border-radius: 20px; border: 1px solid var(--gold); margin-bottom: 25px; }
         .input-box, .select-box, .text-area { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 8px; font-family: inherit; }
-        .text-area { height: 100px; resize: none; font-size: 12px; border: 1px solid #444; }
+        .text-area { height: 120px; resize: none; font-size: 12px; border: 1px solid #444; }
 
-        /* CANALES CIRCULARES ORIGINALES */
         .channels-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 25px; padding: 10px 0; }
         .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; cursor: pointer; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
@@ -41,7 +38,6 @@
         .active .channel-logo { border-color: var(--gold); }
         .channel-name { font-size: 7px; color: #aaa; font-weight: 800; text-transform: uppercase; }
 
-        /* EPISODIO CARD ORIGINAL */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; overflow: hidden; }
         .cover-art { width: 100%; height: 210px; background-size: cover; background-position: center; position: relative; background-color: #000; }
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
@@ -49,17 +45,38 @@
 
         .episode-info { padding: 15px; }
         .program-tag { color: var(--gold); font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .episode-title { margin: 5px 0; font-size: 16px; font-weight: 700; color: #fff; }
+        .episode-title { margin: 5px 0; font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
         
-        .btn-ver-playlist { background: #1a1a1a; border: 1px solid #333; color: #888; padding: 8px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; margin-top: 10px; width: 100%; }
-        .playlist-box { display: none; margin-top: 15px; padding: 12px; background: #080808; border-radius: 10px; border: 1px solid #222; font-size: 12px; color: #bbb; white-space: pre-wrap; line-height: 1.6; }
+        /* --- AQUÍ ESTÁ EL NUEVO ESTILO DEL SETLIST --- */
+        .btn-ver-playlist { 
+            background: #1a1a1a; border: 1px solid #333; color: var(--gold); 
+            padding: 10px; border-radius: 8px; font-size: 11px; font-weight: 800; 
+            cursor: pointer; margin-top: 15px; width: 100%; text-transform: uppercase;
+            letter-spacing: 1px; transition: 0.3s;
+        }
+        .btn-ver-playlist:hover { background: #222; border-color: var(--gold); }
 
-        /* DJ BUTTONS */
-        .dj-actions { display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid #222; padding-top: 15px; }
-        .btn-dj-edit { background: var(--gold); color: black; flex: 1; border: none; padding: 8px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; }
-        .btn-dj-del { background: none; border: 1px solid #ff4444; color: #ff4444; flex: 1; padding: 8px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; }
+        .playlist-box { 
+            display: none; 
+            margin-top: 15px; 
+            padding: 18px; 
+            background: #0a0a0a; 
+            border-radius: 12px; 
+            border-left: 3px solid var(--gold); 
+            font-size: 13px; 
+            color: #ccc; 
+            line-height: 1.8; 
+            font-family: 'Courier New', Courier, monospace; 
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        /* --- FIN DEL NUEVO ESTILO --- */
 
-        /* REPRODUCTOR ORIGINAL */
+        .dj-actions { display: flex; gap: 10px; margin-top: 18px; border-top: 1px solid #222; padding-top: 15px; }
+        .btn-dj-edit { background: var(--gold); color: black; flex: 1; border: none; padding: 10px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; }
+        .btn-dj-del { background: none; border: 1px solid #ff4444; color: #ff4444; flex: 1; padding: 10px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; }
+
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
@@ -91,9 +108,9 @@
 
     <div class="container">
         <div id="admin-panel">
-            <h4 id="admin-label" style="color:var(--gold); text-align:center; font-size:12px; margin-bottom:15px;">SUBIR PROGRAMA</h4>
+            <h4 id="admin-label" style="color:var(--gold); text-align:center; font-size:12px; margin-bottom:15px;">CABINA DE CONTROL</h4>
             <input type="hidden" id="edit-id">
-            <input type="text" id="t-titulo" class="input-box" placeholder="Título">
+            <input type="text" id="t-titulo" class="input-box" placeholder="Título del Episodio">
             <select id="t-programa" class="select-box">
                 <option value="JAZZTABUENO">JAZZTABUENO</option>
                 <option value="STUDIO">STUDIO 79</option>
@@ -102,8 +119,8 @@
             </select>
             <input type="text" id="t-url" class="input-box" placeholder="URL MP3">
             <input type="text" id="t-img" class="input-box" placeholder="URL Imagen">
-            <textarea id="t-playlist" class="text-area" placeholder="Escribe aquí los ARTISTAS y CANCIONES..."></textarea>
-            <button id="btn-save" class="btn-gold-tico" style="padding:12px !important;">📻 GUARDAR CAMBIOS</button>
+            <textarea id="t-playlist" class="text-area" placeholder="Ej: Miles Davis - So What"></textarea>
+            <button id="btn-save" class="btn-gold-tico" style="padding:12px !important;">📻 GUARDAR PROGRAMA</button>
         </div>
 
         <div class="channels-container">
@@ -147,18 +164,19 @@
     const seekBar = document.getElementById('seek-bar');
     let programas = []; let idActual = null; let filtroActivo = 'Todo'; let isAdmin = false;
 
-    // LOGIN
     window.checkLogin = () => {
-        const p = document.getElementById('passInput').value;
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
+        const p = document.getElementById('passInput').value.toLowerCase().trim();
+        if(p === "ticoadmin" || p === "ticoadmind" || p === "jazz2026") { 
+            localStorage.setItem('jtp_auth_key', 'true'); 
+            location.reload(); 
+        } else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_auth')) {
+    if(localStorage.getItem('jtp_auth_key')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
     }
 
-    // ABRIR PANEL (3 TOQUES LOGO)
     let toques = 0; let tToque = 0;
     document.getElementById('admin-trigger').onclick = () => {
         const ahora = new Date().getTime();
@@ -170,7 +188,6 @@
         }
     };
 
-    // GUARDAR O ACTUALIZAR
     document.getElementById('btn-save').onclick = async () => {
         const id = document.getElementById('edit-id').value;
         const datos = {
@@ -199,9 +216,8 @@
         window.scrollTo(0,0);
     };
 
-    window.borrarDoc = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "radio_programas", id)); };
+    window.borrarDoc = async (id) => { if(confirm("¿Borrar definitivamente?")) await deleteDoc(doc(db, "radio_programas", id)); };
 
-    // RENDERIZADO
     onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => {
         programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
     });
@@ -224,7 +240,7 @@
                 <div class="episode-info">
                     <span class="program-tag">${p.programa}</span>
                     <h3 class="episode-title">${p.titulo}</h3>
-                    <button class="btn-ver-playlist" onclick="window.togglePlaylist('${p.id}')">📋 VER ARTISTAS Y CANCIONES</button>
+                    <button class="btn-ver-playlist" onclick="window.togglePlaylist('${p.id}')">📋 VER PLAYLIST</button>
                     <div id="list-${p.id}" class="playlist-box">${p.playlist || "Próximamente..."}</div>
                     ${isAdmin ? `<div class="dj-actions">
                         <button class="btn-dj-edit" onclick="prepararEdicion('${p.id}')">🖋️ EDITAR</button>
@@ -235,7 +251,6 @@
         });
     }
 
-    // LOGICA PLAYER
     window.gestionarReproduccion = (id, url, tit, img) => {
         if(idActual === id) { window.togglePlay(); }
         else {
