@@ -32,7 +32,6 @@
         .channel-item.active { opacity: 1; transform: scale(1.05); }
         .channel-logo { width: 58px; height: 58px; border-radius: 50%; border: 2px solid #333; margin-bottom: 4px; object-fit: cover; }
         .active .channel-logo { border-color: var(--gold); }
-        .channel-name { font-size: 9px; font-weight: 800; color: #888; text-transform: uppercase; }
 
         .episode-card { background: var(--card); border-radius: 18px; margin-bottom: 18px; overflow: hidden; border: 1px solid #222; }
         .cover-art { width: 100%; height: 210px; background-size: cover; background-position: center; position: relative; }
@@ -45,7 +44,6 @@
         .program-tag { display: inline-block; font-size: 9px; color: black; padding: 4px 12px; border-radius: 50px; background: var(--gold); font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
         .episode-title { font-size: 17px; margin: 0; font-weight: 700; color: white; }
 
-        /* --- NUEVO REPRODUCTOR CUSTOM --- */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #0a0a0a; border-top: 1px solid #222; padding: 12px 15px; display: none; z-index: 1000; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); }
         .player-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
         .p-vinyl { width: 45px; height: 45px; border-radius: 50%; border: 1px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
@@ -54,14 +52,9 @@
         .p-info h4 { margin: 0; font-size: 13px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .p-time { font-size: 10px; color: var(--gold); font-weight: bold; margin-top: 2px; }
 
-        /* Barra de Progreso Custom */
         .seek-container { width: 100%; padding: 5px 0; }
-        #seek-bar { 
-            width: 100%; -webkit-appearance: none; background: #333; height: 4px; border-radius: 2px; outline: none;
-        }
-        #seek-bar::-webkit-slider-thumb { 
-            -webkit-appearance: none; width: 14px; height: 14px; background: var(--gold); border-radius: 50%; cursor: pointer; box-shadow: 0 0 5px rgba(0,0,0,0.5);
-        }
+        #seek-bar { width: 100%; -webkit-appearance: none; background: #333; height: 4px; border-radius: 2px; outline: none; }
+        #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--gold); border-radius: 50%; cursor: pointer; }
 
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
@@ -108,22 +101,22 @@
 <div id="global-player">
     <div class="player-top">
         <div id="p-vinyl" class="p-vinyl" style="background-image: url('logo.png');"></div>
-        <div class="p-info">
-            <h4 id="p-title">Reproduciendo...</h4>
-            <div id="p-time-display" class="p-time">00:00 / 00:00</div>
-        </div>
-        <button onclick="audio.paused ? audio.play() : audio.pause()" id="p-play-btn" style="background:none; border:none; color:var(--gold); font-size:24px;">▶</button>
-        <button onclick="cerrarPlayer()" style="background:none; border:none; color:#555; font-size:24px; margin-left:10px;">×</button>
+        <div class="p-info"><h4 id="p-title">...</h4><div id="p-time-display" class="p-time">00:00 / 00:00</div></div>
+        <button onclick="window.togglePlay()" id="p-play-btn" style="background:none; border:none; color:var(--gold); font-size:26px; cursor:pointer; padding:0 10px;">▶</button>
+        <button onclick="window.cerrarPlayer()" style="background:none; border:none; color:#555; font-size:26px; margin-left:5px;">×</button>
     </div>
-    <div class="seek-container">
-        <input type="range" id="seek-bar" value="0" min="0" step="1">
-    </div>
+    <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <audio id="main-audio"></audio>
 </div>
 
 <script type="module">
     import { db } from "./firebase.js";
     import { collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const audio = document.getElementById('main-audio');
+    const seekBar = document.getElementById('seek-bar');
+    const timeDisplay = document.getElementById('p-time-display');
+    let programas = []; let filtroActivo = 'Todo'; let idActual = null;
 
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value;
@@ -137,11 +130,6 @@
         if(localStorage.getItem('jazz_auth') === 'ticoadmin') document.getElementById('admin-panel').style.display = 'block';
     }
 
-    let programas = []; let filtroActivo = 'Todo'; let idActual = null;
-    const audio = document.getElementById('main-audio');
-    const seekBar = document.getElementById('seek-bar');
-    const timeDisplay = document.getElementById('p-time-display');
-
     onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => {
         programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
     });
@@ -152,18 +140,17 @@
             if(filtroActivo === 'Todo') return true;
             return p.programa.toUpperCase().replace(/\s/g, '').includes(filtroActivo.toUpperCase().replace(/\s/g, ''));
         });
-
         lista.forEach(p => {
             const isPlaying = idActual === p.id;
             const div = document.createElement('div');
             div.className = `episode-card ${isPlaying ? 'is-playing' : ''}`;
-            div.innerHTML = `<div class="cover-art" style="background-image: url('${p.imagenUrl || 'logo.png'}')"><div class="cover-overlay"><button class="btn-play-card" onclick="gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo}', '${p.programa}', '${p.imagenUrl}')"></button></div></div><div class="episode-info"><span class="program-tag">${p.programa}</span><h3 class="episode-title">${p.titulo}</h3>${localStorage.getItem('jazz_auth') === 'ticoadmin' ? `<button onclick="iniciarEdicion('${p.id}')" style="background:#333; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:11px; cursor:pointer;">📝 Editar</button>` : ''}</div>`;
+            div.innerHTML = `<div class="cover-art" style="background-image: url('${p.imagenUrl || 'logo.png'}')"><div class="cover-overlay"><button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo}', '${p.programa}', '${p.imagenUrl}')"></button></div></div><div class="episode-info"><span class="program-tag">${p.programa}</span><h3 class="episode-title">${p.titulo}</h3>${localStorage.getItem('jazz_auth') === 'ticoadmin' ? `<button onclick="window.iniciarEdicion('${p.id}')" style="background:#333; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:11px; cursor:pointer;">📝 Editar</button>` : ''}</div>`;
             feed.appendChild(div);
         });
     }
 
     window.gestionarReproduccion = (id, url, titulo, prog, img) => {
-        if (idActual === id) { if (audio.paused) audio.play(); else audio.pause(); } 
+        if (idActual === id) { window.togglePlay(); } 
         else {
             idActual = id; document.getElementById('p-title').innerText = titulo;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img || 'logo.png'}')`;
@@ -173,6 +160,8 @@
         }
         render();
     };
+
+    window.togglePlay = () => { if (audio.paused) audio.play(); else audio.pause(); };
 
     function formatTime(s) {
         const h = Math.floor(s / 3600); const m = Math.floor((s % 3600) / 60); const sec = Math.floor(s % 60);
