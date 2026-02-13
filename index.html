@@ -14,22 +14,13 @@
         :root { --gold: #d4af37; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 230px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 240px; }
         
-        /* LOGIN REFINADO V8.6 - CORRIGIENDO BOTÓN FEO */
+        /* LOGIN V8.7 - ESTILO PREMIUM */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
-        .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; box-shadow: 0 15px 50px rgba(0,0,0,0.8); }
-        .login-card input { 
-            width: 100%; padding: 15px; margin-bottom: 20px; background: #222; border: 1px solid var(--gold); 
-            color: white; border-radius: 15px; text-align: center; font-size: 16px; outline: none;
-        }
-        .btn-enter-gold { 
-            background: var(--gold); border: none; padding: 16px; border-radius: 35px; 
-            font-weight: 800; cursor: pointer; width: 100%; color: black; 
-            text-transform: uppercase; letter-spacing: 1px; font-size: 14px;
-            transition: transform 0.2s;
-        }
-        .btn-enter-gold:active { transform: scale(0.95); }
+        .login-card { width: 85%; max-width: 330px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; box-shadow: 0 15px 50px rgba(0,0,0,0.8); }
+        .login-card input { width: 100%; padding: 15px; margin-bottom: 20px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 15px; text-align: center; font-size: 16px; outline: none; }
+        .btn-enter-gold { background: var(--gold); border: none; padding: 16px; border-radius: 35px; font-weight: 800; cursor: pointer; width: 100%; color: black; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; }
 
         header { background: rgba(0,0,0,0.98); padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
         .header-logo { width: 40px; height: 40px; border-radius: 8px; }
@@ -75,7 +66,8 @@
         .btn-tool { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 15px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; }
 
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        audio { width: 100%; height: 45px; margin-top: 15px; display: none; filter: invert(100%) hue-rotate(180deg) brightness(1.5); }
+        /* Oculto pero activo para Cast */
+        audio { width: 100%; height: 45px; display: none; }
     </style>
 </head>
 <body>
@@ -184,29 +176,40 @@
         });
     }
 
+    // --- ACTUALIZADOR DE METADATOS V8.7 ---
+    function enviarImagenATV(titulo, artista, img) {
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: titulo,
+                artist: artista,
+                album: 'Jazztabueno Productions',
+                artwork: [
+                    { src: img, sizes: '512x512', type: 'image/png' }
+                ]
+            });
+        }
+    }
+
     window.gestionarReproduccion = (id, url, titulo, prog, img) => {
         if (idActual === id) { window.togglePlay(); } 
         else {
-            idActual = id; document.getElementById('p-title').innerText = titulo;
+            idActual = id; 
             const artworkUrl = img || 'logo.png';
+            document.getElementById('p-title').innerText = titulo;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${artworkUrl}')`;
             document.getElementById('global-player').style.display = 'block';
+            
             audio.src = url; 
             const savedTime = localStorage.getItem(`time_${id}`);
             if(savedTime) audio.currentTime = parseFloat(savedTime); 
             
-            // --- ACTUALIZAR IMAGEN PARA LA TV (MediaSession) ---
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.metadata = new MediaMetadata({
-                    title: titulo,
-                    artist: prog,
-                    album: 'Jazztabueno Productions',
-                    artwork: [
-                        { src: artworkUrl, sizes: '512x512', type: 'image/png' }
-                    ]
-                });
-            }
-            audio.play();
+            // Intento 1 de imagen
+            enviarImagenATV(titulo, prog, artworkUrl);
+            
+            audio.play().then(() => {
+                // Intento 2 (Refuerzo 2 segundos después para TVs lentas)
+                setTimeout(() => enviarImagenATV(titulo, prog, artworkUrl), 2500);
+            });
         }
         render();
     };
@@ -243,7 +246,7 @@
         const data = { programa: document.getElementById('prog-name').value, titulo: document.getElementById('prog-title').value, mp3Url: document.getElementById('prog-mp3').value, imagenUrl: document.getElementById('prog-img').value, fecha: new Date() };
         if(id) await updateDoc(doc(db, "radio_programas", id), data); else await addDoc(collection(db, "radio_programas"), data); location.reload();
     };
-    window.borrar = async (id) => { if(confirm("¿Eliminar para siempre?")) await deleteDoc(doc(db, "radio_programas", id)); };
+    window.borrar = async (id) => { if(confirm("¿Eliminar definitivamente?")) await deleteDoc(doc(db, "radio_programas", id)); };
 </script>
 </body>
 </html>
