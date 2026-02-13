@@ -11,7 +11,8 @@
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 
     <style>
-        :root { --gold: #c5a028; --bg: #050505; --card: #121212; }
+        /* COLOR ORO VIEJO - MÁS OSCURO Y ELEGANTE */
+        :root { --gold: #b8962d; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
         html, body { margin: 0; background: var(--bg); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-y: auto !important; }
@@ -28,10 +29,8 @@
 
         .container { max-width: 550px; margin: auto; padding: 15px; padding-bottom: 280px; }
 
-        /* PANEL ADMIN */
         #admin-panel { display: none; background: #111; padding: 20px; border-radius: 20px; border: 1px solid var(--gold); margin-bottom: 25px; }
         .input-box, .select-box, .text-area { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 8px; font-family: inherit; }
-        .text-area { height: 120px; resize: none; font-size: 12px; }
 
         .channels-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 25px; padding: 10px 0; }
         .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; cursor: pointer; }
@@ -40,14 +39,12 @@
         .active .channel-logo { border-color: var(--gold); }
         .channel-name { font-size: 7px; color: #aaa; font-weight: 800; text-transform: uppercase; }
 
-        /* --- TARJETA COMPACTA --- */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 25px; border: 1px solid #1a1a1a; overflow: hidden; }
-        
-        /* REDUCCIÓN DE ALTURA DE PORTADA */
         .cover-art { width: 100%; height: 160px; background-size: cover; background-position: center; position: relative; }
-        
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; }
-        .btn-play-card { background: var(--gold); border: none; width: 55px; height: 55px; border-radius: 50%; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; }
+        
+        /* BOTÓN DE PLAY CORREGIDO - COLOR ORO VIEJO */
+        .btn-play-card { background: var(--gold); border: none; width: 55px; height: 55px; border-radius: 50%; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; color: black; box-shadow: none; }
 
         .episode-info { padding: 15px; }
         .episode-title { margin: 5px 0; font-size: 18px; font-weight: 800; color: #fff; }
@@ -62,10 +59,9 @@
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .p-vinyl { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
-        @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
-        .tool-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 15px; margin-top: 10px; gap: 8px; }
-        .btn-tool { flex: 1; background: #111; border: 1px solid #222; color: #fff; padding: 12px 5px; border-radius: 10px; font-size: 9px; font-weight: 800; cursor: pointer; }
+        /* BOTÓN REPRODUCTOR CORREGIDO */
+        #p-play-btn { background: none; border: none; color: var(--gold); font-size: 35px; cursor: pointer; text-shadow: none; }
     </style>
 </head>
 <body>
@@ -100,7 +96,7 @@
                 <option value="OLD">OLD SCHOOL</option>
             </select>
             <input type="text" id="t-url" class="input-box" placeholder="URL MP3">
-            <input type="text" id="t-img" class="input-box" placeholder="URL Portada">
+            <input type="text" id="t-img" class="input-box" placeholder="URL Imagen">
             <textarea id="t-playlist" class="text-area" placeholder="Lista de ARTISTAS y CANCIONES"></textarea>
             <button id="btn-save" class="btn-gold-tico">💾 GUARDAR PROGRAMA</button>
         </div>
@@ -123,17 +119,17 @@
             <h4 id="p-title" style="margin:0; font-size:14px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:800;">...</h4>
             <div id="p-time" style="font-size:11px; color:var(--gold); font-weight:900;">00:00 / 00:00</div>
         </div>
-        <button onclick="window.togglePlay()" id="p-play-btn" style="background:none; border:none; color:var(--gold); font-size:35px; cursor:pointer;">▶</button>
+        <button onclick="window.togglePlay()" id="p-play-btn">▶</button>
         <button onclick="window.cerrarPlayer()" style="background:none; border:none; color:#444; font-size:24px; margin-left:10px;">×</button>
     </div>
     <input type="range" id="seek-bar" value="0" min="0" step="1" style="width:100%;">
-    <div class="tool-row">
-        <div id="btn-cast-ui" class="btn-tool" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid #222; padding-top: 15px; margin-top: 10px; gap: 8px;">
+        <div id="btn-cast-ui" style="flex:1; background:#111; border:1px solid #222; padding:12px 5px; border-radius:10px; display:flex; align-items:center; justify-content:center; gap:8px;">
             <google-cast-launcher style="width:20px; height:20px; --disconnected-color:var(--gold);"></google-cast-launcher>
-            <span id="cast-label" style="color:var(--gold); font-size:10px;">TV</span>
+            <span id="cast-label" style="color:var(--gold); font-size:10px; font-weight:800;">TV</span>
         </div>
-        <button onclick="window.cambiarVelocidad()" id="btn-speed" class="btn-tool">1.0x</button>
-        <button onclick="window.toggleMute()" id="btn-mute" class="btn-tool">🔊 VOL</button>
+        <button onclick="window.cambiarVelocidad()" id="btn-speed" style="flex:1; background:#111; border:1px solid #222; color:#fff; padding:12px 5px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">1.0x</button>
+        <button onclick="window.toggleMute()" id="btn-mute" style="flex:1; background:#111; border:1px solid #222; color:#fff; padding:12px 5px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">🔊 VOL</button>
     </div>
 </div>
 
@@ -196,9 +192,9 @@
 
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_key_v7', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_key_v8', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_auth_key_v7')) {
+    if(localStorage.getItem('jtp_auth_key_v8')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
