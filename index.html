@@ -16,10 +16,20 @@
         html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 230px; }
         
-        /* LOGIN CENTRADO */
+        /* LOGIN REFINADO V8.6 - CORRIGIENDO BOTÓN FEO */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
-        .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 30px; border-radius: 20px; border: 1px solid #222; }
-        .login-card input { width: 100%; padding: 15px; margin-bottom: 20px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; font-weight: bold; }
+        .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; box-shadow: 0 15px 50px rgba(0,0,0,0.8); }
+        .login-card input { 
+            width: 100%; padding: 15px; margin-bottom: 20px; background: #222; border: 1px solid var(--gold); 
+            color: white; border-radius: 15px; text-align: center; font-size: 16px; outline: none;
+        }
+        .btn-enter-gold { 
+            background: var(--gold); border: none; padding: 16px; border-radius: 35px; 
+            font-weight: 800; cursor: pointer; width: 100%; color: black; 
+            text-transform: uppercase; letter-spacing: 1px; font-size: 14px;
+            transition: transform 0.2s;
+        }
+        .btn-enter-gold:active { transform: scale(0.95); }
 
         header { background: rgba(0,0,0,0.98); padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
         .header-logo { width: 40px; height: 40px; border-radius: 8px; }
@@ -65,7 +75,6 @@
         .btn-tool { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px 15px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; }
 
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        /* Ocultamos audio pero lo usaremos para el Cast nativo */
         audio { width: 100%; height: 45px; margin-top: 15px; display: none; filter: invert(100%) hue-rotate(180deg) brightness(1.5); }
     </style>
 </head>
@@ -76,7 +85,7 @@
         <img src="logo.png" style="width:100px; margin-bottom:20px;">
         <h2 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom: 25px;">JAZZTABUENO</h2>
         <input type="password" id="passInput" placeholder="Introduce tu Clave">
-        <button onclick="checkLogin()" class="btn-enter">ENTRAR ▶</button>
+        <button onclick="checkLogin()" class="btn-enter-gold">ENTRAR A LA CABINA ▶</button>
     </div>
 </div>
 
@@ -193,12 +202,7 @@
                     artist: prog,
                     album: 'Jazztabueno Productions',
                     artwork: [
-                        { src: artworkUrl, sizes: '96x96',   type: 'image/png' },
-                        { src: artworkUrl, sizes: '128x128', type: 'image/png' },
-                        { src: artworkUrl, sizes: '192x192', type: 'image/png' },
-                        { src: artworkUrl, sizes: '256x256', type: 'image/png' },
-                        { src: artworkUrl, sizes: '384x384', type: 'image/png' },
-                        { src: artworkUrl, sizes: '512x512', type: 'image/png' },
+                        { src: artworkUrl, sizes: '512x512', type: 'image/png' }
                     ]
                 });
             }
