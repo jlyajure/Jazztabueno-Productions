@@ -15,16 +15,27 @@
         html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 240px; }
         
-        /* LOGIN PREMIUM V9.0 - BOTÓN DORADO REFORZADO */
+        /* --- LOGIN PREMIUM V9.1 (PROTEGIDO) --- */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
-        .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
-        .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; outline: none; }
+        .login-card { width: 85%; max-width: 330px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 2px solid #222; }
+        .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 15px; text-align: center; font-size: 16px; outline: none; }
         
-        .btn-premium-gold { 
-            background: linear-gradient(145deg, #d4af37, #b8962d); border: none; padding: 18px; border-radius: 50px; 
-            font-weight: 800; cursor: pointer; width: 100%; color: black; 
-            text-transform: uppercase; letter-spacing: 1px; font-size: 14px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 2px 2px rgba(255,255,255,0.2);
+        /* Botón con estilo forzado para que Chrome no lo cambie */
+        .btn-entrar-tico { 
+            display: block !important;
+            width: 100% !important;
+            background: #d4af37 !important; 
+            background: linear-gradient(145deg, #d4af37, #b8962d) !important;
+            color: black !important;
+            border: none !important;
+            padding: 18px !important;
+            border-radius: 50px !important;
+            font-weight: 800 !important;
+            font-size: 14px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            cursor: pointer !important;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5) !important;
         }
 
         header { background: rgba(0,0,0,0.98); padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
@@ -34,20 +45,14 @@
 
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
+        /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 22px; margin-bottom: 35px; overflow: hidden; border: 1px solid #222; position: relative; }
         .cover-art { width: 100%; height: 220px; background-size: cover; background-position: center; position: relative; }
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; }
         .btn-play-card { background: var(--gold); border: none; width: 70px; height: 70px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-play-card::before { content: '▶'; font-size: 28px; color: black; margin-left: 6px; }
 
-        .admin-float { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; z-index: 10; }
-        .btn-mini { background: rgba(0,0,0,0.9); border: 1.5px solid #444; color: white; padding: 12px; border-radius: 12px; cursor: pointer; }
-
-        .episode-info { padding: 22px; }
-        .program-tag { display: inline-block; font-size: 9px; color: black; padding: 5px 14px; border-radius: 50px; background: var(--gold); font-weight: 800; text-transform: uppercase; margin-bottom: 12px; }
-        .episode-title { font-size: 20px; margin: 0; font-weight: 700; color: white; line-height: 1.2; }
-
-        /* CONSOLA DE MANDO */
+        /* REPRODUCTOR */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 18px 20px; display: none; z-index: 1000; box-shadow: 0 -20px 50px rgba(0,0,0,1); }
         .player-top { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
         .p-vinyl { width: 55px; height: 55px; border-radius: 50%; border: 2.5px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
@@ -66,8 +71,8 @@
 
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
-        /* REPRODUCTOR NATIVO REFORZADO */
-        #main-audio { width: 100%; height: 45px; margin-bottom: 15px; display: none; filter: invert(100%) hue-rotate(180deg) brightness(1.8); }
+        /* REPRODUCTOR GOOGLE (OCULTO PERO ACTIVO) */
+        #main-audio { width: 100%; height: 45px; display: none; }
     </style>
 </head>
 <body>
@@ -75,9 +80,9 @@
 <div id="login-screen">
     <div class="login-card">
         <img src="logo.png" style="width:100px; margin-bottom:20px;">
-        <h2 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom: 30px;">ESTACIÓN JAZZ</h2>
+        <h2 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom: 30px;">PRODUCCIONES TICO</h2>
         <input type="password" id="passInput" placeholder="Introduce Clave">
-        <button onclick="checkLogin()" class="btn-premium-gold">ENTRAR A LA CABINA ▶</button>
+        <button onclick="checkLogin()" class="btn-entrar-tico">ENTRAR A LA CABINA ▶</button>
     </div>
 </div>
 
@@ -91,13 +96,6 @@
     </header>
 
     <div class="container">
-        <div id="admin-panel" style="display:none;">
-            <button onclick="toggleUpload()" style="width:100%; padding:16px; background:var(--gold); border:none; border-radius:15px; font-weight:800; margin-bottom:25px; color: black;">📡 NUEVO PROGRAMA</button>
-            <div id="upload-form" style="display:none; background:#111; padding:22px; border-radius:20px; border:1px solid var(--gold); margin-bottom:25px;">
-                <input type="hidden" id="edit-id"><input type="text" id="prog-name" placeholder="Categoría"><input type="text" id="prog-title" placeholder="Título"><input type="text" id="prog-mp3" placeholder="Link MP3"><input type="text" id="prog-img" placeholder="Link Imagen">
-                <button onclick="guardarPrograma()" style="width:100%; padding:14px; background:white; color:black; border:none; border-radius:10px; font-weight:800;">PUBLICAR</button>
-            </div>
-        </div>
         <div id="radio-feed"></div>
     </div>
 </div>
@@ -115,7 +113,7 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button onclick="window.forzarCast()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 CONECTAR TV</button>
+        <button onclick="window.forzarCastV9()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 CONECTAR A LA TV</button>
         <button onclick="window.cambiarVelocidad()" id="btn-speed" class="btn-tool">1.0x</button>
         <button onclick="window.toggleMute()" id="btn-mute" class="btn-tool">🔊 VOL</button>
     </div>
@@ -123,7 +121,7 @@
 
 <script type="module">
     import { db } from "./firebase.js";
-    import { collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const audio = document.getElementById('main-audio');
     const seekBar = document.getElementById('seek-bar');
@@ -139,7 +137,6 @@
     if(localStorage.getItem('jazz_auth')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
-        if(localStorage.getItem('jazz_auth') === 'ticoadmin') document.getElementById('admin-panel').style.display = 'block';
     }
 
     onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => {
@@ -149,12 +146,10 @@
     function render() {
         const feed = document.getElementById('radio-feed'); feed.innerHTML = "";
         programas.forEach(p => {
-            const isPlaying = (idActual === p.id && !audio.paused);
             const div = document.createElement('div');
-            div.className = `episode-card ${isPlaying ? 'is-actually-playing' : ''}`;
+            div.className = 'episode-card';
             div.innerHTML = `
                 <div class="cover-art" style="background-image: url('${p.imagenUrl || 'logo.png'}')">
-                    ${localStorage.getItem('jazz_auth') === 'ticoadmin' ? `<div class="admin-float"><button class="btn-mini" onclick="window.iniciarEdicion('${p.id}')">📝</button><button class="btn-mini" style="color:#ff4444;" onclick="window.borrar('${p.id}')">🗑️</button></div>` : ''}
                     <div class="cover-overlay"><button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}', '${p.mp3Url}', '${p.titulo}', '${p.programa}', '${p.imagenUrl}')"></button></div>
                 </div>
                 <div class="episode-info"><span class="program-tag">${p.programa}</span><h3 class="episode-title">${p.titulo}</h3></div>`;
@@ -171,7 +166,7 @@
             document.getElementById('p-vinyl').style.backgroundImage = `url('${artworkUrl}')`;
             document.getElementById('global-player').style.display = 'block';
             
-            // EL TRUCO: Inyectamos la foto como "poster" del audio para la TV
+            // EL SECRETO PARA LA TV: Ponemos la imagen como 'poster' nativo
             audio.setAttribute('poster', artworkUrl);
             audio.src = url; 
 
@@ -183,14 +178,27 @@
             }
             audio.play();
         }
-        render();
     };
 
-    window.togglePlay = () => { if (audio.paused) audio.play(); else audio.pause(); render(); };
-    window.forzarCast = () => { 
-        audio.style.display = (audio.style.display === 'block') ? 'none' : 'block';
-        if(audio.remotePlayback) audio.remotePlayback.prompt().catch(() => {});
+    window.togglePlay = () => { if (audio.paused) audio.play(); else audio.pause(); };
+    
+    // --- FUNCIÓN GOLPE MAESTRO V9.1 ---
+    window.forzarCastV9 = () => { 
+        // Primero hacemos aparecer el reproductor de Google para "engañar" al sistema
+        audio.style.display = 'block';
+        
+        // Lanzamos la orden de transmitir
+        if(audio.remotePlayback) {
+            // Intentamos disparar el menú oficial del televisor
+            audio.remotePlayback.prompt().then(() => {
+                console.log("Menú abierto");
+            }).catch(() => {
+                // Si Chrome se pone rebelde, mostramos el menú de los 3 puntos automáticamente
+                alert("📡 Director Tico: Chrome está bloqueando el acceso. Toca los 3 PUNTITOS que acaban de aparecer abajo para 'Transmitir' a tu TV.");
+            });
+        }
     };
+
     window.cambiarVelocidad = () => {
         const speeds = [1.0, 1.25, 1.5, 2.0];
         audio.playbackRate = speeds[(speeds.indexOf(audio.playbackRate) + 1) % speeds.length];
@@ -200,11 +208,11 @@
 
     function formatTime(s) { if (isNaN(s)) return "00:00"; const h = Math.floor(s / 3600); const m = Math.floor((s % 3600) / 60); const sec = Math.floor(s % 60); return (h > 0 ? h + ":" : "") + (m < 10 ? "0" + m : m) + ":" + (sec < 10 ? "0" + sec : sec); }
     audio.onloadedmetadata = () => { seekBar.max = Math.floor(audio.duration); };
-    audio.ontimeupdate = () => { if(idActual) { localStorage.setItem(`time_${idActual}`, audio.currentTime); seekBar.value = Math.floor(audio.currentTime); timeDisplay.innerText = formatTime(audio.currentTime) + " / " + formatTime(audio.duration); } };
+    audio.ontimeupdate = () => { if(idActual) { seekBar.value = Math.floor(audio.currentTime); timeDisplay.innerText = formatTime(audio.currentTime) + " / " + formatTime(audio.duration); } };
     seekBar.oninput = () => { audio.currentTime = seekBar.value; };
-    audio.onplay = () => { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; render(); };
-    audio.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; render(); };
-    window.cerrarPlayer = () => { audio.pause(); document.getElementById('global-player').style.display = 'none'; audio.style.display = 'none'; idActual = null; render(); };
+    audio.onplay = () => { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; };
+    audio.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; };
+    window.cerrarPlayer = () => { audio.pause(); document.getElementById('global-player').style.display = 'none'; audio.style.display = 'none'; idActual = null; };
 </script>
 </body>
 </html>
