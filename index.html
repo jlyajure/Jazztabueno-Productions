@@ -15,51 +15,45 @@
         html, body { height: 100%; margin: 0; background: var(--bg); color: #e2e8f0; overflow-x: hidden; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; }
         
-        /* LOGIN PREMIUM */
+        /* LOGIN */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
         .btn-gold-tico { display: block !important; width: 100% !important; background: linear-gradient(145deg, #d4af37, #b8962d) !important; color: black !important; border: none !important; padding: 18px !important; border-radius: 50px !important; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 
-        header { background: rgba(0,0,0,0.98); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; }
+        header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; }
         .header-logo { width: 35px; height: 35px; border-radius: 8px; }
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 12px; text-transform: uppercase; }
-        .btn-salir-premium { background: transparent !important; border: 1.5px solid var(--gold) !important; color: var(--gold) !important; padding: 8px 18px !important; border-radius: 10px !important; font-size: 11px !important; font-weight: 800 !important; text-transform: uppercase !important; cursor: pointer !important; }
+        .btn-salir-premium { background: transparent !important; border: 1.5px solid var(--gold) !important; color: var(--gold) !important; padding: 7px 15px !important; border-radius: 8px !important; font-size: 11px !important; font-weight: 800 !important; text-transform: uppercase !important; cursor: pointer; }
 
         #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
-        /* --- CATEGORÍAS V11.6 (OSR CENTRADO) --- */
+        /* --- CATEGORÍAS MAGNÉTICAS V11.7 --- */
         .channels-container { 
             display: flex; 
-            gap: 15px; 
+            gap: 12px; 
             margin-bottom: 25px; 
             overflow-x: auto; 
-            padding: 10px 15px 10px 15px; 
+            padding: 10px 20px; 
             scrollbar-width: none; 
+            scroll-snap-type: x mandatory; /* El truco del imán */
             -webkit-overflow-scrolling: touch;
         }
-        /* El truco: un espacio invisible al final para que OSR pueda llegar al centro */
-        .channels-container::after { content: ''; min-width: 60vw; }
-        
-        .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; min-width: 75px; cursor: pointer; }
+        .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; min-width: 75px; cursor: pointer; scroll-snap-align: center; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
-        .channel-logo { width: 62px; height: 62px; border-radius: 12px; border: 2px solid #333; margin-bottom: 8px; background: #000; object-fit: contain; padding: 3px; }
+        .channel-logo { width: 62px; height: 62px; border-radius: 12px; border: 2px solid #333; margin-bottom: 8px; background: #000; object-fit: contain; padding: 4px; }
         .active .channel-logo { border-color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.4); }
         .channel-name { font-size: 8.5px; color: #aaa; font-weight: 800; text-transform: uppercase; display: block; }
 
         /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #222; position: relative; overflow: hidden; }
-        .cover-art { width: 100%; height: 210px; background-size: cover; background-position: center; position: relative; }
+        .cover-art { width: 100%; height: 220px; background-size: cover; background-position: center; position: relative; }
         .cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
         .btn-play-card { background: var(--gold); border: none; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-play-card::before { content: '▶'; font-size: 26px; color: black; margin-left: 5px; }
         .is-playing .btn-play-card { background: rgba(0,0,0,0.85) !important; border: 2.5px solid var(--gold); }
         .is-playing .btn-play-card::before { content: '||'; font-family: Arial; font-weight: bold; color: var(--gold); margin-left: 0; }
-
-        .episode-info { padding: 20px; }
-        .program-tag { display: inline-block; font-size: 8px; color: black; padding: 4px 12px; border-radius: 50px; background: var(--gold); font-weight: 800; margin-bottom: 10px; }
-        .episode-title { font-size: 18px; font-weight: 700; color: white; line-height: 1.2; }
 
         /* REPRODUCTOR */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 2px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; box-shadow: 0 -20px 40px rgba(0,0,0,1); }
@@ -75,12 +69,12 @@
         #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--gold); border-radius: 50%; border: 2px solid #000; }
 
         .tool-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 12px; margin-top: 5px; gap: 8px; }
-        .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 5px; border-radius: 10px; font-size: 8.5px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 5px; border-radius: 8px; font-size: 8.5px; font-weight: 800; cursor: pointer; transition: 0.2s; }
         
-        .is-casting-ui { background: var(--gold) !important; color: black !important; }
+        .is-casting-ui { background: var(--gold) !important; color: black !important; border-color: white !important; }
 
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        #main-media { width: 100%; height: 1px; opacity: 0; pointer-events: none; }
+        #main-media { width: 1px; height: 1px; opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -100,7 +94,7 @@
             <img src="logo.png" class="header-logo">
             <div class="brand-title">Jazztabueno<br>Productions</div>
         </div>
-        <button onclick="window.limpiarSesion()" class="btn-salir-premium">SALIR</button>
+        <button onclick="window.limpiarTodo()" class="btn-salir-premium">SALIR</button>
     </header>
 
     <div class="container">
@@ -127,9 +121,9 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button id="btn-cast-116" onclick="window.dispararCastV116()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR A TV</button>
+        <button id="cast-btn-117" onclick="window.lanzarCastV117()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 CONECTAR A TV</button>
         <button onclick="window.refrescarTV()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
-        <button onclick="window.resetUI()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
+        <button onclick="window.resetIcono()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
     </div>
 </div>
 
@@ -140,7 +134,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
-    const castBtn = document.getElementById('btn-cast-116');
+    const castBtn = document.getElementById('cast-btn-117');
     let programas = []; let idActual = null; let filtroActivo = 'Todo';
 
     window.checkLogin = () => {
@@ -178,7 +172,7 @@
         });
     }
 
-    function sendToTV(titulo, prog, img) {
+    function sendMetadata(titulo, prog, img) {
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: titulo, artist: prog, album: 'Jazztabueno Productions',
@@ -190,13 +184,11 @@
     window.gestionarReproduccion = (id, url, titulo, prog, img) => {
         if (idActual === id) { window.togglePlay(); } 
         else {
-            idActual = id; 
-            media.src = url; 
-            media.setAttribute('poster', img || 'logo.png');
+            idActual = id; media.src = url; media.setAttribute('poster', img || 'logo.png');
             document.getElementById('p-title').innerText = titulo;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img || 'logo.png'}')`;
             document.getElementById('global-player').style.display = 'block';
-            sendToTV(titulo, prog, img || 'logo.png');
+            sendMetadata(titulo, prog, img || 'logo.png');
             media.play();
         }
         render();
@@ -204,42 +196,38 @@
 
     window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
     
-    // --- LÓGICA DE TRANSMISIÓN V11.6 ---
-    window.dispararCastV116 = () => { 
+    // --- LÓGICA DE TRANSMISIÓN V11.7 ---
+    window.lanzarCastV117 = () => { 
         if(media.remotePlayback) {
+            // "Disparo de pulso" para Chrome
             media.remotePlayback.prompt().then(() => {
                 castBtn.classList.add('is-casting-ui');
             }).catch(() => {
-                // Forzar limpieza si falla
-                castBtn.classList.remove('is-casting-ui');
-                alert("📡 Director: El navegador bloqueó la conexión. Intenta cerrar la App y abrirla de nuevo.");
+                // Fallback automático
+                media.style.display = 'block';
+                setTimeout(() => { media.style.display = 'none'; }, 5000);
             });
         }
     };
 
-    window.refrescarTV = () => {
+    window.refreshTV = () => {
         if(idActual) {
             const p = programas.find(x => x.id === idActual);
-            if(p) sendToTV(p.titulo, p.programa, p.imagenUrl);
-            alert("📡 Refrescando carátula...");
+            if(p) sendMetadata(p.titulo, p.programa, p.imagenUrl);
         }
     };
 
-    window.resetUI = () => {
-        castBtn.classList.remove('is-casting-ui');
-        media.pause(); media.src = ""; render();
-        alert("♻️ Icono Limpiado.");
-    };
+    window.resetIcono = () => { castBtn.classList.remove('is-casting-ui'); castBtn.innerText = "📡 CONECTAR A TV"; };
 
     setInterval(() => {
         if (media.remotePlayback && media.remotePlayback.state === 'connected') {
             castBtn.classList.add('is-casting-ui');
             castBtn.innerText = "📡 TV CONECTADA";
-        } else {
+        } else if (media.remotePlayback && media.remotePlayback.state === 'disconnected') {
             castBtn.classList.remove('is-casting-ui');
-            castBtn.innerText = "📡 TRANSMITIR A TV";
+            castBtn.innerText = "📡 CONECTAR A TV";
         }
-    }, 1500);
+    }, 2000);
 
     window.filtrar = (cat, el) => {
         filtroActivo = cat;
@@ -248,7 +236,7 @@
         render();
     };
 
-    window.limpiarSesion = () => { localStorage.clear(); location.reload(); };
+    window.limpiarTodo = () => { localStorage.clear(); location.reload(); };
     media.onloadedmetadata = () => { seekBar.max = Math.floor(media.duration); };
     media.onplay = () => { document.getElementById('global-player').classList.add('playing'); document.getElementById('p-play-btn').innerText = '||'; render(); };
     media.onpause = () => { document.getElementById('global-player').classList.remove('playing'); document.getElementById('p-play-btn').innerText = '▶'; render(); };
