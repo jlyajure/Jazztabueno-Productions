@@ -24,34 +24,23 @@
         header { background: rgba(0,0,0,0.98); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; z-index: 100; }
         .header-logo { width: 35px; height: 35px; border-radius: 8px; }
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 12px; text-transform: uppercase; }
-        
-        /* BOTÓN SALIR ESTILO CABINA */
-        .btn-salir-premium { 
-            background: transparent !important; 
-            border: 1.5px solid var(--gold) !important; 
-            color: var(--gold) !important; 
-            padding: 8px 18px !important; 
-            border-radius: 10px !important; 
-            font-size: 11px !important; 
-            font-weight: 800 !important; 
-            text-transform: uppercase !important; 
-            cursor: pointer !important;
-        }
+        .btn-salir-premium { background: transparent !important; border: 1.5px solid var(--gold) !important; color: var(--gold) !important; padding: 8px 18px !important; border-radius: 10px !important; font-size: 11px !important; font-weight: 800 !important; text-transform: uppercase !important; cursor: pointer !important; }
 
         #app-content { flex: 1; overflow-y: auto; padding-bottom: 280px; }
         .container { max-width: 550px; margin: auto; padding: 15px; }
 
-        /* --- CATEGORÍAS V11.5 (AJUSTE DE SCROLL) --- */
+        /* --- CATEGORÍAS V11.6 (OSR CENTRADO) --- */
         .channels-container { 
             display: flex; 
             gap: 15px; 
             margin-bottom: 25px; 
             overflow-x: auto; 
-            padding: 10px 0; 
+            padding: 10px 15px 10px 15px; 
             scrollbar-width: none; 
             -webkit-overflow-scrolling: touch;
         }
-        .channels-container::after { content: ''; min-width: 40px; } /* Espacio para que el último icono no se pegue al borde */
+        /* El truco: un espacio invisible al final para que OSR pueda llegar al centro */
+        .channels-container::after { content: ''; min-width: 60vw; }
         
         .channel-item { text-align: center; opacity: 0.5; transition: 0.3s; min-width: 75px; cursor: pointer; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
@@ -86,13 +75,12 @@
         #seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--gold); border-radius: 50%; border: 2px solid #000; }
 
         .tool-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 12px; margin-top: 5px; gap: 8px; }
-        .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 5px; border-radius: 8px; font-size: 8.5px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn-tool { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 5px; border-radius: 10px; font-size: 8.5px; font-weight: 800; cursor: pointer; transition: 0.2s; }
         
         .is-casting-ui { background: var(--gold) !important; color: black !important; }
 
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        /* El reproductor nativo que usaremos de rescate */
-        #main-media { width: 100%; height: 40px; margin-top: 10px; display: none; filter: invert(1); }
+        #main-media { width: 100%; height: 1px; opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -128,7 +116,7 @@
 </div>
 
 <div id="global-player">
-    <video id="main-media" controls playsinline crossorigin="anonymous"></video>
+    <video id="main-media" playsinline crossorigin="anonymous"></video>
     <div class="player-top">
         <div id="p-vinyl" class="p-vinyl" style="background-image: url('logo.png');"></div>
         <div class="p-info"><h4 id="p-title">...</h4><div id="p-time-display" class="p-time">00:00 / 00:00</div></div>
@@ -139,9 +127,9 @@
     </div>
     <div class="seek-container"><input type="range" id="seek-bar" value="0" min="0" step="1"></div>
     <div class="tool-row">
-        <button id="cast-btn-115" onclick="window.dispararCastV115()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR A TV</button>
+        <button id="btn-cast-116" onclick="window.dispararCastV116()" class="btn-tool" style="border-color: var(--gold); color: var(--gold);">📡 TRANSMITIR A TV</button>
         <button onclick="window.refrescarTV()" class="btn-tool" style="border-color: #00ff00; color: #00ff00;">🖼️ REFRESCAR TV</button>
-        <button onclick="window.resetBoton()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
+        <button onclick="window.resetUI()" class="btn-tool" style="border-color: #ff4444; color: #ff4444;">♻️ RESET ICONO</button>
     </div>
 </div>
 
@@ -152,7 +140,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     const timeDisplay = document.getElementById('p-time-display');
-    const castBtn = document.getElementById('cast-btn-115');
+    const castBtn = document.getElementById('btn-cast-116');
     let programas = []; let idActual = null; let filtroActivo = 'Todo';
 
     window.checkLogin = () => {
@@ -216,15 +204,15 @@
 
     window.togglePlay = () => { if (media.paused) media.play(); else media.pause(); render(); };
     
-    // --- LÓGICA DE TRANSMISIÓN "PLAN B" V11.5 ---
-    window.dispararCastV115 = () => { 
+    // --- LÓGICA DE TRANSMISIÓN V11.6 ---
+    window.dispararCastV116 = () => { 
         if(media.remotePlayback) {
             media.remotePlayback.prompt().then(() => {
                 castBtn.classList.add('is-casting-ui');
             }).catch(() => {
-                // FALLBACK: Si Chrome bloquea, mostramos los controles nativos para usar sus 3 puntos
-                media.style.display = 'block';
-                alert("📡 Director: Chrome bloqueó el menú. Toca los 3 puntos del reproductor gris que apareció abajo y selecciona 'Transmitir'.");
+                // Forzar limpieza si falla
+                castBtn.classList.remove('is-casting-ui');
+                alert("📡 Director: El navegador bloqueó la conexión. Intenta cerrar la App y abrirla de nuevo.");
             });
         }
     };
@@ -237,20 +225,21 @@
         }
     };
 
-    window.resetBoton = () => {
+    window.resetUI = () => {
         castBtn.classList.remove('is-casting-ui');
-        alert("♻️ Icono Restaurado.");
+        media.pause(); media.src = ""; render();
+        alert("♻️ Icono Limpiado.");
     };
 
     setInterval(() => {
         if (media.remotePlayback && media.remotePlayback.state === 'connected') {
             castBtn.classList.add('is-casting-ui');
             castBtn.innerText = "📡 TV CONECTADA";
-        } else if (media.remotePlayback && media.remotePlayback.state === 'disconnected') {
+        } else {
             castBtn.classList.remove('is-casting-ui');
             castBtn.innerText = "📡 TRANSMITIR A TV";
         }
-    }, 2000);
+    }, 1500);
 
     window.filtrar = (cat, el) => {
         filtroActivo = cat;
