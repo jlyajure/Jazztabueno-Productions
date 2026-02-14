@@ -11,7 +11,7 @@
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 
     <style>
-        /* 🛡️ BÓVEDA DE PROTECCIÓN */
+        /* 🛡️ BÓVEDA DE PROTECCIÓN (Variables) */
         :root { 
             --gold: #a68a44; 
             --bg: #050505; 
@@ -33,7 +33,7 @@
 
         .container { max-width: 550px; margin: auto; padding: 15px; padding-bottom: 280px; }
 
-        /* CANALES - CENTRADO Y NOMBRES COMPLETOS */
+        /* CANALES - CENTRADO BLINDADO */
         .channels-container { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: 5px; margin-bottom: 25px; padding: 10px 0; width: 100%; }
         .channel-item { display: flex; flex-direction: column; align-items: center; text-align: center; opacity: 0.9; transition: 0.3s; cursor: pointer; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
@@ -41,22 +41,46 @@
         .active .channel-logo { border-color: var(--gold); }
         .channel-name { font-size: 6px; color: #ffffff; font-weight: 800; text-transform: uppercase; line-height: 1.1; max-width: 100%; }
 
-        /* PANEL DJ - DISEÑO ESPACIOSO CON BOTÓN CANCELAR */
+        /* PANEL DJ ESPACIOSO */
         #admin-panel { display: none; background: #111; padding: 25px; border-radius: 25px; border: 2px solid var(--gold); margin-bottom: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
         .admin-row { display: flex; gap: 10px; margin-bottom: 12px; }
         .input-box, .select-box { flex: 1; width: 100%; padding: 14px; background: #000; border: 1px solid #333; color: white; border-radius: 10px; font-size: 14px; }
         .text-area { width: 100%; height: 180px; padding: 14px; background: #000; border: 1px solid var(--gold); color: white; border-radius: 10px; font-size: 14px; resize: none; margin-bottom: 15px; font-family: inherit; }
-        
         .admin-actions-row { display: flex; gap: 12px; }
         .btn-save-admin { flex: 2; background: var(--gold); color: black; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
         .btn-cancel-admin { flex: 1; background: transparent; border: 1.5px solid #444; color: #888; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
 
-        /* TARJETAS - CENTRADO PERFECTO DEL BOTÓN */
-        .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #1a1a1a; overflow: hidden; transition: 0.3s; }
-        .episode-card.is-playing { border-color: var(--gold); }
-        .cover-art { width: 100%; height: 160px; background-size: cover; background-position: center; position: relative; border-bottom: 1.5px solid var(--gold); }
-        .cover-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex !important; align-items: center !important; justify-content: center !important; background: rgba(0,0,0,0.1); }
-        .btn-play-card { background-color: var(--gold) !important; border: none !important; width: 55px; height: 55px; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer; padding: 0; }
+        /* 🖼️ TARJETAS CON MARCO DE GALA */
+        .episode-card { 
+            background: var(--card); 
+            border-radius: 20px; 
+            margin-bottom: 30px; 
+            border: 1px solid #222; /* Borde base */
+            overflow: hidden; 
+            transition: 0.3s;
+        }
+        .episode-card.is-playing { 
+            border: 1px solid var(--gold); /* Borde dorado cuando suena */
+            box-shadow: 0 0 20px rgba(166, 138, 68, 0.2);
+        }
+        
+        .cover-art { 
+            width: 100%; height: 160px; 
+            background-size: cover; background-position: center; 
+            position: relative; 
+            border-bottom: 1px solid var(--gold); /* Línea divisoria dorada */
+        }
+        .cover-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex !important; align-items: center !important; justify-content: center !important; background: rgba(0,0,0,0.05); }
+        
+        .btn-play-card { 
+            background-color: var(--gold) !important; 
+            border: none !important; 
+            width: 55px; height: 55px; 
+            border-radius: 50% !important; 
+            display: flex !important; align-items: center !important; justify-content: center !important; 
+            cursor: pointer; padding: 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
         .btn-play-card svg { width: 28px; height: 28px; fill: black; display: block; }
 
         .episode-info { padding: 20px; }
@@ -64,7 +88,6 @@
         .btn-ver-playlist { background: #1a1a1a; border: 1.5px solid #333; color: #ffffff; padding: 12px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; margin-top: 15px; width: 100%; text-transform: uppercase; }
         .playlist-box { display: none; margin-top: 15px; padding: 20px; background: #080808; border-radius: 15px; border: 1px solid #222; font-size: 14px; color: #ffffff; line-height: 1.8; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
 
-        /* ACCIONES DJ - BOTONES PULIDOS */
         .dj-actions { display: flex; gap: 10px; margin-top: 20px; border-top: 1px solid #222; padding-top: 20px; }
         .btn-dj-edit { background: transparent; border: 1.5px solid var(--gold); color: var(--gold); flex: 1; padding: 12px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
         .btn-dj-del { background: transparent; border: 1.5px solid #ff4444; color: #ff4444; flex: 1; padding: 12px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
@@ -100,7 +123,7 @@
 
     <div class="container">
         <div id="admin-panel">
-            <h4 id="admin-label" style="color:var(--gold); text-align:center; font-size:13px; margin-bottom:20px; text-transform:uppercase; letter-spacing:2px;">Panel DJ</h4>
+            <h4 id="admin-label" style="color:var(--gold); text-align:center; font-size:13px; margin-bottom:20px; text-transform:uppercase;">Panel DJ</h4>
             <input type="hidden" id="edit-id">
             <div class="admin-row">
                 <input type="text" id="t-titulo" class="input-box" placeholder="Título">
@@ -166,9 +189,9 @@
 
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_v51', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_shield_v52', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_auth_v51')) {
+    if(localStorage.getItem('jtp_shield_v52')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
@@ -249,7 +272,7 @@
                     <span class="program-tag" style="color:var(--gold); font-size:9px; font-weight:900;">${p.programa}</span>
                     <h3 class="episode-title">${p.titulo}</h3>
                     <button class="btn-ver-playlist" onclick="window.togglePlaylist('${p.id}')">📋 VER PROGRAMACIÓN MUSICAL</button>
-                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Detalles pronto."}</div>
+                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Detalles musicales pronto."}</div>
                     ${isAdmin ? `<div class="dj-actions">
                         <button class="btn-dj-edit" onclick="prepararEdicion('${p.id}')">🖋️ EDITAR</button>
                         <button class="btn-dj-del" onclick="borrarDoc('${p.id}')">🗑️ BORRAR</button>
