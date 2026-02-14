@@ -16,7 +16,6 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         html, body { margin: 0; background: var(--bg); color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-y: auto !important; }
         
-        /* LOGIN PREMIUM */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; }
@@ -26,7 +25,6 @@
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; line-height: 1.2; }
         .btn-salir-premium { background: transparent; border: 2.5px solid var(--gold); color: var(--gold); padding: 7px 15px; border-radius: 8px; font-size: 10px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
 
-        /* CONTENEDOR CENTRAL (Anti-Gigante) */
         .container { max-width: 450px; margin: auto; padding: 15px; padding-bottom: 300px; }
 
         /* CANALES */
@@ -145,7 +143,7 @@
     const playSVG = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
     const pauseSVG = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
 
-    // 🛡️ LÓGICA DE TRANSMISIÓN SINCRONIZADA (ARTE + SILENCIO LOCAL)
+    // 🛡️ LÓGICA DE TRANSMISIÓN INTELIGENTE (RETORNO DE AUDIO)
     window['__onGCastApiAvailable'] = function(isAvailable) {
       if (isAvailable) {
         const castContext = cast.framework.CastContext.getInstance();
@@ -155,22 +153,24 @@
         });
 
         castContext.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (event) => {
+            const session = castContext.getCurrentSession();
+            
+            // ESCENARIO A: Se inicia la transmisión
             if (event.sessionState === cast.framework.SessionState.SESSION_STARTED) {
-                // 1. Silenciamos el celular de inmediato
-                media.pause(); 
-                
-                // 2. Enviamos todo a la TV
-                const session = castContext.getCurrentSession();
+                media.pause(); // Celular se calla
                 const mediaInfo = new chrome.cast.media.MediaInfo(currentAudioUrl, 'audio/mp3');
                 const metadata = new chrome.cast.media.MusicTrackMediaMetadata();
                 metadata.title = currentTitle;
                 metadata.artist = "Jazztabueno Productions";
-                // Envoltura especial para la IMAGEN
                 metadata.images = [new chrome.cast.Image(currentCover)];
-                
                 mediaInfo.metadata = metadata;
                 const request = new chrome.cast.media.LoadRequest(mediaInfo);
                 session.loadMedia(request);
+            }
+            
+            // ESCENARIO B: Se detiene la transmisión (RETORNO AL CELULAR)
+            if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) {
+                media.play(); // El celular retoma el audio automáticamente
             }
         });
       }
@@ -178,9 +178,9 @@
 
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_v74', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_v75_ok', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_auth_v74')) {
+    if(localStorage.getItem('jtp_v75_ok')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
@@ -215,7 +215,7 @@
         programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
     });
 
-    window.borrarDoc = async (id) => { if(confirm("¿Borrar definitivamente?")) await deleteDoc(doc(db, "radio_programas", id)); };
+    window.borrarDoc = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "radio_programas", id)); };
 
     function render() {
         const feed = document.getElementById('radio-feed'); if(!feed) return;
@@ -238,7 +238,7 @@
                     <span style="color:var(--gold); font-size:9px; font-weight:900; text-transform:uppercase;">${p.programa}</span>
                     <h3 class="episode-title">${p.titulo}</h3>
                     <button class="btn-ver-playlist" onclick="window.togglePlaylist('${p.id}')">📋 VER PROGRAMACIÓN</button>
-                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Detalles pronto."}</div>
+                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Próximamente detalles."}</div>
                     ${isAdmin ? `<div class="dj-actions" style="display:flex; gap:10px; margin-top:20px; border-top:1px solid #222; padding-top:20px;">
                         <button class="btn-dj-edit" onclick="prepararEdicion('${p.id}')" style="background:transparent; border:1.5px solid var(--gold); color:var(--gold); flex:1; padding:10px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">🖋️ EDITAR</button>
                         <button class="btn-dj-del" onclick="borrarDoc('${p.id}')" style="background:transparent; border:1.5px solid #ff4444; color:#ff4444; flex:1; padding:10px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">🗑️ BORRAR</button>
