@@ -22,7 +22,7 @@
 
         header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; line-height: 1.2; }
-        .btn-salir-premium { background: transparent; border: 2.5px solid var(--gold); color: var(--gold); padding: 7px 15px; border-radius: 8px; font-size: 10px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
+        .btn-salir-premium { background: transparent; border: 2px solid var(--gold); color: var(--gold); padding: 7px 15px; border-radius: 8px; font-size: 10px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
 
         .container { max-width: 450px; margin: auto; padding: 15px; padding-bottom: 300px; }
 
@@ -34,7 +34,14 @@
 
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #1a1a1a; overflow: hidden; transition: 0.3s; }
         .episode-card.is-playing { border-color: var(--gold); }
-        .cover-art { width: 100%; height: 180px !important; background-size: cover; background-position: center; position: relative; border-bottom: 1.5px solid var(--gold); }
+        
+        /* 🖼️ BORDE DORADO FINO EN PORTADAS */
+        .cover-art { 
+            width: 100%; height: 180px !important; 
+            background-size: cover; background-position: center; 
+            position: relative; 
+            border: 1.5px solid var(--gold); /* Marco de Gala */
+        }
         .cover-overlay { position: absolute; inset: 0; display: flex !important; align-items: center !important; justify-content: center !important; }
         .btn-play-card { background-color: var(--gold) !important; border: none !important; width: 55px !important; height: 55px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer; padding: 0; }
         .btn-play-card svg { width: 28px; height: 28px; fill: black; }
@@ -87,7 +94,7 @@
                 <option value="OLD SCHOOL RADIO">OLD SCHOOL RADIO</option>
             </select>
             <input type="text" id="t-url" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL Audio (MP3)">
-            <input type="text" id="t-img" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL Imagen">
+            <input type="text" id="t-img" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL Portada">
             <textarea id="t-playlist" style="width:100%; height:120px; background:#000; color:white; border:1px solid var(--gold); border-radius:10px; padding:10px; margin-bottom:15px;" placeholder="Canciones..."></textarea>
             <div style="display:flex; gap:10px;"><button id="btn-save" style="flex:2; background:var(--gold); border:none; padding:15px; border-radius:12px; font-weight:800; cursor:pointer;">💾 GUARDAR</button><button onclick="window.cancelarEdicion()" style="flex:1; background:transparent; border:1px solid #444; color:#888; border-radius:12px; cursor:pointer;">❌</button></div>
         </div>
@@ -136,7 +143,6 @@
     const playSVG = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
     const pauseSVG = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
 
-    // 🛡️ LÓGICA DE TRANSMISIÓN (RESTAURADA A V7.4 + SYNC DE TIEMPO)
     window['__onGCastApiAvailable'] = function(isAvailable) {
       if (isAvailable) {
         const castContext = cast.framework.CastContext.getInstance();
@@ -158,21 +164,17 @@
                 const session = castContext.getCurrentSession();
                 const mediaInfo = new chrome.cast.media.MediaInfo(currentAudioUrl, 'audio/mp3');
                 const metadata = new chrome.cast.media.MusicTrackMediaMetadata();
-                
-                // 🛡️ VOLVEMOS AL FORMATO QUE SÍ SE VEÍA
                 metadata.title = currentTitle;
                 metadata.artist = "Jazztabueno Productions";
                 metadata.images = [new chrome.cast.Image(currentCover)];
-                
                 mediaInfo.metadata = metadata;
                 const request = new chrome.cast.media.LoadRequest(mediaInfo);
                 request.currentTime = media.currentTime;
                 session.loadMedia(request);
             }
-            
             if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) {
                 if (lastTvTime > 0) { media.currentTime = lastTvTime; }
-                setTimeout(() => { media.play().catch(e => console.log("Play")); render(); }, 300);
+                setTimeout(() => { media.play().catch(e => {}); render(); }, 300);
             }
         });
       }
@@ -180,9 +182,9 @@
 
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_v78_sync', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_v79_final', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_v78_sync')) {
+    if(localStorage.getItem('jtp_v79_final')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
@@ -217,19 +219,36 @@
         programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
     });
 
-    window.borrarDoc = async (id) => { if(confirm("¿Borrar definitivamente?")) await deleteDoc(doc(db, "radio_programas", id)); };
+    window.prepararEdicion = (id) => {
+        const p = programas.find(x => x.id === id);
+        document.getElementById('edit-id').value = p.id;
+        document.getElementById('t-titulo').value = p.titulo;
+        document.getElementById('t-programa').value = p.programa;
+        document.getElementById('t-url').value = p.mp3Url;
+        document.getElementById('t-img').value = p.imagenUrl;
+        document.getElementById('t-playlist').value = p.playlist || "";
+        document.getElementById('admin-panel').style.display = 'block';
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    };
+
+    window.borrarDoc = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "radio_programas", id)); };
 
     function render() {
         const feed = document.getElementById('radio-feed'); if(!feed) return;
         feed.innerHTML = "";
+        
         const lista = programas.filter(p => {
             if (filtroActivo === 'Todo') return true;
             if (!p.programa) return false;
-            const dbV = p.programa.toUpperCase();
-            const btnV = filtroActivo.toUpperCase();
-            if (btnV.includes("STUDIO")) return dbV.includes("STUDIO");
+            const dbV = p.programa.toUpperCase().trim();
+            const btnV = filtroActivo.toUpperCase().trim();
+            
+            // 🛡️ REGLA DE DIAMANTE: Studio 79 rescata cualquier cosa con "STUDIO" o "79"
+            if (btnV.includes("STUDIO")) return dbV.includes("STUDIO") || dbV.includes("79");
+            
             return dbV.includes(btnV.split(' ')[0]);
         });
+
         lista.forEach(p => {
             const isPlaying = idActual === p.id && !media.paused;
             const div = document.createElement('div');
@@ -240,7 +259,7 @@
                     <span style="color:var(--gold); font-size:9px; font-weight:900; text-transform:uppercase;">${p.programa}</span>
                     <h3 class="episode-title">${p.titulo}</h3>
                     <button class="btn-ver-playlist" onclick="window.togglePlaylist('${p.id}')">📋 VER PROGRAMACIÓN</button>
-                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Detalles pronto."}</div>
+                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Próximamente detalles."}</div>
                     ${isAdmin ? `<div class="dj-actions" style="display:flex; gap:10px; margin-top:20px; border-top:1px solid #222; padding-top:20px;">
                         <button class="btn-dj-edit" onclick="prepararEdicion('${p.id}')" style="background:transparent; border:1.5px solid var(--gold); color:var(--gold); flex:1; padding:10px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">🖋️ EDITAR</button>
                         <button class="btn-dj-del" onclick="borrarDoc('${p.id}')" style="background:transparent; border:1.5px solid #ff4444; color:#ff4444; flex:1; padding:10px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">🗑️ BORRAR</button>
