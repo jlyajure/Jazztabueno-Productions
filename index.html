@@ -11,7 +11,7 @@
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 
     <style>
-        /* 🛡️ BÓVEDA DE PROTECCIÓN (Variables de Color) */
+        /* 🛡️ BÓVEDA DE PROTECCIÓN JTP */
         :root { 
             --gold: #a68a44; 
             --bg: #050505; 
@@ -33,22 +33,13 @@
 
         .container { max-width: 550px; margin: auto; padding: 15px; padding-bottom: 280px; }
 
-        /* CANALES - CENTRADO Y NOMBRES COMPLETOS */
+        /* CANALES - ALINEACIÓN TOTAL */
         .channels-container { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: 5px; margin-bottom: 25px; padding: 10px 0; width: 100%; }
         .channel-item { display: flex; flex-direction: column; align-items: center; text-align: center; opacity: 0.9; transition: 0.3s; cursor: pointer; }
         .channel-item.active { opacity: 1; transform: scale(1.05); }
         .channel-logo { width: 44px; height: 44px; border-radius: 12px; border: 2.5px solid #222; margin-bottom: 6px; background: #000; object-fit: contain; }
         .active .channel-logo { border-color: var(--gold); }
-        .channel-name { font-size: 6px; color: #ffffff; font-weight: 800; text-transform: uppercase; line-height: 1.1; max-width: 100%; }
-
-        /* PANEL DJ ESPACIOSO CON SALIDA */
-        #admin-panel { display: none; background: #111; padding: 25px; border-radius: 25px; border: 2px solid var(--gold); margin-bottom: 30px; }
-        .admin-row { display: flex; gap: 10px; margin-bottom: 12px; }
-        .input-box, .select-box { flex: 1; width: 100%; padding: 14px; background: #000; border: 1px solid #333; color: white; border-radius: 10px; font-size: 14px; }
-        .text-area { width: 100%; height: 180px; padding: 14px; background: #000; border: 1px solid var(--gold); color: white; border-radius: 10px; font-size: 14px; resize: none; margin-bottom: 15px; font-family: inherit; }
-        .admin-actions-row { display: flex; gap: 12px; }
-        .btn-save-admin { flex: 2; background: var(--gold); color: black; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        .btn-cancel-admin { flex: 1; background: transparent; border: 1.5px solid #444; color: #888; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .channel-name { font-size: 6px; color: #ffffff; font-weight: 800; text-transform: uppercase; line-height: 1.1; width: 100%; }
 
         /* TARJETAS - MARCO DE GALA */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #1a1a1a; overflow: hidden; transition: 0.3s; }
@@ -65,11 +56,16 @@
         .btn-ver-playlist { background: #1a1a1a; border: 1.5px solid #333; color: #ffffff; padding: 12px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; margin-top: 15px; width: 100%; text-transform: uppercase; }
         .playlist-box { display: none; margin-top: 15px; padding: 20px; background: #080808; border-radius: 15px; border: 1px solid #222; font-size: 14px; color: #ffffff; line-height: 1.8; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
 
-        .dj-actions { display: flex; gap: 10px; margin-top: 20px; border-top: 1px solid #222; padding-top: 20px; }
-        .btn-dj-edit { background: transparent; border: 1.5px solid var(--gold); color: var(--gold); flex: 1; padding: 12px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        .btn-dj-del { background: transparent; border: 1.5px solid #ff4444; color: #ff4444; flex: 1; padding: 12px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        /* PANEL DJ ESPACIOSO */
+        #admin-panel { display: none; background: #111; padding: 25px; border-radius: 25px; border: 2px solid var(--gold); margin-bottom: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        .admin-row { display: flex; gap: 10px; margin-bottom: 12px; }
+        .input-box, .select-box { flex: 1; width: 100%; padding: 14px; background: #000; border: 1px solid #333; color: white; border-radius: 10px; font-size: 14px; }
+        .text-area { width: 100%; height: 180px; padding: 14px; background: #000; border: 1px solid var(--gold); color: white; border-radius: 10px; font-size: 14px; resize: none; margin-bottom: 15px; font-family: inherit; }
+        .admin-actions-row { display: flex; gap: 12px; }
+        .btn-save-admin { flex: 2; background: var(--gold); color: black; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .btn-cancel-admin { flex: 1; background: transparent; border: 1.5px solid #444; color: #888; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
 
-        /* PLAYER GLOBAL */
+        /* REPRODUCTOR */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 3px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .p-vinyl { width: 55px; height: 55px; border-radius: 50%; border: 2.5px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
@@ -166,9 +162,9 @@
 
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_v53', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_v54', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_auth_v53')) {
+    if(localStorage.getItem('jtp_auth_v54')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
@@ -219,7 +215,6 @@
         document.getElementById('t-img').value = p.imagenUrl;
         document.getElementById('t-playlist').value = p.playlist || "";
         document.getElementById('admin-panel').style.display = 'block';
-        document.getElementById('admin-label').innerText = "EDITANDO PROGRAMA";
         window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
@@ -233,12 +228,14 @@
         const feed = document.getElementById('radio-feed'); if(!feed) return;
         feed.innerHTML = "";
         
-        // 🛡️ FILTRO CON BLINDAJE DE COMPATIBILIDAD
+        // 🛡️ FILTRO MAESTRO DE COMPATIBILIDAD
         const lista = programas.filter(p => {
             if (filtroActivo === 'Todo') return true;
-            // Busca si el nombre guardado en Firebase empieza igual que el del botón
-            const tagBusqueda = filtroActivo.split(' ')[0].toUpperCase();
-            return p.programa.toUpperCase().includes(tagBusqueda);
+            if (!p.programa) return false;
+            // Busca coincidencias parciales (ej: "Studio" en "STUDIO 79")
+            const busqueda = filtroActivo.toUpperCase();
+            const valorDB = p.programa.toUpperCase();
+            return busqueda.includes(valorDB) || valorDB.includes(busqueda) || valorDB.includes("STUDIO");
         });
 
         lista.forEach(p => {
@@ -257,7 +254,7 @@
                     <span class="program-tag" style="color:var(--gold); font-size:9px; font-weight:900;">${p.programa}</span>
                     <h3 class="episode-title">${p.titulo}</h3>
                     <button class="btn-ver-playlist" onclick="window.togglePlaylist('${p.id}')">📋 VER PROGRAMACIÓN MUSICAL</button>
-                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Detalles pronto."}</div>
+                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Detalles musicales pronto."}</div>
                     ${isAdmin ? `<div class="dj-actions">
                         <button class="btn-dj-edit" onclick="prepararEdicion('${p.id}')">🖋️ EDITAR</button>
                         <button class="btn-dj-del" onclick="borrarDoc('${p.id}')">🗑️ BORRAR</button>
