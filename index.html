@@ -8,7 +8,6 @@
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 
     <style>
@@ -89,7 +88,7 @@
             </select>
             <input type="text" id="t-url" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL Audio (MP3)">
             <input type="text" id="t-img" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL Portada">
-            <textarea id="t-playlist" style="width:100%; height:120px; background:#000; color:white; border:1px solid var(--gold); border-radius:10px; padding:10px; margin-bottom:15px;" placeholder="Lista de canciones..."></textarea>
+            <textarea id="t-playlist" style="width:100%; height:120px; background:#000; color:white; border:1px solid var(--gold); border-radius:10px; padding:10px; margin-bottom:15px;" placeholder="Canciones..."></textarea>
             <div style="display:flex; gap:10px;"><button id="btn-save" style="flex:2; background:var(--gold); border:none; padding:15px; border-radius:12px; font-weight:800; cursor:pointer;">💾 GUARDAR</button><button onclick="window.cancelarEdicion()" style="flex:1; background:transparent; border:1px solid #444; color:#888; border-radius:12px; cursor:pointer;">❌</button></div>
         </div>
 
@@ -132,11 +131,12 @@
     const seekBar = document.getElementById('seek-bar');
     let programas = []; let idActual = null; let filtroActivo = 'Todo'; let isAdmin = false;
     let currentAudioUrl = ""; let currentTitle = ""; let currentCover = "";
+    let lastTvTime = 0; // 🛡️ VARIABLE PARA RASTREAR EL TIEMPO DE LA TV
 
     const playSVG = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
     const pauseSVG = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
 
-    // 🛡️ LÓGICA DE TRANSMISIÓN REFORZADA
+    // 🛡️ LÓGICA DE SINCRONÍA DE TIEMPO TV -> CELULAR
     window['__onGCastApiAvailable'] = function(isAvailable) {
       if (isAvailable) {
         const castContext = cast.framework.CastContext.getInstance();
@@ -145,27 +145,38 @@
           autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
         });
 
+        const remotePlayer = new cast.framework.RemotePlayer();
+        const remotePlayerController = new cast.framework.RemotePlayerController(remotePlayer);
+
+        // Cada vez que la TV avanza, guardamos el segundo actual
+        remotePlayerController.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => {
+            lastTvTime = remotePlayer.currentTime;
+        });
+
         castContext.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (event) => {
-            const session = castContext.getCurrentSession();
-            
             if (event.sessionState === cast.framework.SessionState.SESSION_STARTED) {
-                media.pause(); // Callamos el celular
+                media.pause(); // Celular se calla
+                const session = castContext.getCurrentSession();
                 const mediaInfo = new chrome.cast.media.MediaInfo(currentAudioUrl, 'audio/mp3');
                 const metadata = new chrome.cast.media.MusicTrackMediaMetadata();
                 metadata.title = currentTitle;
-                metadata.artist = "Jazztabueno Productions";
+                metadata.subtitle = "Jazztabueno Productions";
                 metadata.images = [new chrome.cast.Image(currentCover)];
                 mediaInfo.metadata = metadata;
                 const request = new chrome.cast.media.LoadRequest(mediaInfo);
+                request.currentTime = media.currentTime; // Empezamos en la TV donde iba el celular
                 session.loadMedia(request);
             }
             
-            // RETORNO AUTOMÁTICO AL CELULAR AL DESCONECTAR
-            if (event.sessionState === cast.framework.SessionState.SESSION_ENDED || event.sessionState === cast.framework.SessionState.SESSION_START_FAILED) {
+            // RETORNO CON TIEMPO EXACTO AL DESCONECTAR
+            if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) {
+                if (lastTvTime > 0) {
+                    media.currentTime = lastTvTime; // Saltamos al segundo de la TV
+                }
                 setTimeout(() => {
-                    media.play().catch(e => console.log("Retorno manual necesario")); 
+                    media.play().catch(e => console.log("Play manual"));
                     render();
-                }, 500);
+                }, 300);
             }
         });
       }
@@ -173,9 +184,9 @@
 
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_v76_ready', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_v77_sync', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_v76_ready')) {
+    if(localStorage.getItem('jtp_v77_sync')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
