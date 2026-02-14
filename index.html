@@ -6,7 +6,52 @@
     <title>Jazztabueno Productions</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <script>
+        window.castUrl = ""; window.castTitle = ""; window.castCover = ""; window.lastTvTime = 0;
+        window['__onGCastApiAvailable'] = function(isAvailable) {
+            if (isAvailable) {
+                const castContext = cast.framework.CastContext.getInstance();
+                castContext.setOptions({ 
+                    receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID, 
+                    autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED 
+                });
+                
+                const player = new cast.framework.RemotePlayer();
+                const controller = new cast.framework.RemotePlayerController(player);
+                
+                controller.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => {
+                    window.lastTvTime = player.currentTime;
+                });
+
+                castContext.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (event) => {
+                    const media = document.getElementById('main-media');
+                    if (event.sessionState === 'SESSION_STARTED') {
+                        media.pause();
+                        const session = castContext.getCurrentSession();
+                        const info = new chrome.cast.media.MediaInfo(window.castUrl, 'audio/mp3');
+                        const meta = new chrome.cast.media.MusicTrackMediaMetadata();
+                        meta.title = window.castTitle; 
+                        meta.artist = "Jazztabueno Productions";
+                        meta.images = [new chrome.cast.Image(window.castCover)];
+                        info.metadata = meta;
+                        const req = new chrome.cast.media.LoadRequest(info);
+                        req.currentTime = media.currentTime;
+                        session.loadMedia(req);
+                    }
+                    if (event.sessionState === 'SESSION_ENDED') {
+                        if (window.lastTvTime > 0) media.currentTime = window.lastTvTime;
+                        setTimeout(() => { 
+                            media.play().catch(()=>{}); 
+                            if(window.actualizarUI) window.actualizarUI(); 
+                        }, 500);
+                    }
+                });
+            }
+        };
+    </script>
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+
     <style>
         :root { --gold: #a68a44; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -47,7 +92,9 @@
         
         .controls { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 15px; margin-top: 12px; gap: 10px; }
         .ctrl-btn { flex: 1; background: #111; border: 1px solid #333; color: #fff; padding: 12px 5px; border-radius: 12px; font-size: 9px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        google-cast-launcher { width: 20px; height: 20px; --disconnected-color: var(--gold); }
+        
+        /* ESTILO DEL BOTÓN CAST */
+        google-cast-launcher { width: 20px; height: 20px; --disconnected-color: var(--gold); cursor: pointer; display: inline-block; }
     </style>
 </head>
 <body>
@@ -115,7 +162,9 @@
     <input type="range" id="seek-bar" value="0" min="0" step="1" style="width:100%;">
     
     <div class="controls">
-        <div class="ctrl-btn"><google-cast-launcher></google-cast-launcher><span style="color:var(--gold);">Google TV</span></div>
+        <div class="ctrl-btn" style="display:flex; align-items:center; gap:8px;">
+            <google-cast-launcher></google-cast-launcher><span style="color:var(--gold);">Google TV</span>
+        </div>
         <button onclick="window.doSpeed()" id="btn-speed" class="ctrl-btn">1.0x</button>
         <button onclick="window.doMute()" id="btn-mute" class="ctrl-btn">🔊 VOL</button>
     </div>
@@ -131,11 +180,11 @@
     let idActual = null;
     let filtro = 'Todo';
     let isAdmin = false;
-    let castUrl = "", castTitle = "", castImg = "";
-    let lastTvTime = 0;
 
     const SVG_PLAY = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
     const SVG_PAUSE = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+
+    window.actualizarUI = () => { render(); }; // Para que el Cast pueda refrescar el botón
 
     window.doLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
@@ -143,9 +192,11 @@
     };
     window.doLogout = () => { localStorage.clear(); location.reload(); };
     window.setFilter = (cat, el) => { filtro = cat; document.querySelectorAll('.ch-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); render(); };
+    
     window.playItem = (id, url, tit, img) => {
         if(idActual === id) { window.doToggle(); } else {
-            idActual = id; castUrl = url; castTitle = tit; castImg = img;
+            idActual = id; 
+            window.castUrl = url; window.castTitle = tit; window.castCover = img; // Actualizar para TV
             media.src = url; media.play();
             document.getElementById('p-title').innerText = tit;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`;
@@ -153,12 +204,14 @@
         }
         render();
     };
+
     window.doToggle = () => { if(media.paused) media.play(); else media.pause(); render(); };
     window.doClose = () => { media.pause(); document.getElementById('global-player').style.display='none'; idActual=null; render(); };
     window.toggleList = (id) => { const el = document.getElementById(`list-${id}`); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; };
     window.doSpeed = () => { const r = [1.0, 1.25, 1.5, 2.0]; media.playbackRate = r[(r.indexOf(media.playbackRate)+1)%r.length]; document.getElementById('btn-speed').innerText = media.playbackRate+"x"; };
     window.doMute = () => { media.muted = !media.muted; document.getElementById('btn-mute').innerText = media.muted ? "🔇 MUTE" : "🔊 VOL"; };
     window.cancelEdit = () => { document.getElementById('admin-panel').style.display='none'; document.getElementById('edit-id').value=""; };
+    
     window.prepEdit = (id) => {
         const p = programas.find(x => x.id === id);
         document.getElementById('edit-id').value = p.id; document.getElementById('t-titulo').value = p.titulo; document.getElementById('t-programa').value = p.programa; document.getElementById('t-url').value = p.mp3Url; document.getElementById('t-img').value = p.imagenUrl; document.getElementById('t-playlist').value = p.playlist || ""; document.getElementById('admin-panel').style.display = 'block'; window.scrollTo({top:0, behavior:'smooth'});
@@ -190,17 +243,10 @@
 
         const list = programas.filter(p => {
             if(filtro === 'Todo') return true;
-            
-            // 🛡️ AQUÍ ESTÁ LA MAGIA: Leemos el programa Y el título de la base de datos
             const dbVal = (p.programa || "").toUpperCase();
             const titVal = (p.titulo || "").toUpperCase(); 
             const filterVal = filtro.toUpperCase();
-            
-            // Si el botón es Studio 79, busca "STUDIO" o "79" en el programa o en el título
-            if(filterVal.includes("STUDIO")) {
-                return dbVal.includes("STUDIO") || dbVal.includes("79") || titVal.includes("STUDIO") || titVal.includes("79");
-            }
-            
+            if(filterVal.includes("STUDIO")) return dbVal.includes("STUDIO") || dbVal.includes("79") || titVal.includes("STUDIO") || titVal.includes("79");
             return dbVal.includes(filterVal.split(' ')[0]) || titVal.includes(filterVal.split(' ')[0]);
         });
 
@@ -241,31 +287,6 @@
     };
     media.onloadedmetadata = () => { seekBar.max = media.duration; };
     seekBar.oninput = () => { media.currentTime = seekBar.value; };
-
-    window['__onGCastApiAvailable'] = (isAvailable) => {
-        if (isAvailable) {
-            const castContext = cast.framework.CastContext.getInstance();
-            castContext.setOptions({ receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID, autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED });
-            const player = new cast.framework.RemotePlayer();
-            const controller = new cast.framework.RemotePlayerController(player);
-            controller.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => { lastTvTime = player.currentTime; });
-            castContext.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (e) => {
-                if (e.sessionState === 'SESSION_STARTED') {
-                    media.pause();
-                    const session = castContext.getCurrentSession();
-                    const info = new chrome.cast.media.MediaInfo(castUrl, 'audio/mp3');
-                    const meta = new chrome.cast.media.MusicTrackMediaMetadata();
-                    meta.title = castTitle; meta.artist = "Jazztabueno Productions"; meta.images = [new chrome.cast.Image(castImg)];
-                    info.metadata = meta;
-                    const req = new chrome.cast.media.LoadRequest(info); req.currentTime = media.currentTime; session.loadMedia(req);
-                }
-                if (e.sessionState === 'SESSION_ENDED') {
-                    if (lastTvTime > 0) media.currentTime = lastTvTime;
-                    setTimeout(() => { media.play().catch(()=>{}); render(); }, 500);
-                }
-            });
-        }
-    };
 </script>
 </body>
 </html>
