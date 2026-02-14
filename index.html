@@ -7,24 +7,20 @@
     <link rel="icon" type="image/png" href="logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-    
     <style>
         :root { --gold: #a68a44; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; background: var(--bg); color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; }
+        body { margin: 0; background: var(--bg); color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
         
-        /* 1. LOGIN */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
         .btn-entrar { width: 100% !important; background: var(--gold) !important; color: black !important; border: none !important; padding: 18px !important; border-radius: 50px !important; font-weight: 800 !important; cursor: pointer !important; }
 
-        /* 2. HEADER */
         header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; line-height: 1.2; }
         .btn-salir { background: transparent !important; border: 2px solid var(--gold) !important; color: var(--gold) !important; padding: 7px 15px !important; border-radius: 8px !important; font-size: 10px !important; font-weight: 900 !important; cursor: pointer !important; }
 
-        /* 3. LAYOUT */
         .container { max-width: 450px; margin: auto; padding: 15px; padding-bottom: 300px; }
         .channels-grid { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: 5px; margin-bottom: 25px; padding: 10px 0; }
         .ch-item { display: flex; flex-direction: column; align-items: center; text-align: center; opacity: 0.9; cursor: pointer; }
@@ -32,7 +28,6 @@
         .active .ch-logo { border-color: var(--gold); }
         .ch-name { font-size: 6px; color: #ffffff; font-weight: 800; text-transform: uppercase; line-height: 1.1; width: 100%; }
 
-        /* 4. TARJETAS */
         .card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #1a1a1a; overflow: hidden; }
         .card.playing { border-color: var(--gold); }
         .card-cover { width: 100%; height: 180px !important; background-size: cover; background-position: center; position: relative; border: 1.5px solid var(--gold); }
@@ -45,7 +40,6 @@
         .btn-list { background: #1a1a1a !important; border: 1.5px solid #333 !important; color: #ffffff !important; padding: 12px !important; border-radius: 12px !important; font-size: 11px !important; font-weight: 800 !important; width: 100% !important; cursor: pointer; }
         .list-box { display: none; margin-top: 15px; padding: 20px; background: #080808; border-radius: 15px; border: 1px solid #222; font-size: 14px; white-space: pre-wrap; }
 
-        /* 5. PLAYER GLOBAL */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 3px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .p-vinyl { width: 55px; height: 55px; border-radius: 50%; border: 2.3px solid var(--gold); background-size: cover; animation: rot 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
@@ -87,7 +81,7 @@
                 <option value="OLD SCHOOL RADIO">OLD SCHOOL RADIO</option>
             </select>
             <input type="text" id="t-url" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL MP3">
-            <input type="text" id="t-img" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL Imagen">
+            <input type="text" id="t-img" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL Portada">
             <textarea id="t-playlist" style="width:100%; height:120px; background:#000; color:white; border:1px solid var(--gold); border-radius:10px; padding:10px; margin-bottom:15px;" placeholder="Lista..."></textarea>
             <div style="display:flex; gap:10px;">
                 <button id="btn-save" style="flex:2; background:var(--gold); border:none; padding:15px; border-radius:12px; font-weight:800; cursor:pointer;">💾 GUARDAR</button>
@@ -131,7 +125,6 @@
     import { db } from "./firebase.js";
     import { collection, query, orderBy, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // VARIABLES
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     let programas = [];
@@ -144,29 +137,14 @@
     const SVG_PLAY = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
     const SVG_PAUSE = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
 
-    // --- FUNCIONES GLOBALES (WINDOW) ---
-    
     window.doLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { 
-            localStorage.setItem('jtp_auth', 'ok'); 
-            location.reload(); 
-        } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth', 'ok'); location.reload(); } else { alert("Clave Incorrecta"); }
     };
-
     window.doLogout = () => { localStorage.clear(); location.reload(); };
-
-    window.setFilter = (cat, el) => {
-        filtro = cat;
-        document.querySelectorAll('.ch-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-        render();
-    };
-
+    window.setFilter = (cat, el) => { filtro = cat; document.querySelectorAll('.ch-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); render(); };
     window.playItem = (id, url, tit, img) => {
-        if(idActual === id) {
-            window.doToggle();
-        } else {
+        if(idActual === id) { window.doToggle(); } else {
             idActual = id; castUrl = url; castTitle = tit; castImg = img;
             media.src = url; media.play();
             document.getElementById('p-title').innerText = tit;
@@ -175,76 +153,34 @@
         }
         render();
     };
-
     window.doToggle = () => { if(media.paused) media.play(); else media.pause(); render(); };
     window.doClose = () => { media.pause(); document.getElementById('global-player').style.display='none'; idActual=null; render(); };
-    
-    window.toggleList = (id) => { 
-        const el = document.getElementById(`list-${id}`); 
-        el.style.display = (el.style.display === 'block') ? 'none' : 'block'; 
-    };
-
-    window.doSpeed = () => { 
-        const rates = [1.0, 1.25, 1.5, 2.0];
-        media.playbackRate = rates[(rates.indexOf(media.playbackRate)+1) % rates.length];
-        document.getElementById('btn-speed').innerText = media.playbackRate + "x";
-    };
-
-    window.doMute = () => {
-        media.muted = !media.muted;
-        document.getElementById('btn-mute').innerText = media.muted ? "🔇 MUTE" : "🔊 VOL";
-    };
-
-    // --- ADMIN ---
+    window.toggleList = (id) => { const el = document.getElementById(`list-${id}`); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; };
+    window.doSpeed = () => { const r = [1.0, 1.25, 1.5, 2.0]; media.playbackRate = r[(r.indexOf(media.playbackRate)+1)%r.length]; document.getElementById('btn-speed').innerText = media.playbackRate+"x"; };
+    window.doMute = () => { media.muted = !media.muted; document.getElementById('btn-mute').innerText = media.muted ? "🔇 MUTE" : "🔊 VOL"; };
     window.cancelEdit = () => { document.getElementById('admin-panel').style.display='none'; document.getElementById('edit-id').value=""; };
     window.prepEdit = (id) => {
         const p = programas.find(x => x.id === id);
-        document.getElementById('edit-id').value = p.id;
-        document.getElementById('t-titulo').value = p.titulo;
-        document.getElementById('t-programa').value = p.programa;
-        document.getElementById('t-url').value = p.mp3Url;
-        document.getElementById('t-img').value = p.imagenUrl;
-        document.getElementById('t-playlist').value = p.playlist || "";
-        document.getElementById('admin-panel').style.display = 'block';
-        window.scrollTo({top:0, behavior:'smooth'});
+        document.getElementById('edit-id').value = p.id; document.getElementById('t-titulo').value = p.titulo; document.getElementById('t-programa').value = p.programa; document.getElementById('t-url').value = p.mp3Url; document.getElementById('t-img').value = p.imagenUrl; document.getElementById('t-playlist').value = p.playlist || ""; document.getElementById('admin-panel').style.display = 'block'; window.scrollTo({top:0, behavior:'smooth'});
     };
     window.doDel = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "radio_programas", id)); };
 
     document.getElementById('btn-save').onclick = async () => {
         const id = document.getElementById('edit-id').value;
-        const data = {
-            titulo: document.getElementById('t-titulo').value,
-            programa: document.getElementById('t-programa').value,
-            mp3Url: document.getElementById('t-url').value,
-            imagenUrl: document.getElementById('t-img').value || "logo.png",
-            playlist: document.getElementById('t-playlist').value,
-            fecha: new Date().getTime()
-        };
-        if(id) await updateDoc(doc(db, "radio_programas", id), data);
-        else await addDoc(collection(db, "radio_programas"), data);
+        const data = { titulo: document.getElementById('t-titulo').value, programa: document.getElementById('t-programa').value, mp3Url: document.getElementById('t-url').value, imagenUrl: document.getElementById('t-img').value || "logo.png", playlist: document.getElementById('t-playlist').value, fecha: new Date().getTime() };
+        if(id) await updateDoc(doc(db, "radio_programas", id), data); else await addDoc(collection(db, "radio_programas"), data);
         window.cancelEdit();
     };
 
-    // --- INICIO ---
-    if(localStorage.getItem('jtp_auth')) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-content').style.display = 'block';
-        isAdmin = true;
-    }
-
+    if(localStorage.getItem('jtp_auth')) { document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').style.display = 'block'; isAdmin = true; }
     let taps = 0, lastTap = 0;
     document.getElementById('admin-trigger').onclick = () => {
-        const now = new Date().getTime();
-        if(now - lastTap > 1000) taps = 0;
-        lastTap = now; taps++;
+        const now = new Date().getTime(); if(now - lastTap > 1000) taps = 0; lastTap = now; taps++;
         if(taps === 3 && isAdmin) document.getElementById('admin-panel').style.display = 'block';
     };
 
-    // --- DATABASE ---
     onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => {
-        programas = [];
-        snap.forEach(d => programas.push({id: d.id, ...d.data()}));
-        render();
+        programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
     });
 
     function render() {
@@ -254,11 +190,18 @@
 
         const list = programas.filter(p => {
             if(filtro === 'Todo') return true;
+            
+            // 🛡️ AQUÍ ESTÁ LA MAGIA: Leemos el programa Y el título de la base de datos
             const dbVal = (p.programa || "").toUpperCase();
+            const titVal = (p.titulo || "").toUpperCase(); 
             const filterVal = filtro.toUpperCase();
-            // 🛡️ FILTRO STUDIO 79
-            if(filterVal.includes("STUDIO")) return dbVal.includes("STUDIO");
-            return dbVal.includes(filterVal.split(' ')[0]);
+            
+            // Si el botón es Studio 79, busca "STUDIO" o "79" en el programa o en el título
+            if(filterVal.includes("STUDIO")) {
+                return dbVal.includes("STUDIO") || dbVal.includes("79") || titVal.includes("STUDIO") || titVal.includes("79");
+            }
+            
+            return dbVal.includes(filterVal.split(' ')[0]) || titVal.includes(filterVal.split(' ')[0]);
         });
 
         list.forEach(p => {
@@ -268,9 +211,7 @@
             div.innerHTML = `
                 <div class="card-cover" style="background-image: url('${p.imagenUrl}')">
                     <div class="card-overlay">
-                        <button class="btn-play" onclick="window.playItem('${p.id}','${p.mp3Url}','${p.titulo}','${p.imagenUrl}')">
-                            ${isPlaying ? SVG_PAUSE : SVG_PLAY}
-                        </button>
+                        <button class="btn-play" onclick="window.playItem('${p.id}','${p.mp3Url}','${p.titulo}','${p.imagenUrl}')">${isPlaying ? SVG_PAUSE : SVG_PLAY}</button>
                     </div>
                 </div>
                 <div class="info">
@@ -288,51 +229,35 @@
 
         const pBtn = document.getElementById('p-play-btn');
         if(pBtn) pBtn.innerHTML = media.paused ? SVG_PLAY : SVG_PAUSE;
-        
         if(!media.paused) document.getElementById('global-player').classList.add('playing');
         else document.getElementById('global-player').classList.remove('playing');
     }
 
-    // --- EVENTS ---
     media.ontimeupdate = () => { 
         seekBar.value = media.currentTime; 
         const m = Math.floor(media.currentTime/60), s = Math.floor(media.currentTime%60);
         const dm = Math.floor(media.duration/60), ds = Math.floor(media.duration%60);
-        document.getElementById('p-time').innerText = 
-            `${m}:${s<10?'0':''}${s} / ${dm|0}:${ds<10?'0':''}${ds|0}`;
+        document.getElementById('p-time').innerText = `${m}:${s<10?'0':''}${s} / ${dm|0}:${ds<10?'0':''}${ds|0}`;
     };
     media.onloadedmetadata = () => { seekBar.max = media.duration; };
     seekBar.oninput = () => { media.currentTime = seekBar.value; };
 
-    // --- CAST ---
     window['__onGCastApiAvailable'] = (isAvailable) => {
         if (isAvailable) {
             const castContext = cast.framework.CastContext.getInstance();
-            castContext.setOptions({ 
-                receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID, 
-                autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED 
-            });
-            
+            castContext.setOptions({ receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID, autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED });
             const player = new cast.framework.RemotePlayer();
             const controller = new cast.framework.RemotePlayerController(player);
-            
-            controller.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => {
-                lastTvTime = player.currentTime;
-            });
-
+            controller.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => { lastTvTime = player.currentTime; });
             castContext.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (e) => {
                 if (e.sessionState === 'SESSION_STARTED') {
                     media.pause();
                     const session = castContext.getCurrentSession();
                     const info = new chrome.cast.media.MediaInfo(castUrl, 'audio/mp3');
                     const meta = new chrome.cast.media.MusicTrackMediaMetadata();
-                    meta.title = castTitle; 
-                    meta.artist = "Jazztabueno Productions";
-                    meta.images = [new chrome.cast.Image(castImg)];
+                    meta.title = castTitle; meta.artist = "Jazztabueno Productions"; meta.images = [new chrome.cast.Image(castImg)];
                     info.metadata = meta;
-                    const req = new chrome.cast.media.LoadRequest(info);
-                    req.currentTime = media.currentTime;
-                    session.loadMedia(req);
+                    const req = new chrome.cast.media.LoadRequest(info); req.currentTime = media.currentTime; session.loadMedia(req);
                 }
                 if (e.sessionState === 'SESSION_ENDED') {
                     if (lastTvTime > 0) media.currentTime = lastTvTime;
