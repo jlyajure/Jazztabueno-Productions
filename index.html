@@ -11,7 +11,7 @@
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 
     <style>
-        /* 🛡️ BÓVEDA DE DISEÑO BLOQUEADA */
+        /* 🛡️ BÓVEDA ESTÉTICA BLOQUEADA */
         :root { --gold: #a68a44; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         html, body { margin: 0; background: var(--bg); color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-y: auto !important; }
@@ -37,7 +37,7 @@
         .episode-card.is-playing { border-color: var(--gold); }
         .cover-art { width: 100%; height: 180px !important; background-size: cover; background-position: center; position: relative; border-bottom: 1.5px solid var(--gold); }
         .cover-overlay { position: absolute; inset: 0; display: flex !important; align-items: center !important; justify-content: center !important; }
-        .btn-play-card { background-color: var(--gold) !important; border: none !important; width: 55px !important; height: 55px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer; }
+        .btn-play-card { background-color: var(--gold) !important; border: none !important; width: 55px !important; height: 55px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer; padding: 0; }
         .btn-play-card svg { width: 28px !important; height: 28px !important; fill: black !important; }
 
         .episode-info { padding: 20px; }
@@ -87,9 +87,9 @@
                 <option value="SALSA BRAVA">SALSA BRAVA</option>
                 <option value="OLD SCHOOL RADIO">OLD SCHOOL RADIO</option>
             </select>
-            <input type="text" id="t-url" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL MP3">
-            <input type="text" id="t-img" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL Imagen">
-            <textarea id="t-playlist" style="width:100%; height:120px; background:#000; color:white; border:1px solid var(--gold); border-radius:10px; padding:10px; margin-bottom:15px;" placeholder="Lista..."></textarea>
+            <input type="text" id="t-url" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL Audio">
+            <input type="text" id="t-img" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL Portada">
+            <textarea id="t-playlist" style="width:100%; height:120px; background:#000; color:white; border:1px solid var(--gold); border-radius:10px; padding:10px; margin-bottom:15px;" placeholder="Playlist..."></textarea>
             <div style="display:flex; gap:10px;"><button id="btn-save" style="flex:2; background:var(--gold); border:none; padding:15px; border-radius:12px; font-weight:800; cursor:pointer;">💾 GUARDAR</button><button onclick="window.cancelarEdicion()" style="flex:1; background:transparent; border:1px solid #444; color:#888; border-radius:12px; cursor:pointer;">❌</button></div>
         </div>
 
@@ -132,115 +132,148 @@
     const playSVG = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
     const pauseSVG = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
 
+    // 🛡️ LÓGICA CAST ULTRA-SÓLIDA
     window['__onGCastApiAvailable'] = function(isAvailable) {
       if (isAvailable) {
         const castContext = cast.framework.CastContext.getInstance();
-        castContext.setOptions({ receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID, autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED });
+        castContext.setOptions({
+          receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+          autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+        });
         const remotePlayer = new cast.framework.RemotePlayer();
         const remotePlayerController = new cast.framework.RemotePlayerController(remotePlayer);
-        remotePlayerController.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => { lastTvTime = remotePlayer.currentTime; });
+        remotePlayerController.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => {
+          lastTvTime = remotePlayer.currentTime;
+        });
         castContext.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (event) => {
-            if (event.sessionState === cast.framework.SessionState.SESSION_STARTED) {
-                media.pause();
-                const session = castContext.getCurrentSession();
-                const mediaInfo = new chrome.cast.media.MediaInfo(currentAudioUrl, 'audio/mp3');
-                const metadata = new chrome.cast.media.MusicTrackMediaMetadata();
-                metadata.title = currentTitle; metadata.artist = "Jazztabueno Productions";
-                metadata.images = [new chrome.cast.Image(currentCover)];
-                mediaInfo.metadata = metadata;
-                const request = new chrome.cast.media.LoadRequest(mediaInfo);
-                request.currentTime = media.currentTime; session.loadMedia(request);
-            }
-            if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) {
-                if (lastTvTime > 0) { media.currentTime = lastTvTime; }
-                setTimeout(() => { media.play().catch(e => {}); render(); }, 300);
-            }
+          if (event.sessionState === cast.framework.SessionState.SESSION_STARTED) {
+            media.pause();
+            const session = castContext.getCurrentSession();
+            const mediaInfo = new chrome.cast.media.MediaInfo(currentAudioUrl, 'audio/mp3');
+            const metadata = new chrome.cast.media.MusicTrackMediaMetadata();
+            metadata.title = currentTitle;
+            metadata.artist = "Jazztabueno Productions";
+            metadata.images = [new chrome.cast.Image(currentCover)];
+            mediaInfo.metadata = metadata;
+            const request = new chrome.cast.media.LoadRequest(mediaInfo);
+            request.currentTime = media.currentTime;
+            session.loadMedia(request);
+          }
+          if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) {
+            if (lastTvTime > 0) { media.currentTime = lastTvTime; }
+            setTimeout(() => { media.play().catch(() => {}); render(); }, 300);
+          }
         });
       }
     };
 
     window.checkLogin = () => {
-        const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_v81_auth', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
+      const p = document.getElementById('passInput').value.toLowerCase().trim();
+      if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_v82_auth', 'true'); location.reload(); }
+      else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_v81_auth')) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-content').style.display = 'block';
-        isAdmin = true;
+    if(localStorage.getItem('jtp_v82_auth')) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app-content').style.display = 'block';
+      isAdmin = true;
     }
 
     let toques = 0; let tToque = 0;
     document.getElementById('admin-trigger').onclick = () => {
-        const ahora = new Date().getTime();
-        if(ahora - tToque > 1000) toques = 0;
-        tToque = ahora; toques++;
-        if(toques === 3 && isAdmin) document.getElementById('admin-panel').style.display = 'block';
+      const ahora = new Date().getTime();
+      if(ahora - tToque > 1000) toques = 0;
+      tToque = ahora; toques++;
+      if(toques === 3 && isAdmin) document.getElementById('admin-panel').style.display = 'block';
     };
 
-    window.cancelarEdicion = () => { document.getElementById('admin-panel').style.display = 'none'; document.getElementById('edit-id').value = ""; };
+    window.cancelarEdicion = () => {
+      document.getElementById('admin-panel').style.display = 'none';
+      document.getElementById('edit-id').value = "";
+    };
 
     document.getElementById('btn-save').onclick = async () => {
-        const id = document.getElementById('edit-id').value;
-        const datos = {
-            titulo: document.getElementById('t-titulo').value, programa: document.getElementById('t-programa').value,
-            mp3Url: document.getElementById('t-url').value, imagenUrl: document.getElementById('t-img').value || "logo.png",
-            playlist: document.getElementById('t-playlist').value, fecha: new Date().getTime()
-        };
-        if(id) await updateDoc(doc(db, "radio_programas", id), datos);
-        else await addDoc(collection(db, "radio_programas"), datos);
-        window.cancelarEdicion();
+      const id = document.getElementById('edit-id').value;
+      const datos = {
+        titulo: document.getElementById('t-titulo').value,
+        programa: document.getElementById('t-programa').value,
+        mp3Url: document.getElementById('t-url').value,
+        imagenUrl: document.getElementById('t-img').value || "logo.png",
+        playlist: document.getElementById('t-playlist').value,
+        fecha: new Date().getTime()
+      };
+      if(id) await updateDoc(doc(db, "radio_programas", id), datos);
+      else await addDoc(collection(db, "radio_programas"), datos);
+      window.cancelarEdicion();
     };
 
     onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => {
-        programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
+      programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
     });
 
     window.borrarDoc = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "radio_programas", id)); };
 
     window.prepararEdicion = (id) => {
-        const p = programas.find(x => x.id === id);
-        document.getElementById('edit-id').value = p.id; document.getElementById('t-titulo').value = p.titulo;
-        document.getElementById('t-programa').value = p.programa; document.getElementById('t-url').value = p.mp3Url;
-        document.getElementById('t-img').value = p.imagenUrl; document.getElementById('t-playlist').value = p.playlist || "";
-        document.getElementById('admin-panel').style.display = 'block'; window.scrollTo({top: 0, behavior: 'smooth'});
+      const p = programas.find(x => x.id === id);
+      document.getElementById('edit-id').value = p.id;
+      document.getElementById('t-titulo').value = p.titulo;
+      document.getElementById('t-programa').value = p.programa;
+      document.getElementById('t-url').value = p.mp3Url;
+      document.getElementById('t-img').value = p.imagenUrl;
+      document.getElementById('t-playlist').value = p.playlist || "";
+      document.getElementById('admin-panel').style.display = 'block';
+      window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
     function render() {
-        const feed = document.getElementById('radio-feed'); if(!feed) return;
-        feed.innerHTML = "";
-        const lista = programas.filter(p => {
-            if (filtroActivo === 'Todo') return true;
-            if (!p.programa) return false;
-            const dbVal = p.programa.toUpperCase().trim();
-            const btnVal = filtroActivo.toUpperCase().trim();
-            if (btnVal.includes("STUDIO")) return dbVal.includes("STUDIO");
-            return dbVal.includes(btnVal.split(' ')[0]);
-        });
-        lista.forEach(p => {
-            const isPlaying = idActual === p.id && !media.paused;
-            const div = document.createElement('div');
-            div.className = `episode-card ${isPlaying ? 'is-playing' : ''}`;
-            div.innerHTML = `
-                <div class="cover-art" style="background-image: url('${p.imagenUrl}')"><div class="cover-overlay"><button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}','${p.mp3Url}','${p.titulo}','${p.imagenUrl}')">${isPlaying ? pauseSVG : playSVG}</button></div></div>
-                <div class="episode-info">
-                    <span style="color:var(--gold); font-size:9px; font-weight:900; text-transform:uppercase;">${p.programa}</span>
-                    <h3 class="episode-title">${p.titulo}</h3>
-                    <button class="btn-ver-playlist" onclick="window.togglePlaylist('${p.id}')">📋 VER PROGRAMACIÓN</button>
-                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Próximamente."}</div>
-                    ${isAdmin ? `<div class="dj-actions" style="display:flex; gap:10px; margin-top:20px; border-top:1px solid #222; padding-top:20px;">
-                        <button class="btn-dj-edit" onclick="prepararEdicion('${p.id}')" style="background:transparent; border:1.5px solid var(--gold); color:var(--gold); flex:1; padding:10px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">🖋️ EDITAR</button>
-                        <button class="btn-dj-del" onclick="borrarDoc('${p.id}')" style="background:transparent; border:1.5px solid #ff4444; color:#ff4444; flex:1; padding:10px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">🗑️ BORRAR</button>
-                    </div>` : ''}
-                </div>`;
-            feed.appendChild(div);
-        });
-        actualizarPlayerStatus();
+      const feed = document.getElementById('radio-feed'); if(!feed) return;
+      feed.innerHTML = "";
+      const lista = programas.filter(p => {
+        if (filtroActivo === 'Todo') return true;
+        if (!p.programa) return false;
+        const dbVal = p.programa.toUpperCase().trim();
+        const btnVal = filtroActivo.toUpperCase().trim();
+        // 🛡️ REGLA TICO PARA STUDIO 79
+        if (btnVal.includes("STUDIO")) return dbVal.includes("STUDIO");
+        return dbVal.includes(btnVal.split(' ')[0]);
+      });
+
+      lista.forEach(p => {
+        const isPlaying = idActual === p.id && !media.paused;
+        const div = document.createElement('div');
+        div.className = `episode-card ${isPlaying ? 'is-playing' : ''}`;
+        div.innerHTML = `
+          <div class="cover-art" style="background-image: url('${p.imagenUrl}')">
+            <div class="cover-overlay">
+              <button class="btn-play-card" onclick="window.gestionarReproduccion('${p.id}','${p.mp3Url}','${p.titulo}','${p.imagenUrl}')">
+                ${isPlaying ? pauseSVG : playSVG}
+              </button>
+            </div>
+          </div>
+          <div class="episode-info">
+            <span style="color:var(--gold); font-size:9px; font-weight:900; text-transform:uppercase;">${p.programa}</span>
+            <h3 class="episode-title">${p.titulo}</h3>
+            <button class="btn-ver-playlist" onclick="window.togglePlaylist('${p.id}')">📋 VER PROGRAMACIÓN</button>
+            <div id="list-${p.id}" class="playlist-box">${p.playlist || "Próximamente detalles."}</div>
+            ${isAdmin ? `<div class="dj-actions" style="display:flex; gap:10px; margin-top:20px; border-top:1px solid #222; padding-top:20px;">
+              <button class="btn-dj-edit" onclick="prepararEdicion('${p.id}')" style="background:transparent; border:1.5px solid var(--gold); color:var(--gold); flex:1; padding:10px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">🖋️ EDITAR</button>
+              <button class="btn-dj-del" onclick="borrarDoc('${p.id}')" style="background:transparent; border:1.5px solid #ff4444; color:#ff4444; flex:1; padding:10px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">🗑️ BORRAR</button>
+            </div>` : ''}
+          </div>`;
+        feed.appendChild(div);
+      });
+      actualizarPlayerStatus();
     }
 
     window.gestionarReproduccion = (id, url, tit, img) => {
-        if(idActual === id) { window.togglePlay(); }
-        else { idActual = id; currentAudioUrl = url; currentTitle = tit; currentCover = img; media.src = url; media.play(); document.getElementById('p-title').innerText = tit; document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`; document.getElementById('global-player').style.display = 'block'; }
-        render();
+      if(idActual === id) { window.togglePlay(); }
+      else { 
+        idActual = id; currentAudioUrl = url; currentTitle = tit; currentCover = img;
+        media.src = url; media.play(); 
+        document.getElementById('p-title').innerText = tit; 
+        document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`; 
+        document.getElementById('global-player').style.display = 'block';
+      }
+      render();
     };
 
     window.togglePlay = () => { if(media.paused) media.play(); else media.pause(); render(); };
@@ -252,13 +285,16 @@
     window.toggleMute = () => { media.muted = !media.muted; document.getElementById('btn-mute').innerText = media.muted ? "🔇 MUTE" : "🔊 VOL"; };
 
     function actualizarPlayerStatus() {
-        const pBtn = document.getElementById('p-play-btn');
-        if(pBtn) pBtn.innerHTML = media.paused ? playSVG : pauseSVG;
-        if(!media.paused) document.getElementById('global-player').classList.add('playing');
-        else document.getElementById('global-player').classList.remove('playing');
+      const pBtn = document.getElementById('p-play-btn');
+      if(pBtn) pBtn.innerHTML = media.paused ? playSVG : pauseSVG;
+      if(!media.paused) document.getElementById('global-player').classList.add('playing');
+      else document.getElementById('global-player').classList.remove('playing');
     }
 
-    media.ontimeupdate = () => { seekBar.value = media.currentTime; document.getElementById('p-time').innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration); };
+    media.ontimeupdate = () => { 
+      seekBar.value = media.currentTime; 
+      document.getElementById('p-time').innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration);
+    };
     media.onloadedmetadata = () => { seekBar.max = media.duration; };
     seekBar.oninput = () => { media.currentTime = seekBar.value; };
     function formatTime(s) { if(isNaN(s)) return "00:00"; const m=Math.floor(s/60), sec=Math.floor(s%60); return (m<10?"0":"")+m+":"+(sec<10?"0":"")+sec; }
