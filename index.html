@@ -16,7 +16,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         html, body { margin: 0; background: var(--bg); color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-y: auto !important; }
         
-        /* LOGIN PREMIUM BLINDADO */
+        /* LOGIN PREMIUM */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; }
@@ -26,6 +26,7 @@
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; line-height: 1.2; }
         .btn-salir-premium { background: transparent; border: 2.5px solid var(--gold); color: var(--gold); padding: 7px 15px; border-radius: 8px; font-size: 10px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
 
+        /* CONTENEDOR CENTRAL (Anti-Gigante) */
         .container { max-width: 450px; margin: auto; padding: 15px; padding-bottom: 300px; }
 
         /* CANALES */
@@ -35,7 +36,7 @@
         .active .channel-logo { border-color: var(--gold); }
         .channel-name { font-size: 6px; color: #ffffff; font-weight: 800; text-transform: uppercase; line-height: 1.1; }
 
-        /* TARJETAS CON MARCO DE GALA */
+        /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #1a1a1a; overflow: hidden; transition: 0.3s; }
         .episode-card.is-playing { border-color: var(--gold); }
         .cover-art { width: 100%; height: 180px !important; background-size: cover; background-position: center; position: relative; border-bottom: 1.5px solid var(--gold); }
@@ -88,16 +89,16 @@
     <div class="container">
         <div id="admin-panel" style="display:none; background: #111; padding: 25px; border-radius: 25px; border: 2px solid var(--gold); margin-bottom: 30px;">
             <input type="hidden" id="edit-id">
-            <input type="text" id="t-titulo" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="Título">
+            <input type="text" id="t-titulo" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="Título del Episodio">
             <select id="t-programa" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;">
                 <option value="JAZZTABUENO">JAZZTABUENO</option>
                 <option value="STUDIO 79">STUDIO 79</option>
                 <option value="SALSA BRAVA">SALSA BRAVA</option>
                 <option value="OLD SCHOOL RADIO">OLD SCHOOL RADIO</option>
             </select>
-            <input type="text" id="t-url" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL MP3">
-            <input type="text" id="t-img" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL Imagen">
-            <textarea id="t-playlist" style="width:100%; height:120px; background:#000; color:white; border:1px solid var(--gold); border-radius:10px; padding:10px; margin-bottom:15px;" placeholder="Playlist..."></textarea>
+            <input type="text" id="t-url" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL del Audio (MP3)">
+            <input type="text" id="t-img" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL de la Portada">
+            <textarea id="t-playlist" style="width:100%; height:120px; background:#000; color:white; border:1px solid var(--gold); border-radius:10px; padding:10px; margin-bottom:15px;" placeholder="Lista de canciones..."></textarea>
             <div style="display:flex; gap:10px;"><button id="btn-save" style="flex:2; background:var(--gold); border:none; padding:15px; border-radius:12px; font-weight:800; cursor:pointer;">💾 GUARDAR</button><button onclick="window.cancelarEdicion()" style="flex:1; background:transparent; border:1px solid #444; color:#888; border-radius:12px; cursor:pointer;">❌</button></div>
         </div>
 
@@ -139,12 +140,12 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     let programas = []; let idActual = null; let filtroActivo = 'Todo'; let isAdmin = false;
-    let currentAudioUrl = ""; let currentTitle = "";
+    let currentAudioUrl = ""; let currentTitle = ""; let currentCover = "";
 
     const playSVG = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
     const pauseSVG = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
 
-    // 🛡️ CEREBRO DE TRANSMISIÓN: Envía la música a la TV automáticamente
+    // 🛡️ LÓGICA DE TRANSMISIÓN SINCRONIZADA (ARTE + SILENCIO LOCAL)
     window['__onGCastApiAvailable'] = function(isAvailable) {
       if (isAvailable) {
         const castContext = cast.framework.CastContext.getInstance();
@@ -153,13 +154,20 @@
           autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
         });
 
-        // Escucha cuando la TV se conecta para enviar el audio
         castContext.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (event) => {
             if (event.sessionState === cast.framework.SessionState.SESSION_STARTED) {
+                // 1. Silenciamos el celular de inmediato
+                media.pause(); 
+                
+                // 2. Enviamos todo a la TV
                 const session = castContext.getCurrentSession();
                 const mediaInfo = new chrome.cast.media.MediaInfo(currentAudioUrl, 'audio/mp3');
                 const metadata = new chrome.cast.media.MusicTrackMediaMetadata();
                 metadata.title = currentTitle;
+                metadata.artist = "Jazztabueno Productions";
+                // Envoltura especial para la IMAGEN
+                metadata.images = [new chrome.cast.Image(currentCover)];
+                
                 mediaInfo.metadata = metadata;
                 const request = new chrome.cast.media.LoadRequest(mediaInfo);
                 session.loadMedia(request);
@@ -170,9 +178,9 @@
 
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_v73_final', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_v74', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_v73_final')) {
+    if(localStorage.getItem('jtp_auth_v74')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
@@ -244,7 +252,7 @@
     window.gestionarReproduccion = (id, url, tit, img) => {
         if(idActual === id) { window.togglePlay(); }
         else { 
-            idActual = id; currentAudioUrl = url; currentTitle = tit;
+            idActual = id; currentAudioUrl = url; currentTitle = tit; currentCover = img;
             media.src = url; media.play(); 
             document.getElementById('p-title').innerText = tit; 
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`; 
