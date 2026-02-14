@@ -15,10 +15,11 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         html, body { margin: 0; background: var(--bg); color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-y: auto !important; }
         
+        /* LOGIN */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
-        .btn-gold-tico { width: 100% !important; background: var(--gold) !important; color: black !important; border: none !important; padding: 18px !important; border-radius: 50px !important; font-weight: 800 !important; text-transform: uppercase !important; cursor: pointer !important; display: block !important; }
+        .btn-gold-tico { width: 100% !important; background: var(--gold) !important; color: black !important; border: none !important; padding: 18px !important; border-radius: 50px !important; font-weight: 800 !important; text-transform: uppercase !important; cursor: pointer !important; }
 
         header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; line-height: 1.2; }
@@ -26,12 +27,14 @@
 
         .container { max-width: 450px; margin: auto; padding: 15px; padding-bottom: 300px; }
 
+        /* CANALES */
         .channels-container { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: 5px; margin-bottom: 25px; padding: 10px 0; }
         .channel-item { display: flex; flex-direction: column; align-items: center; text-align: center; opacity: 0.9; cursor: pointer; }
         .channel-logo { width: 44px; height: 44px; border-radius: 12px; border: 2.5px solid #222; margin-bottom: 6px; background: #000; object-fit: contain; }
         .active .channel-logo { border-color: var(--gold); }
         .channel-name { font-size: 6px; color: #ffffff; font-weight: 800; text-transform: uppercase; line-height: 1.1; width: 100%; }
 
+        /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #1a1a1a; overflow: hidden; transition: 0.3s; }
         .episode-card.is-playing { border-color: var(--gold); }
         .cover-art { width: 100%; height: 180px !important; background-size: cover; background-position: center; position: relative; border-bottom: 1.5px solid var(--gold); }
@@ -44,10 +47,11 @@
         .btn-ver-playlist { background: #1a1a1a !important; border: 1.5px solid #333 !important; color: #ffffff !important; padding: 12px !important; border-radius: 12px !important; font-size: 11px !important; font-weight: 800 !important; cursor: pointer !important; width: 100% !important; text-transform: uppercase !important; }
         .playlist-box { display: none; margin-top: 15px; padding: 20px; background: #080808; border-radius: 15px; border: 1px solid #222; font-size: 14px; color: #ffffff; line-height: 1.8; white-space: pre-wrap; }
 
+        /* PLAYER */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 3px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .p-vinyl { width: 55px; height: 55px; border-radius: 50%; border: 2.5px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
-        #p-play-btn { background: none; border: none; cursor: pointer; }
+        #p-play-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         #p-play-btn svg { width: 38px; height: 38px; fill: var(--gold); }
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
@@ -131,7 +135,7 @@
     const playSVG = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
     const pauseSVG = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
 
-    // 🛡️ LÓGICA CAST SINCRONIZADA
+    // 🛡️ LÓGICA CAST DENTRO DEL MÓDULO PARA EVITAR ERRORES DE COMPILACIÓN
     window['__onGCastApiAvailable'] = function(isAvailable) {
         if (isAvailable) {
             const castContext = cast.framework.CastContext.getInstance();
@@ -161,10 +165,10 @@
 
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_v83', 'true'); location.reload(); }
+        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_v84', 'true'); location.reload(); }
         else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_auth_v83')) {
+    if(localStorage.getItem('jtp_auth_v84')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
@@ -173,7 +177,10 @@
     window.salirTotal = () => { localStorage.clear(); location.reload(); };
 
     document.getElementById('admin-trigger').onclick = () => {
-        if(isAdmin) document.getElementById('admin-panel').style.display = 'block';
+        if(isAdmin) {
+            const panel = document.getElementById('admin-panel');
+            panel.style.display = (panel.style.display === 'none') ? 'block' : 'none';
+        }
     };
 
     window.cancelarEdicion = () => { document.getElementById('admin-panel').style.display = 'none'; document.getElementById('edit-id').value = ""; };
@@ -194,14 +201,14 @@
         programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
     });
 
-    window.borrarDoc = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "radio_programas", id)); };
+    window.borrarDoc = async (id) => { if(confirm("¿Borrar definitivamente?")) await deleteDoc(doc(db, "radio_programas", id)); };
 
     window.prepararEdicion = (id) => {
         const p = programas.find(x => x.id === id);
         document.getElementById('edit-id').value = p.id; document.getElementById('t-titulo').value = p.titulo;
         document.getElementById('t-programa').value = p.programa; document.getElementById('t-url').value = p.mp3Url;
         document.getElementById('t-img').value = p.imagenUrl; document.getElementById('t-playlist').value = p.playlist || "";
-        document.getElementById('admin-panel').style.display = 'block';
+        document.getElementById('admin-panel').style.display = 'block'; window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
     window.filtrar = (cat, el) => { filtroActivo = cat; document.querySelectorAll('.channel-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); render(); };
@@ -226,10 +233,10 @@
                     <span style="color:var(--gold); font-size:9px; font-weight:900; text-transform:uppercase;">${p.programa}</span>
                     <h3 class="episode-title">${p.titulo}</h3>
                     <button class="btn-ver-playlist" onclick="window.togglePlaylist('${p.id}')">📋 VER PROGRAMACIÓN</button>
-                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Detalles pronto."}</div>
+                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Próximamente."}</div>
                     ${isAdmin ? `<div class="dj-actions" style="display:flex; gap:10px; margin-top:20px; border-top:1px solid #222; padding-top:20px;">
-                        <button class="btn-dj-edit" onclick="prepararEdicion('${p.id}')" style="background:transparent; border:1.5px solid var(--gold); color:var(--gold); flex:1; padding:10px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">🖋️ EDITAR</button>
-                        <button class="btn-dj-del" onclick="borrarDoc('${p.id}')" style="background:transparent; border:1.5px solid #ff4444; color:#ff4444; flex:1; padding:10px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">🗑️ BORRAR</button>
+                        <button class="btn-dj-edit" onclick="window.prepararEdicion('${p.id}')" style="background:transparent; border:1.5px solid var(--gold); color:var(--gold); flex:1; padding:10px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">🖋️ EDITAR</button>
+                        <button class="btn-dj-del" onclick="window.borrarDoc('${p.id}')" style="background:transparent; border:1.5px solid #ff4444; color:#ff4444; flex:1; padding:10px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">🗑️ BORRAR</button>
                     </div>` : ''}
                 </div>`;
             feed.appendChild(div);
