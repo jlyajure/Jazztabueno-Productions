@@ -11,10 +11,14 @@
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 
     <style>
-        /* COLOR BRONCE MATE - ELEGANTE PARA MÓVIL */
-        :root { --gold: #a68a44; --bg: #050505; --card: #121212; }
+        /* 🛡️ BÓVEDA DE COLORES (El Escudo) */
+        :root { 
+            --gold: #a68a44; /* Bronce Mate de Sábado */
+            --bg: #050505; 
+            --card: #121212; 
+        }
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
         html, body { margin: 0; background: var(--bg); color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-y: auto !important; }
         
         #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: flex; align-items: center; justify-content: center; }
@@ -29,66 +33,47 @@
 
         .container { max-width: 550px; margin: auto; padding: 15px; padding-bottom: 280px; }
 
-        /* PANEL DJ CÓMODO Y ESPACIOSO */
-        #admin-panel { 
-            display: none; 
-            background: #111; 
-            padding: 25px; 
-            border-radius: 25px; 
-            border: 2px solid var(--gold); 
-            margin-bottom: 30px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-        }
+        /* 🛠️ PANEL DJ: ESTRUCTURA BLINDADA */
+        #admin-panel { display: none; background: #111; padding: 25px; border-radius: 25px; border: 2px solid var(--gold); margin-bottom: 30px; }
         .admin-row { display: flex; gap: 10px; margin-bottom: 12px; }
-        .input-box, .select-box { 
-            flex: 1; width: 100%; padding: 14px; background: #000; border: 1px solid #333; color: white; border-radius: 10px; font-size: 14px;
-        }
-        .text-area { 
-            width: 100%; height: 180px; padding: 14px; background: #000; border: 1px solid var(--gold); color: white; border-radius: 10px; font-size: 14px; resize: none; margin-bottom: 15px; font-family: inherit;
-        }
+        .input-box, .select-box { flex: 1; width: 100%; padding: 14px; background: #000; border: 1px solid #333; color: white; border-radius: 10px; font-size: 14px; }
+        .text-area { width: 100%; height: 180px; padding: 14px; background: #000; border: 1px solid var(--gold); color: white; border-radius: 10px; font-size: 14px; resize: none; margin-bottom: 15px; font-family: inherit; }
 
-        /* --- CANALES: ALINEACIÓN LÁSER --- */
-        .channels-container {
-            display: grid !important;
-            grid-template-columns: repeat(5, 1fr) !important;
-            gap: 8px;
-            margin-bottom: 25px;
-            padding: 10px 0;
-            width: 100%;
+        /* --- CANALES: ALINEACIÓN Y NOMBRES COMPLETOS --- */
+        .channels-container { 
+            display: grid !important; 
+            grid-template-columns: repeat(5, 1fr) !important; 
+            gap: 5px; 
+            margin-bottom: 25px; 
+            padding: 10px 0; 
+            width: 100%; 
         }
-        .channel-item {
-            /* Usamos Flexbox para un centrado perfecto en columna */
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Centra horizontalmente */
-            justify-content: flex-start;
-            opacity: 0.9;
-            transition: 0.3s;
-            cursor: pointer;
+        .channel-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-align: center;
+            opacity: 0.9; 
+            transition: 0.3s; 
+            cursor: pointer; 
         }
-        .channel-item.active { opacity: 1; transform: scale(1.1); }
-        .channel-logo {
-            width: 44px; height: 44px;
-            border-radius: 12px; border: 2.5px solid #222;
-            margin-bottom: 6px; /* Solo margen abajo, el centrado lo hace flex */
-            background: #000; object-fit: contain;
-        }
+        .channel-item.active { opacity: 1; transform: scale(1.05); }
+        .channel-logo { width: 44px; height: 44px; border-radius: 12px; border: 2.5px solid #222; margin-bottom: 6px; background: #000; object-fit: contain; }
         .active .channel-logo { border-color: var(--gold); }
-        .channel-name {
-            font-size: 7px; color: #ffffff; font-weight: 800; text-transform: uppercase;
-            text-align: center; /* Asegura el centrado del texto */
-            width: 100%; /* Ocupa todo el ancho de su columna */
+        .channel-name { 
+            font-size: 6px; /* Un punto menos para que entren nombres largos */
+            color: #ffffff; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            line-height: 1.1; 
+            max-width: 100%;
         }
 
-        /* TARJETAS */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #1a1a1a; overflow: hidden; }
         .cover-art { width: 100%; height: 160px; background-size: cover; background-position: center; position: relative; }
         .cover-overlay { position: absolute; inset: 0; background: transparent; display: flex; align-items: center; justify-content: center; }
         
-        .btn-play-card { 
-            background-color: var(--gold) !important; border: none !important; width: 55px; height: 55px; border-radius: 50%; color: black !important; font-size: 24px; display: flex; align-items: center; justify-content: center;
-        }
-
+        .btn-play-card { background-color: var(--gold) !important; border: none !important; width: 55px; height: 55px; border-radius: 50%; color: black !important; font-size: 24px; display: flex; align-items: center; justify-content: center; }
         .episode-info { padding: 20px; }
         .episode-title { margin: 8px 0; font-size: 19px; font-weight: 800; color: #ffffff; }
         
@@ -99,7 +84,6 @@
         .btn-dj-edit { background: var(--gold); color: black; flex: 1; border: none; padding: 12px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; }
         .btn-dj-del { background: none; border: 1.5px solid #ff4444; color: #ff4444; flex: 1; padding: 12px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; }
 
-        /* PLAYER GLOBAL */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 3px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .p-vinyl { width: 55px; height: 55px; border-radius: 50%; border: 2.5px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
@@ -129,33 +113,21 @@
 
     <div class="container">
         <div id="admin-panel">
-            <h4 id="admin-label" style="color:var(--gold); text-align:center; font-size:14px; margin-bottom:20px; text-transform:uppercase; letter-spacing:2px;">Panel DJ</h4>
+            <h4 id="admin-label" style="color:var(--gold); text-align:center; font-size:14px; margin-bottom:20px; text-transform:uppercase;">Panel DJ</h4>
             <input type="hidden" id="edit-id">
-            <div class="admin-row">
-                <input type="text" id="t-titulo" class="input-box" placeholder="Título del Episodio">
-                <select id="t-programa" class="select-box">
-                    <option value="JAZZTABUENO">JAZZTABUENO</option>
-                    <option value="STUDIO">STUDIO 79</option>
-                    <option value="SALSA">SALSA BRAVA</option>
-                    <option value="OLD">OLD SCHOOL</option>
-                </select>
-            </div>
-            <div class="admin-row">
-                <input type="text" id="t-url" class="input-box" placeholder="URL del Audio (MP3)">
-            </div>
-            <div class="admin-row">
-                <input type="text" id="t-img" class="input-box" placeholder="URL de la Portada">
-            </div>
-            <textarea id="t-playlist" class="text-area" placeholder="Escribe aquí la lista de ARTISTAS y CANCIONES (puedes usar números o guiones)"></textarea>
-            <button id="btn-save" class="btn-gold-tico">💾 GUARDAR PROGRAMA EN FIREBASE</button>
+            <div class="admin-row"><input type="text" id="t-titulo" class="input-box" placeholder="Título"><select id="t-programa" class="select-box"><option value="JAZZTABUENO">JAZZTABUENO</option><option value="STUDIO 79">STUDIO 79</option><option value="SALSA BRAVA">SALSA BRAVA</option><option value="OLD SCHOOL RADIO">OLD SCHOOL RADIO</option></select></div>
+            <div class="admin-row"><input type="text" id="t-url" class="input-box" placeholder="URL MP3"></div>
+            <div class="admin-row"><input type="text" id="t-img" class="input-box" placeholder="URL Portada"></div>
+            <textarea id="t-playlist" class="text-area" placeholder="Lista de ARTISTAS y CANCIONES"></textarea>
+            <button id="btn-save" class="btn-gold-tico">💾 GUARDAR PROGRAMA</button>
         </div>
 
         <div class="channels-container">
             <div class="channel-item active" onclick="filtrar('Todo', this)"><img src="logo.png" class="channel-logo"><span class="channel-name">Todo</span></div>
-            <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)"><img src="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png" class="channel-logo"><span class="channel-name">Jazz</span></div>
-            <div class="channel-item" onclick="filtrar('STUDIO', this)"><img src="https://i.postimg.cc/NKMDbYJB/S79.png" class="channel-logo"><span class="channel-name">Studio</span></div>
-            <div class="channel-item" onclick="filtrar('SALSA', this)"><img src="https://i.postimg.cc/75fchgyt/Salsa-Brava.png" class="channel-logo"><span class="channel-name">Salsa</span></div>
-            <div class="channel-item" onclick="filtrar('OLD', this)"><img src="https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png" class="channel-logo"><span class="channel-name">Old</span></div>
+            <div class="channel-item" onclick="filtrar('JAZZTABUENO', this)"><img src="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png" class="channel-logo"><span class="channel-name">Jazztabueno</span></div>
+            <div class="channel-item" onclick="filtrar('STUDIO 79', this)"><img src="https://i.postimg.cc/NKMDbYJB/S79.png" class="channel-logo"><span class="channel-name">Studio 79</span></div>
+            <div class="channel-item" onclick="filtrar('SALSA BRAVA', this)"><img src="https://i.postimg.cc/75fchgyt/Salsa-Brava.png" class="channel-logo"><span class="channel-name">Salsa Brava</span></div>
+            <div class="channel-item" onclick="filtrar('OLD SCHOOL RADIO', this)"><img src="https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png" class="channel-logo"><span class="channel-name">Old School Radio</span></div>
         </div>
         <div id="radio-feed"></div>
     </div>
@@ -193,9 +165,9 @@
 
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_sabado', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_key_shield', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_auth_sabado')) {
+    if(localStorage.getItem('jtp_auth_key_shield')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
@@ -236,11 +208,10 @@
         document.getElementById('t-img').value = p.imagenUrl;
         document.getElementById('t-playlist').value = p.playlist || "";
         document.getElementById('admin-panel').style.display = 'block';
-        document.getElementById('admin-label').innerText = "EDITANDO PROGRAMA";
         window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
-    window.borrarDoc = async (id) => { if(confirm("¿Borrar definitivamente?")) await deleteDoc(doc(db, "radio_programas", id)); };
+    window.borrarDoc = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "radio_programas", id)); };
 
     onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => {
         programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
@@ -264,7 +235,7 @@
                     <span class="program-tag" style="color:var(--gold); font-size:9px; font-weight:900;">${p.programa}</span>
                     <h3 class="episode-title">${p.titulo}</h3>
                     <button class="btn-ver-playlist" onclick="window.togglePlaylist('${p.id}')">📋 VER PROGRAMACIÓN MUSICAL</button>
-                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Detalles musicales pronto."}</div>
+                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Próximamente detalles."}</div>
                     ${isAdmin ? `<div class="dj-actions">
                         <button class="btn-dj-edit" onclick="prepararEdicion('${p.id}')">🖋️ EDITAR</button>
                         <button class="btn-dj-del" onclick="borrarDoc('${p.id}')">🗑️ BORRAR</button>
