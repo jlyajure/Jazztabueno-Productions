@@ -11,39 +11,33 @@
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 
     <style>
-        /* 🛡️ BÓVEDA DE DISEÑO (Prohibido alterar) */
+        /* 🛡️ BÓVEDA DE DISEÑO BLOQUEADA */
         :root { --gold: #a68a44; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         html, body { margin: 0; background: var(--bg); color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-y: auto !important; }
         
-        /* LOGIN */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
-        .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; }
+        .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
         .btn-gold-tico { width: 100% !important; background: var(--gold) !important; color: black !important; border: none !important; padding: 18px !important; border-radius: 50px !important; font-weight: 800 !important; text-transform: uppercase !important; cursor: pointer !important; }
 
         header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; line-height: 1.2; }
-        
-        /* BOTÓN DE SALIR BLINDADO */
         .btn-salir-premium { background: transparent !important; border: 2px solid var(--gold) !important; color: var(--gold) !important; padding: 7px 15px !important; border-radius: 8px !important; font-size: 10px !important; font-weight: 900 !important; text-transform: uppercase !important; cursor: pointer !important; }
 
         .container { max-width: 450px; margin: auto; padding: 15px; padding-bottom: 300px; }
 
-        /* CANALES */
         .channels-container { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: 5px; margin-bottom: 25px; padding: 10px 0; }
         .channel-item { display: flex; flex-direction: column; align-items: center; text-align: center; opacity: 0.9; cursor: pointer; }
         .channel-logo { width: 44px; height: 44px; border-radius: 12px; border: 2.5px solid #222; margin-bottom: 6px; background: #000; object-fit: contain; }
         .active .channel-logo { border-color: var(--gold); }
-        .channel-name { font-size: 6px; color: #ffffff; font-weight: 800; text-transform: uppercase; line-height: 1.1; }
+        .channel-name { font-size: 6px; color: #ffffff; font-weight: 800; text-transform: uppercase; line-height: 1.1; width: 100%; }
 
-        /* TARJETAS Y PLAY/PAUSA BLINDADOS */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #1a1a1a; overflow: hidden; transition: 0.3s; }
         .episode-card.is-playing { border-color: var(--gold); }
         .cover-art { width: 100%; height: 180px !important; background-size: cover; background-position: center; position: relative; border-bottom: 1.5px solid var(--gold); }
         .cover-overlay { position: absolute; inset: 0; display: flex !important; align-items: center !important; justify-content: center !important; }
-        
-        .btn-play-card { background-color: var(--gold) !important; border: none !important; width: 55px !important; height: 55px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; padding: 0; }
+        .btn-play-card { background-color: var(--gold) !important; border: none !important; width: 55px !important; height: 55px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer; }
         .btn-play-card svg { width: 28px !important; height: 28px !important; fill: black !important; }
 
         .episode-info { padding: 20px; }
@@ -51,7 +45,6 @@
         .btn-ver-playlist { background: #1a1a1a !important; border: 1.5px solid #333 !important; color: #ffffff !important; padding: 12px !important; border-radius: 12px !important; font-size: 11px !important; font-weight: 800 !important; cursor: pointer !important; width: 100% !important; text-transform: uppercase !important; }
         .playlist-box { display: none; margin-top: 15px; padding: 20px; background: #080808; border-radius: 15px; border: 1px solid #222; font-size: 14px; color: #ffffff; line-height: 1.8; white-space: pre-wrap; }
 
-        /* REPRODUCTOR Y TRANSMISIÓN BLINDADOS */
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 3px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
         .p-vinyl { width: 55px; height: 55px; border-radius: 50%; border: 2.5px solid var(--gold); background-size: cover; animation: rotateVinyl 4s linear infinite; animation-play-state: paused; }
         .playing .p-vinyl { animation-play-state: running; }
@@ -94,9 +87,9 @@
                 <option value="SALSA BRAVA">SALSA BRAVA</option>
                 <option value="OLD SCHOOL RADIO">OLD SCHOOL RADIO</option>
             </select>
-            <input type="text" id="t-url" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL Audio">
-            <input type="text" id="t-img" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL Portada">
-            <textarea id="t-playlist" style="width:100%; height:120px; background:#000; color:white; border:1px solid var(--gold); border-radius:10px; padding:10px; margin-bottom:15px;" placeholder="Playlist..."></textarea>
+            <input type="text" id="t-url" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL MP3">
+            <input type="text" id="t-img" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL Imagen">
+            <textarea id="t-playlist" style="width:100%; height:120px; background:#000; color:white; border:1px solid var(--gold); border-radius:10px; padding:10px; margin-bottom:15px;" placeholder="Lista..."></textarea>
             <div style="display:flex; gap:10px;"><button id="btn-save" style="flex:2; background:var(--gold); border:none; padding:15px; border-radius:12px; font-weight:800; cursor:pointer;">💾 GUARDAR</button><button onclick="window.cancelarEdicion()" style="flex:1; background:transparent; border:1px solid #444; color:#888; border-radius:12px; cursor:pointer;">❌</button></div>
         </div>
 
@@ -120,12 +113,8 @@
         <button onclick="window.cerrarPlayer()" style="background:none; border:none; color:#666; font-size:28px;">×</button>
     </div>
     <input type="range" id="seek-bar" value="0" min="0" step="1" style="width:100%;">
-    
     <div class="player-tools">
-        <div class="tool-box">
-            <google-cast-launcher></google-cast-launcher>
-            <span style="color:var(--gold);">Google TV</span>
-        </div>
+        <div class="tool-box"><google-cast-launcher></google-cast-launcher><span style="color:var(--gold);">Google TV</span></div>
         <button onclick="window.cambiarVelocidad()" id="btn-speed" class="tool-box">1.0x</button>
         <button onclick="window.toggleMute()" id="btn-mute" class="tool-box">🔊 VOL</button>
     </div>
@@ -138,42 +127,33 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     let programas = []; let idActual = null; let filtroActivo = 'Todo'; let isAdmin = false;
-    let currentAudioUrl = ""; let currentTitle = ""; let currentCover = "";
-    let lastTvTime = 0;
+    let currentAudioUrl = ""; let currentTitle = ""; let currentCover = ""; let lastTvTime = 0;
 
     const playSVG = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
     const pauseSVG = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
 
-    // 🛡️ LOGICA CAST RESTAURADA (V7.8 + SYNC)
     window['__onGCastApiAvailable'] = function(isAvailable) {
       if (isAvailable) {
         const castContext = cast.framework.CastContext.getInstance();
-        castContext.setOptions({
-          receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-          autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
-        });
+        castContext.setOptions({ receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID, autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED });
         const remotePlayer = new cast.framework.RemotePlayer();
         const remotePlayerController = new cast.framework.RemotePlayerController(remotePlayer);
-        remotePlayerController.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => {
-            lastTvTime = remotePlayer.currentTime;
-        });
+        remotePlayerController.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, () => { lastTvTime = remotePlayer.currentTime; });
         castContext.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (event) => {
             if (event.sessionState === cast.framework.SessionState.SESSION_STARTED) {
                 media.pause();
                 const session = castContext.getCurrentSession();
                 const mediaInfo = new chrome.cast.media.MediaInfo(currentAudioUrl, 'audio/mp3');
                 const metadata = new chrome.cast.media.MusicTrackMediaMetadata();
-                metadata.title = currentTitle;
-                metadata.artist = "Jazztabueno Productions";
+                metadata.title = currentTitle; metadata.artist = "Jazztabueno Productions";
                 metadata.images = [new chrome.cast.Image(currentCover)];
                 mediaInfo.metadata = metadata;
                 const request = new chrome.cast.media.LoadRequest(mediaInfo);
-                request.currentTime = media.currentTime;
-                session.loadMedia(request);
+                request.currentTime = media.currentTime; session.loadMedia(request);
             }
             if (event.sessionState === cast.framework.SessionState.SESSION_ENDED) {
                 if (lastTvTime > 0) { media.currentTime = lastTvTime; }
-                setTimeout(() => { media.play(); render(); }, 300);
+                setTimeout(() => { media.play().catch(e => {}); render(); }, 300);
             }
         });
       }
@@ -181,9 +161,9 @@
 
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_v8_auth', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_v81_auth', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_v8_auth')) {
+    if(localStorage.getItem('jtp_v81_auth')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
@@ -202,12 +182,9 @@
     document.getElementById('btn-save').onclick = async () => {
         const id = document.getElementById('edit-id').value;
         const datos = {
-            titulo: document.getElementById('t-titulo').value,
-            programa: document.getElementById('t-programa').value,
-            mp3Url: document.getElementById('t-url').value,
-            imagenUrl: document.getElementById('t-img').value || "logo.png",
-            playlist: document.getElementById('t-playlist').value,
-            fecha: new Date().getTime()
+            titulo: document.getElementById('t-titulo').value, programa: document.getElementById('t-programa').value,
+            mp3Url: document.getElementById('t-url').value, imagenUrl: document.getElementById('t-img').value || "logo.png",
+            playlist: document.getElementById('t-playlist').value, fecha: new Date().getTime()
         };
         if(id) await updateDoc(doc(db, "radio_programas", id), datos);
         else await addDoc(collection(db, "radio_programas"), datos);
@@ -222,32 +199,23 @@
 
     window.prepararEdicion = (id) => {
         const p = programas.find(x => x.id === id);
-        document.getElementById('edit-id').value = p.id;
-        document.getElementById('t-titulo').value = p.titulo;
-        document.getElementById('t-programa').value = p.programa;
-        document.getElementById('t-url').value = p.mp3Url;
-        document.getElementById('t-img').value = p.imagenUrl;
-        document.getElementById('t-playlist').value = p.playlist || "";
-        document.getElementById('admin-panel').style.display = 'block';
-        window.scrollTo({top: 0, behavior: 'smooth'});
+        document.getElementById('edit-id').value = p.id; document.getElementById('t-titulo').value = p.titulo;
+        document.getElementById('t-programa').value = p.programa; document.getElementById('t-url').value = p.mp3Url;
+        document.getElementById('t-img').value = p.imagenUrl; document.getElementById('t-playlist').value = p.playlist || "";
+        document.getElementById('admin-panel').style.display = 'block'; window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
     function render() {
         const feed = document.getElementById('radio-feed'); if(!feed) return;
         feed.innerHTML = "";
-        
-        // 🛡️ REGLA DE STUDIO 79 RESTAURADA (Búsqueda por Raíz)
         const lista = programas.filter(p => {
             if (filtroActivo === 'Todo') return true;
             if (!p.programa) return false;
             const dbVal = p.programa.toUpperCase().trim();
             const btnVal = filtroActivo.toUpperCase().trim();
-            
-            // Si el botón es STUDIO 79, rescatamos STUDIO
             if (btnVal.includes("STUDIO")) return dbVal.includes("STUDIO");
             return dbVal.includes(btnVal.split(' ')[0]);
         });
-
         lista.forEach(p => {
             const isPlaying = idActual === p.id && !media.paused;
             const div = document.createElement('div');
@@ -258,7 +226,7 @@
                     <span style="color:var(--gold); font-size:9px; font-weight:900; text-transform:uppercase;">${p.programa}</span>
                     <h3 class="episode-title">${p.titulo}</h3>
                     <button class="btn-ver-playlist" onclick="window.togglePlaylist('${p.id}')">📋 VER PROGRAMACIÓN</button>
-                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Próximamente detalles."}</div>
+                    <div id="list-${p.id}" class="playlist-box">${p.playlist || "Próximamente."}</div>
                     ${isAdmin ? `<div class="dj-actions" style="display:flex; gap:10px; margin-top:20px; border-top:1px solid #222; padding-top:20px;">
                         <button class="btn-dj-edit" onclick="prepararEdicion('${p.id}')" style="background:transparent; border:1.5px solid var(--gold); color:var(--gold); flex:1; padding:10px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">🖋️ EDITAR</button>
                         <button class="btn-dj-del" onclick="borrarDoc('${p.id}')" style="background:transparent; border:1.5px solid #ff4444; color:#ff4444; flex:1; padding:10px; border-radius:10px; font-size:9px; font-weight:800; cursor:pointer;">🗑️ BORRAR</button>
@@ -271,13 +239,7 @@
 
     window.gestionarReproduccion = (id, url, tit, img) => {
         if(idActual === id) { window.togglePlay(); }
-        else { 
-            idActual = id; currentAudioUrl = url; currentTitle = tit; currentCover = img;
-            media.src = url; media.play(); 
-            document.getElementById('p-title').innerText = tit; 
-            document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`; 
-            document.getElementById('global-player').style.display = 'block';
-        }
+        else { idActual = id; currentAudioUrl = url; currentTitle = tit; currentCover = img; media.src = url; media.play(); document.getElementById('p-title').innerText = tit; document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`; document.getElementById('global-player').style.display = 'block'; }
         render();
     };
 
@@ -296,10 +258,7 @@
         else document.getElementById('global-player').classList.remove('playing');
     }
 
-    media.ontimeupdate = () => { 
-        seekBar.value = media.currentTime; 
-        document.getElementById('p-time').innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration);
-    };
+    media.ontimeupdate = () => { seekBar.value = media.currentTime; document.getElementById('p-time').innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration); };
     media.onloadedmetadata = () => { seekBar.max = media.duration; };
     seekBar.oninput = () => { media.currentTime = seekBar.value; };
     function formatTime(s) { if(isNaN(s)) return "00:00"; const m=Math.floor(s/60), sec=Math.floor(s%60); return (m<10?"0":"")+m+":"+(sec<10?"0":"")+sec; }
