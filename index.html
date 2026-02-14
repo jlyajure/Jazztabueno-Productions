@@ -12,12 +12,11 @@
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 
     <style>
-        /* 🛡️ BÓVEDA DE DISEÑO JTP */
         :root { --gold: #a68a44; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         html, body { margin: 0; background: var(--bg); color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-y: auto !important; }
         
-        /* LOGIN PREMIUM */
+        /* LOGIN PREMIUM BLINDADO */
         #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
         .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; }
@@ -27,7 +26,6 @@
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; line-height: 1.2; }
         .btn-salir-premium { background: transparent; border: 2.5px solid var(--gold); color: var(--gold); padding: 7px 15px; border-radius: 8px; font-size: 10px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
 
-        /* CONTENEDOR CENTRAL (Anti-Gigante) */
         .container { max-width: 450px; margin: auto; padding: 15px; padding-bottom: 300px; }
 
         /* CANALES */
@@ -37,15 +35,14 @@
         .active .channel-logo { border-color: var(--gold); }
         .channel-name { font-size: 6px; color: #ffffff; font-weight: 800; text-transform: uppercase; line-height: 1.1; }
 
-        /* TARJETAS */
+        /* TARJETAS CON MARCO DE GALA */
         .episode-card { background: var(--card); border-radius: 20px; margin-bottom: 30px; border: 1px solid #1a1a1a; overflow: hidden; transition: 0.3s; }
         .episode-card.is-playing { border-color: var(--gold); }
         .cover-art { width: 100%; height: 180px !important; background-size: cover; background-position: center; position: relative; border-bottom: 1.5px solid var(--gold); }
         .cover-overlay { position: absolute; inset: 0; display: flex !important; align-items: center !important; justify-content: center !important; }
-        .btn-play-card { background-color: var(--gold) !important; border: none !important; width: 55px !important; height: 55px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer; }
+        .btn-play-card { background-color: var(--gold) !important; border: none !important; width: 55px !important; height: 55px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer; padding: 0; }
         .btn-play-card svg { width: 28px; height: 28px; fill: black; }
 
-        /* BOTONES RESTAURADOS */
         .episode-info { padding: 20px; }
         .episode-title { margin: 8px 0; font-size: 19px; font-weight: 800; color: #ffffff; }
         .btn-ver-playlist { background: #1a1a1a !important; border: 1.5px solid #333 !important; color: #ffffff !important; padding: 12px !important; border-radius: 12px !important; font-size: 11px !important; font-weight: 800 !important; cursor: pointer !important; width: 100% !important; text-transform: uppercase !important; }
@@ -62,7 +59,7 @@
         #p-play-btn svg { width: 38px; height: 38px; fill: var(--gold); }
         @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* HERRAMIENTAS DEL REPRODUCTOR */
+        /* HERRAMIENTAS GOOGLE TV */
         .player-tools { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 15px; margin-top: 12px; gap: 10px; }
         .tool-box { flex: 1; background: #111; border: 1px solid #333; color: #fff; padding: 12px 5px; border-radius: 12px; font-size: 9px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; }
         google-cast-launcher { width: 20px; height: 20px; --disconnected-color: var(--gold); }
@@ -119,7 +116,7 @@
     <audio id="main-media" crossorigin="anonymous"></audio>
     <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
         <div id="p-vinyl" class="p-vinyl" style="background-image: url('logo.png');"></div>
-        <div style="flex:1; overflow:hidden;"><h4 id="p-title" style="margin:0; font-size:15px; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:800;">...</h4><div id="p-time" style="font-size:12px; color:var(--gold); font-weight:900;">00:00 / 00:00</div></div>
+        <div style="flex:1; overflow:hidden;"><h4 id="p-title" style="margin:0; font-size:15px; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:800;">...</h4><div id="p-time" style="font-size:12px; color:var(--gold); font-weight:900; margin-top:3px;">00:00 / 00:00</div></div>
         <button onclick="window.togglePlay()" id="p-play-btn"></button>
         <button onclick="window.cerrarPlayer()" style="background:none; border:none; color:#666; font-size:28px;">×</button>
     </div>
@@ -142,24 +139,40 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     let programas = []; let idActual = null; let filtroActivo = 'Todo'; let isAdmin = false;
+    let currentAudioUrl = ""; let currentTitle = "";
 
     const playSVG = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
     const pauseSVG = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
 
+    // 🛡️ CEREBRO DE TRANSMISIÓN: Envía la música a la TV automáticamente
     window['__onGCastApiAvailable'] = function(isAvailable) {
       if (isAvailable) {
-        cast.framework.CastContext.getInstance().setOptions({
+        const castContext = cast.framework.CastContext.getInstance();
+        castContext.setOptions({
           receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
           autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+        });
+
+        // Escucha cuando la TV se conecta para enviar el audio
+        castContext.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, (event) => {
+            if (event.sessionState === cast.framework.SessionState.SESSION_STARTED) {
+                const session = castContext.getCurrentSession();
+                const mediaInfo = new chrome.cast.media.MediaInfo(currentAudioUrl, 'audio/mp3');
+                const metadata = new chrome.cast.media.MusicTrackMediaMetadata();
+                metadata.title = currentTitle;
+                mediaInfo.metadata = metadata;
+                const request = new chrome.cast.media.LoadRequest(mediaInfo);
+                session.loadMedia(request);
+            }
         });
       }
     };
 
     window.checkLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth_v72', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_v73_final', 'true'); location.reload(); } else { alert("Clave Incorrecta"); }
     };
-    if(localStorage.getItem('jtp_auth_v72')) {
+    if(localStorage.getItem('jtp_v73_final')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         isAdmin = true;
@@ -230,7 +243,13 @@
 
     window.gestionarReproduccion = (id, url, tit, img) => {
         if(idActual === id) { window.togglePlay(); }
-        else { idActual = id; media.src = url; media.play(); document.getElementById('p-title').innerText = tit; document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`; document.getElementById('global-player').style.display = 'block'; }
+        else { 
+            idActual = id; currentAudioUrl = url; currentTitle = tit;
+            media.src = url; media.play(); 
+            document.getElementById('p-title').innerText = tit; 
+            document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`; 
+            document.getElementById('global-player').style.display = 'block';
+        }
         render();
     };
 
@@ -249,8 +268,6 @@
         else document.getElementById('global-player').classList.remove('playing');
     }
 
-    media.onplay = () => actualizarPlayerStatus();
-    media.onpause = () => actualizarPlayerStatus();
     media.ontimeupdate = () => { 
         seekBar.value = media.currentTime; 
         document.getElementById('p-time').innerText = formatTime(media.currentTime) + " / " + formatTime(media.duration);
