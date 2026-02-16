@@ -20,11 +20,11 @@
         
         .track-card { background: var(--card); border-radius: 12px; margin-bottom: 15px; padding: 15px; display: flex; align-items: center; border: 1px solid #222; }
         .track-img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; margin-right: 15px; border: 1px solid #333; }
-        .track-info { flex: 1; }
-        .track-title { font-size: 16px; font-weight: 700; color: #fff; margin: 0 0 5px 0; }
+        .track-info { flex: 1; overflow: hidden; }
+        .track-title { font-size: 16px; font-weight: 700; color: #fff; margin: 0 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .track-desc { font-size: 13px; color: #888; margin: 0; }
 
-        .btn-play { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-play { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .btn-play svg { width: 20px; height: 20px; fill: #000; }
 
         #player-bar { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 2px solid var(--gold); padding: 15px; display: none; z-index: 1000; }
@@ -43,7 +43,7 @@
 </header>
 
 <div class="container" id="feed">
-    <p style="text-align:center; color:#666;">Sintonizando señal...</p>
+    <p style="text-align:center; color:#666;" id="status">Sintonizando señal...</p>
 </div>
 
 <div id="player-bar">
@@ -73,35 +73,34 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    // 🛡️ Inicialización SEGURA de Analytics (si falla, la app sigue)
-    let analytics;
-    try {
-        analytics = getAnalytics(app);
-        logEvent(analytics, 'session_start');
-    } catch (e) {
-        console.log("Analytics bloqueado por el navegador");
-    }
+    // Analytics opcional para evitar que el bloqueo detenga la app
+    let analytics = null;
+    try { analytics = getAnalytics(app); } catch (e) { }
 
     const audio = document.getElementById('main-audio');
     const pTitle = document.getElementById('p-title');
     const playerBar = document.getElementById('player-bar');
 
-    // Función global para que el botón funcione
     window.playTrack = (url, title) => {
         if(analytics) logEvent(analytics, 'play_program', { program_title: title });
         pTitle.innerText = title;
         audio.src = url;
         playerBar.style.display = 'block';
-        audio.play();
+        audio.play().catch(e => console.log("Error al reproducir"));
     };
 
-    onSnapshot(query(collection(db, "canciones"), orderBy("fecha", "desc")), (snap) => {
+    // CONEXIÓN DIRECTA A LA COLECCIÓN
+    const colRef = collection(db, "canciones");
+    const q = query(colRef, orderBy("fecha", "desc"));
+
+    onSnapshot(q, (snap) => {
         const feed = document.getElementById('feed');
-        feed.innerHTML = "";
-        if(snap.empty) {
-            feed.innerHTML = "<p style='text-align:center;'>No hay programas disponibles.</p>";
+        if (snap.empty) {
+            feed.innerHTML = "<p style='text-align:center; color:#666;'>Buscando programas en la nube...</p>";
             return;
         }
+        
+        feed.innerHTML = "";
         snap.forEach(doc => {
             const data = doc.data();
             const card = document.createElement('div');
@@ -109,8 +108,8 @@
             card.innerHTML = `
                 <img src="${data.imagenUrl || 'logo.png'}" class="track-img">
                 <div class="track-info">
-                    <p class="track-title">${data.titulo}</p>
-                    <p class="track-desc">${data.artista}</p>
+                    <p class="track-title">${data.titulo || 'Sin título'}</p>
+                    <p class="track-desc">${data.artista || 'Jazztabueno'}</p>
                 </div>
                 <button class="btn-play" onclick="playTrack('${data.mp3Url}', '${data.titulo}')">
                     <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -118,8 +117,8 @@
             `;
             feed.appendChild(card);
         });
-    }, (error) => {
-        document.getElementById('feed').innerHTML = "<p style='text-align:center;'>Error de conexión.</p>";
+    }, (err) => {
+        document.getElementById('status').innerText = "Error de señal. Verifica tu conexión.";
     });
 </script>
 </body>
