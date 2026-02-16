@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jazztabueno Productions V3.3</title>
+    <title>Jazztabueno Productions V3.4</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #c5a059; --bg: #030508; --card: #111418; }
+        :root { --gold: #c5a059; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; }
-        body { margin: 0; background: var(--bg); color: #e0e0e0; font-family: 'Source Sans Pro', sans-serif; }
+        body { margin: 0; background: var(--bg); color: #e0e0e0; font-family: 'Source Sans Pro', sans-serif; overflow-x: hidden; }
         
-        /* LOGIN SCREEN - AHORA CON FONDO AZULADO PARA DIFERENCIAR */
-        #login-screen { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; align-items: center; justify-content: center; }
-        .login-card { width: 85%; max-width: 320px; text-align: center; background: #0a0e14; padding: 40px 30px; border-radius: 20px; border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(197, 160, 89, 0.2); }
-        .input-box { width: 100%; padding: 12px; margin: 20px 0 10px 0; background: #000; border: 1px solid #333; color: white; border-radius: 8px; text-align: center; }
+        /* LOGIN */
+        #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: flex; align-items: center; justify-content: center; }
+        .login-card { width: 85%; max-width: 320px; text-align: center; background: #0a0a0a; padding: 40px 30px; border-radius: 20px; border: 2px solid var(--gold); }
+        .input-box { width: 100%; padding: 12px; margin: 20px 0 10px 0; background: #000; border: 1px solid #333; color: white; border-radius: 8px; text-align: center; font-size: 16px; }
         
-        header { background: #000; padding: 20px; text-align: center; border-bottom: 2px solid var(--gold); }
+        header { background: #000; padding: 20px; text-align: center; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 100; }
         .logo-img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--gold); }
         h1 { font-family: 'Playfair Display', serif; color: var(--gold); margin: 10px 0 0 0; font-size: 18px; }
 
@@ -27,7 +27,7 @@
         .track-title { font-size: 15px; font-weight: 700; color: #fff; margin: 0; }
         
         .btn-play { background: var(--gold); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        #player-bar { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 2px solid var(--gold); padding: 15px; display: none; }
+        #player-bar { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 2px solid var(--gold); padding: 15px; display: none; z-index: 1000; }
         audio { width: 100%; margin-top: 10px; filter: invert(100%); }
     </style>
 </head>
@@ -35,21 +35,19 @@
 
 <div id="login-screen">
     <div class="login-card">
-        <img src="logo.png" style="width: 50px; margin-bottom: 10px;">
-        <h2 style="color:var(--gold); margin:0; font-size: 16px;">CABINA JAZZ V3.3</h2>
-        <p style="font-size: 10px; color: #666;">Introduce la clave de Director</p>
-        <input type="password" id="passInput" class="input-box" placeholder="Clave">
-        <button onclick="doLogin()" style="width:100%; background:var(--gold); color:black; padding:12px; border:none; border-radius:8px; font-weight:800; cursor:pointer;">ENTRAR A LA APP</button>
+        <h2 style="color:var(--gold); margin:0; font-size: 18px;">CONSOLA JAZZ V3.4</h2>
+        <input type="password" id="passInput" class="input-box" placeholder="Introduce tu clave">
+        <button onclick="doLogin()" style="width:100%; background:var(--gold); color:black; padding:12px; border:none; border-radius:8px; font-weight:800; cursor:pointer;">ENTRAR</button>
     </div>
 </div>
 
 <header>
-    <img src="logo.png" class="logo-img">
+    <img src="logo.png" class="logo-img" id="admin-trigger">
     <h1>JAZZTABUENO PRODUCTIONS</h1>
 </header>
 
 <div class="container" id="feed">
-    <p style="text-align:center; color:var(--gold);">Sintonizando programas...</p>
+    <p style="text-align:center; color:var(--gold);">Sintonizando...</p>
 </div>
 
 <div id="player-bar">
@@ -61,7 +59,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { initializeFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { initializeFirestore, collection, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI",
@@ -73,15 +71,21 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    // FORZAMOS LA CONEXION MANUAL PARA EVITAR BLOQUEOS EN VENEZUELA
     const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+
+    let userRole = null; // 'admin' o 'user'
 
     window.doLogin = () => {
         const pass = document.getElementById('passInput').value;
-        if(pass === "jazztabueno2026") {
+        if(pass === "yajuadmin2026") {
+            userRole = 'admin';
             document.getElementById('login-screen').style.display = 'none';
             iniciarApp();
-        } else { alert("Clave incorrecta"); }
+        } else if(pass === "jazz2026") {
+            userRole = 'user';
+            document.getElementById('login-screen').style.display = 'none';
+            iniciarApp();
+        } else { alert("Clave incorrecta. Intenta de nuevo."); }
     };
 
     function iniciarApp() {
@@ -96,19 +100,21 @@
             audio.play();
         };
 
-        // USAMOS UNA CONSULTA SIMPLE SIN ORDERBY POR SI EL CELULAR TIENE LENTITUD
-        onSnapshot(collection(db, "canciones"), (snap) => {
+        window.borrarDoc = async (id) => {
+            if(confirm("¿Seguro que quieres borrar este programa?")) {
+                await deleteDoc(doc(db, "canciones", id));
+            }
+        };
+
+        onSnapshot(query(collection(db, "canciones"), orderBy("fecha", "desc")), (snap) => {
             const feed = document.getElementById('feed');
             if (snap.empty) {
-                feed.innerHTML = "<p style='text-align:center;'>La nube está vacía.</p>";
+                feed.innerHTML = "<p style='text-align:center;'>No hay programas en el aire.</p>";
                 return;
             }
             feed.innerHTML = "";
-            let docs = [];
-            snap.forEach(d => docs.push(d.data()));
-            docs.sort((a,b) => b.fecha - a.fecha);
-            
-            docs.forEach(data => {
+            snap.forEach(d => {
+                const data = d.data();
                 const card = document.createElement('div');
                 card.className = 'track-card';
                 card.innerHTML = `
@@ -120,6 +126,7 @@
                     <button class="btn-play" onclick="playTrack('${data.mp3Url}', '${data.titulo}')">
                         <svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
                     </button>
+                    ${userRole === 'admin' ? `<button onclick="borrarDoc('${d.id}')" style="background:none; border:none; color:red; margin-left:10px; font-size:18px;">🗑️</button>` : ''}
                 `;
                 feed.appendChild(card);
             });
