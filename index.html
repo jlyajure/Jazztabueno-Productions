@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jazztabueno Productions V4.0</title>
+    <title>Jazztabueno Productions V4.1</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -13,7 +13,7 @@
         #login-screen { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; align-items: center; justify-content: center; }
         .login-card { width: 300px; padding: 30px; border: 2px solid var(--gold); border-radius: 20px; background: #0a0a0a; }
         .input-box { width: 100%; padding: 12px; margin: 20px 0; background: #000; border: 1px solid #333; color: white; border-radius: 8px; text-align: center; font-size: 16px; }
-        header { padding: 20px; border-bottom: 2px solid var(--gold); background: #000; position: sticky; top: 0; z-index: 100; }
+        header { padding: 20px; border-bottom: 2px solid var(--gold); background: #000; }
         .logo-img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--gold); }
         .container { max-width: 500px; margin: auto; padding: 20px; padding-bottom: 120px; }
         .track-card { background: var(--card); border-radius: 12px; margin-bottom: 15px; padding: 15px; display: flex; align-items: center; border: 1px solid #222; }
@@ -21,14 +21,16 @@
         .btn-play { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         #player-bar { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 2px solid var(--gold); padding: 15px; display: none; z-index: 1000; }
         audio { width: 100%; filter: invert(100%); margin-top: 10px; }
-        #debug-log { font-size: 10px; color: #444; margin-top: 20px; padding: 10px; border-top: 1px solid #222; }
+        
+        /* RADAR DE ERRORES */
+        #radar { background: #300; color: #ff0; font-size: 11px; padding: 10px; border: 1px solid red; margin: 10px; border-radius: 8px; display: block; text-align: left; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
     <div class="login-card">
-        <h2 style="color:var(--gold); font-size:18px;">CONSOLA V4.0</h2>
+        <h2 style="color:var(--gold); font-size:18px;">CONSOLA V4.1</h2>
         <input type="password" id="passInput" class="input-box" placeholder="Clave">
         <button onclick="doLogin()" style="width:100%; background:var(--gold); padding:12px; border:none; border-radius:8px; font-weight:800; cursor:pointer;">ENTRAR</button>
     </div>
@@ -39,16 +41,16 @@
     <h1 style="color:var(--gold); margin:10px 0 0 0; font-size:18px;">JAZZTABUENO</h1>
 </header>
 
+<div id="radar">📡 Radar: Esperando login...</div>
+
 <div class="container" id="feed">
-    <p id="status-msg">Iniciando antena...</p>
+    <p id="status-msg">Iniciando sistema...</p>
 </div>
 
 <div id="player-bar">
     <p id="p-title" style="color:var(--gold); font-size:12px; margin:0; font-weight:700;"></p>
     <audio id="main-audio" controls controlsList="nodownload"></audio>
 </div>
-
-<div id="debug-log">Log: Esperando acción...</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -63,43 +65,47 @@
       appId: "1:692035727386:web:dfa3e39a481d56368a61a3"
     };
 
-    const log = (msg) => { document.getElementById('debug-log').innerText = "Log: " + msg; };
+    const radar = (msg) => { document.getElementById('radar').innerText = "📡 Radar: " + msg; };
 
     const app = initializeApp(firebaseConfig);
-    const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+    // Configuración especial para redes inestables
+    const db = initializeFirestore(app, { 
+        experimentalForceLongPolling: true,
+        useFetchStreams: false 
+    });
 
     window.doLogin = () => {
         const pass = document.getElementById('passInput').value;
         if(pass === "ticoadmin" || pass === "jazz2026") {
             document.getElementById('login-screen').style.display = 'none';
-            log("Login exitoso. Cargando...");
-            cargarDatos();
+            radar("Conectando con Google...");
+            buscarMusica();
         } else { alert("Clave incorrecta."); }
     };
 
-    async function cargarDatos() {
+    async function buscarMusica() {
         const feed = document.getElementById('feed');
         const status = document.getElementById('status-msg');
-        status.innerText = "Buscando programas en la nube...";
-
+        
         try {
-            log("Pidiendo documentos a la colección 'canciones'...");
-            const querySnapshot = await getDocs(collection(db, "canciones"));
+            radar("Pidiendo programas a la nube...");
+            const snap = await getDocs(collection(db, "canciones"));
             
-            log("Respuesta recibida. Total: " + querySnapshot.size);
+            radar("¡Respuesta recibida! Documentos encontrados: " + snap.size);
 
-            if (querySnapshot.empty) {
-                status.innerText = "La antena no recibe nada (0 programas).";
+            if (snap.empty) {
+                status.innerText = "La nube respondió vacía (0 programas).";
+                radar("Error: Colección 'canciones' no tiene datos.");
                 return;
             }
 
             feed.innerHTML = "";
             let programas = [];
-            querySnapshot.forEach(doc => {
-                programas.push({ id: doc.id, ...doc.data() });
+            snap.forEach(d => {
+                programas.push({ id: d.id, ...d.data() });
             });
 
-            // Ordenamos por fecha manualmente
+            // Ordenar por fecha
             programas.sort((a, b) => (b.fecha || 0) - (a.fecha || 0));
 
             programas.forEach(data => {
@@ -115,11 +121,11 @@
                 `;
                 feed.appendChild(div);
             });
-            log("Carga completa.");
+            radar("✅ Todo sintonizado perfectamente.");
 
-        } catch (error) {
-            log("ERROR: " + error.message);
-            status.innerText = "Error de señal. Revisa el Log abajo.";
+        } catch (e) {
+            radar("🚨 FALLA: " + e.message);
+            status.innerText = "Error de señal.";
         }
     }
 
