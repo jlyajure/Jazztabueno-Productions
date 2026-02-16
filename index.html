@@ -9,42 +9,78 @@
     <style>
         :root { --gold: #c5a059; --bg: #0a0a0a; --card: #161616; }
         * { box-sizing: border-box; }
-        body { margin: 0; background: var(--bg); color: #e0e0e0; font-family: 'Source Sans Pro', sans-serif; }
-        header { background: #000; padding: 20px; text-align: center; border-bottom: 2px solid var(--gold); }
-        .logo-img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--gold); margin-bottom: 10px; }
-        h1 { font-family: 'Playfair Display', serif; color: var(--gold); margin: 0; font-size: 22px; }
+        body { margin: 0; background: var(--bg); color: #e0e0e0; font-family: 'Source Sans Pro', sans-serif; overflow-x: hidden; }
+        
+        /* HEADER CON SENSOR SECRETO */
+        header { background: #000; padding: 20px; text-align: center; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 100; }
+        .logo-img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--gold); cursor: pointer; }
+        h1 { font-family: 'Playfair Display', serif; color: var(--gold); margin: 10px 0 0 0; font-size: 20px; letter-spacing: 1px; }
+
         .container { max-width: 500px; margin: auto; padding: 20px; padding-bottom: 120px; }
+        
+        /* LOGIN SCREEN */
+        #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: none; align-items: center; justify-content: center; }
+        .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 20px; border: 1px solid var(--gold); }
+        .input-box { width: 100%; padding: 12px; margin: 20px 0 10px 0; background: #000; border: 1px solid #333; color: white; border-radius: 8px; }
+        .btn-gold { width: 100%; background: var(--gold); color: black; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; }
+
+        /* ADMIN PANEL */
+        #admin-panel { display: none; background: #111; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--gold); }
+
+        /* TRACK CARDS */
         .track-card { background: var(--card); border-radius: 12px; margin-bottom: 15px; padding: 15px; display: flex; align-items: center; border: 1px solid #222; }
-        .track-img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; margin-right: 15px; }
+        .track-img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; margin-right: 15px; border: 1px solid #333; }
         .track-info { flex: 1; overflow: hidden; }
-        .track-title { font-size: 16px; font-weight: 700; color: #fff; margin: 0; }
-        .btn-play { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .track-title { font-size: 16px; font-weight: 700; color: #fff; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-desc { font-size: 13px; color: #888; margin: 5px 0 0 0; }
+        
+        .btn-play { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .btn-play svg { width: 20px; height: 20px; fill: #000; }
-        #player-bar { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 2px solid var(--gold); padding: 15px; display: none; }
-        .player-title { font-size: 14px; font-weight: 700; color: var(--gold); margin: 0; }
+
+        #player-bar { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 2px solid var(--gold); padding: 15px; display: none; z-index: 1000; }
         audio { width: 100%; margin-top: 10px; filter: invert(100%); }
-        #debug-console { font-size: 10px; color: #555; text-align: center; margin-top: 20px; padding: 10px; }
     </style>
 </head>
 <body>
-    <header>
-        <img src="logo.png" class="logo-img">
-        <h1>JAZZTABUENO PRODUCTIONS</h1>
-    </header>
-    <div class="container" id="feed">
-        <p style="text-align:center; color:var(--gold);" id="status">Buscando señal de Jazz...</p>
+
+<div id="login-screen">
+    <div class="login-card">
+        <h2 style="color:var(--gold); margin:0;">CABINA JAZZ</h2>
+        <input type="password" id="passInput" class="input-box" placeholder="Clave de Director">
+        <button onclick="doLogin()" class="btn-gold">ENTRAR</button>
     </div>
-    <div id="player-bar">
-        <div class="player-content">
-            <p id="p-title" class="player-title">Selecciona un programa</p>
-            <audio id="main-audio" controls controlsList="nodownload"></audio>
-        </div>
+</div>
+
+<header>
+    <img src="logo.png" class="logo-img" id="secret-sensor" alt="Jazztabueno Logo">
+    <h1>JAZZTABUENO PRODUCTIONS</h1>
+</header>
+
+<div class="container">
+    <div id="admin-panel">
+        <h3 style="color:var(--gold); text-align:center; font-size:14px;">SUBIR PROGRAMA</h3>
+        <input type="text" id="t-titulo" class="input-box" placeholder="Título del Programa">
+        <input type="text" id="t-artista" class="input-box" placeholder="Fecha / Descripción">
+        <input type="text" id="t-url" class="input-box" placeholder="Link MP3">
+        <input type="text" id="t-img" class="input-box" placeholder="Link Portada (Opcional)">
+        <button id="btn-guardar" class="btn-gold">📻 PUBLICAR</button>
+        <button onclick="location.reload()" style="background:none; border:none; color:red; width:100%; margin-top:10px; cursor:pointer;">Cerrar Panel</button>
     </div>
-    <div id="debug-console">Iniciando sistema...</div>
+    <div id="feed">
+        <p style="text-align:center; color:var(--gold);">Cargando programas...</p>
+    </div>
+</div>
+
+<div id="player-bar">
+    <div style="max-width:500px; margin:auto;">
+        <p id="p-title" style="font-size:14px; color:var(--gold); margin:0; font-weight:700;">Selecciona un programa</p>
+        <audio id="main-audio" controls controlsList="nodownload"></audio>
+    </div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { initializeFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { initializeFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI",
@@ -55,66 +91,90 @@
       appId: "1:692035727386:web:dfa3e39a481d56368a61a3"
     };
 
-    const debug = (msg) => { document.getElementById('debug-console').innerText = msg; };
+    const app = initializeApp(firebaseConfig);
+    const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+    const colName = "canciones"; // Colección de Jazztabueno
 
-    try {
-        const app = initializeApp(firebaseConfig);
-        
-        // 🚀 EL TRUCO MAESTRO: Forzamos el modo de conexión compatible con redes móviles de Venezuela
-        const db = initializeFirestore(app, {
-            experimentalForceLongPolling: true
-        });
+    let modoAdmin = false;
 
-        const audio = document.getElementById('main-audio');
-        const pTitle = document.getElementById('p-title');
-        const playerBar = document.getElementById('player-bar');
+    // SENSOR SECRETO (3 toques al logo)
+    let toques = 0;
+    document.getElementById('secret-sensor').onclick = () => {
+        toques++;
+        if (toques === 3) { toques = 0; document.getElementById('login-screen').style.display = 'flex'; }
+    };
 
-        window.playTrack = (url, title) => {
-            pTitle.innerText = title;
-            audio.src = url;
-            playerBar.style.display = 'block';
-            audio.play();
-        };
+    window.doLogin = () => {
+        if(document.getElementById('passInput').value === "jazztabueno2026") {
+            modoAdmin = true;
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'block';
+            render();
+        } else { alert("Clave Incorrecta"); }
+    };
 
-        debug("Conectando con la base de datos...");
-
-        // Usamos la colección "canciones"
-        onSnapshot(collection(db, "canciones"), (snap) => {
-            const feed = document.getElementById('feed');
-            debug("Respuesta recibida. Documentos: " + snap.size);
-
-            if (snap.empty) {
-                feed.innerHTML = "<p style='text-align:center;'>La nube respondió vacía (0 programas).</p>";
-                return;
-            }
-
-            feed.innerHTML = "";
-            let docs = [];
-            snap.forEach(d => docs.push(d.data()));
-            docs.sort((a,b) => b.fecha - a.fecha);
-            
-            docs.forEach(data => {
-                const card = document.createElement('div');
-                card.className = 'track-card';
-                card.innerHTML = `
-                    <img src="${data.imagenUrl || 'logo.png'}" class="track-img">
-                    <div class="track-info">
-                        <p class="track-title">${data.titulo}</p>
-                        <p class="track-desc">${data.artista}</p>
-                    </div>
-                    <button class="btn-play" onclick="playTrack('${data.mp3Url}', '${data.titulo}')">
-                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
-                `;
-                feed.appendChild(card);
+    // SUBIR PROGRAMA
+    document.getElementById('btn-guardar').onclick = async () => {
+        const btn = document.getElementById('btn-guardar');
+        btn.disabled = true;
+        try {
+            await addDoc(collection(db, colName), {
+                titulo: document.getElementById('t-titulo').value,
+                artista: document.getElementById('t-artista').value,
+                mp3Url: document.getElementById('t-url').value,
+                imagenUrl: document.getElementById('t-img').value || "logo.png",
+                fecha: new Date().getTime()
             });
-        }, (err) => {
-            debug("Error de Firebase: " + err.message);
-            document.getElementById('status').innerText = "Error de conexión.";
+            alert("¡Programa publicado!");
+            document.getElementById('t-titulo').value = "";
+            document.getElementById('t-artista').value = "";
+            document.getElementById('t-url').value = "";
+        } catch(e) { alert("Error al subir"); }
+        btn.disabled = false;
+    };
+
+    window.borrar = async (id) => { if(confirm("¿Borrar programa?")) await deleteDoc(doc(db, colName, id)); };
+
+    const audio = document.getElementById('main-audio');
+    const pTitle = document.getElementById('p-title');
+    const playerBar = document.getElementById('player-bar');
+
+    window.playTrack = (url, title) => {
+        pTitle.innerText = title;
+        audio.src = url;
+        playerBar.style.display = 'block';
+        audio.play();
+    };
+
+    // ESCUCHAR LA BASE DE DATOS
+    onSnapshot(query(collection(db, colName), orderBy("fecha", "desc")), (snap) => {
+        const feed = document.getElementById('feed');
+        if (snap.empty) {
+            feed.innerHTML = "<p style='text-align:center;'>No hay programas en la nube.</p>";
+            return;
+        }
+        feed.innerHTML = "";
+        snap.forEach(d => {
+            const data = d.data();
+            const id = d.id;
+            const card = document.createElement('div');
+            card.className = 'track-card';
+            card.innerHTML = `
+                <img src="${data.imagenUrl || 'logo.png'}" class="track-img">
+                <div class="track-info">
+                    <p class="track-title">${data.titulo}</p>
+                    <p class="track-desc">${data.artista}</p>
+                </div>
+                <button class="btn-play" onclick="playTrack('${data.mp3Url}', '${data.titulo}')">
+                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                ${modoAdmin ? `<button onclick="borrar('${id}')" style="margin-left:10px; color:red; background:none; border:none; font-size:18px;">🗑️</button>` : ''}
+            `;
+            feed.appendChild(card);
         });
-    } catch (e) {
-        debug("Error crítico: " + e.message);
-    }
+    });
+
+    function render() { /* Re-renderizado automático por onSnapshot */ }
 </script>
 </body>
 </html>
