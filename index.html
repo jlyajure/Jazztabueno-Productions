@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jazztabueno Productions V3.5</title>
+    <title>Jazztabueno Productions V3.6</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -21,7 +21,7 @@
 
         .container { max-width: 500px; margin: auto; padding: 20px; padding-bottom: 120px; }
         .track-card { background: var(--card); border-radius: 12px; margin-bottom: 15px; padding: 15px; display: flex; align-items: center; border: 1px solid #222; }
-        .track-img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; margin-right: 15px; }
+        .track-img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; margin-right: 15px; border: 1px solid #333; }
         .track-info { flex: 1; overflow: hidden; }
         .track-title { font-size: 15px; font-weight: 700; color: #fff; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
@@ -34,9 +34,9 @@
 
 <div id="login-screen">
     <div class="login-card">
-        <h2 style="color:var(--gold); margin:0; font-size: 18px;">CONSOLA JAZZ V3.5</h2>
-        <input type="password" id="passInput" class="input-box" placeholder="Introduce tu clave">
-        <button onclick="doLogin()" style="width:100%; background:var(--gold); color:black; padding:12px; border:none; border-radius:8px; font-weight:800; cursor:pointer;">ENTRAR</button>
+        <h2 style="color:var(--gold); margin:0; font-size: 18px;">CONSOLA JAZZ V3.6</h2>
+        <input type="password" id="passInput" class="input-box" placeholder="Clave de Director">
+        <button onclick="doLogin()" style="width:100%; background:var(--gold); color:black; padding:12px; border:none; border-radius:8px; font-weight:800; cursor:pointer;">ENTRAR A CABINA</button>
     </div>
 </div>
 
@@ -46,7 +46,7 @@
 </header>
 
 <div class="container" id="feed">
-    <p style="text-align:center; color:var(--gold);">Sintonizando...</p>
+    <p style="text-align:center; color:var(--gold);">Sintonizando programas...</p>
 </div>
 
 <div id="player-bar">
@@ -58,7 +58,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { initializeFirestore, collection, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { initializeFirestore, collection, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI",
@@ -70,13 +70,13 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    // 🚀 MODO DE FUERZA BRUTA PARA VENEZUELA ACTIVADO
     const db = initializeFirestore(app, { experimentalForceLongPolling: true });
 
     let userRole = null;
 
     window.doLogin = () => {
         const pass = document.getElementById('passInput').value;
-        // USAMOS TUS CLAVES REALES
         if(pass === "ticoadmin") {
             userRole = 'admin';
             document.getElementById('login-screen').style.display = 'none';
@@ -85,7 +85,7 @@
             userRole = 'user';
             document.getElementById('login-screen').style.display = 'none';
             iniciarApp();
-        } else { alert("Clave incorrecta. Intenta de nuevo."); }
+        } else { alert("Clave incorrecta."); }
     };
 
     function iniciarApp() {
@@ -101,32 +101,39 @@
         };
 
         window.borrarDoc = async (id) => {
-            if(confirm("¿Borrar este programa?")) {
-                await deleteDoc(doc(db, "canciones", id));
-            }
+            if(confirm("¿Borrar programa?")) await deleteDoc(doc(db, "canciones", id));
         };
 
-        onSnapshot(query(collection(db, "canciones"), orderBy("fecha", "desc")), (snap) => {
+        // 🚀 CAMBIO CLAVE: Pedimos los datos sin filtros para que el celular no se pierda
+        onSnapshot(collection(db, "canciones"), (snap) => {
             const feed = document.getElementById('feed');
             if (snap.empty) {
-                feed.innerHTML = "<p style='text-align:center;'>No hay programas en el aire.</p>";
+                feed.innerHTML = "<p style='text-align:center;'>La antena no recibe señal (0 programas).</p>";
                 return;
             }
+            
             feed.innerHTML = "";
+            let programas = [];
             snap.forEach(d => {
-                const data = d.data();
+                programas.push({ id: d.id, ...d.data() });
+            });
+
+            // 🚀 ORDENAMOS AQUÍ MISMO (Los más recientes primero)
+            programas.sort((a, b) => (b.fecha || 0) - (a.fecha || 0));
+
+            programas.forEach(data => {
                 const card = document.createElement('div');
                 card.className = 'track-card';
                 card.innerHTML = `
                     <img src="${data.imagenUrl || 'logo.png'}" class="track-img">
                     <div class="track-info">
                         <p class="track-title">${data.titulo}</p>
-                        <p style="font-size:12px; color:#888; margin:5px 0 0 0;">${data.artista}</p>
+                        <p style="font-size:12px; color:#888; margin:5px 0 0 0;">${data.artista || 'Jazztabueno'}</p>
                     </div>
                     <button class="btn-play" onclick="playTrack('${data.mp3Url}', '${data.titulo}')">
                         <svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
                     </button>
-                    ${userRole === 'admin' ? `<button onclick="borrarDoc('${d.id}')" style="background:none; border:none; color:red; margin-left:10px; font-size:18px;">🗑️</button>` : ''}
+                    ${userRole === 'admin' ? `<button onclick="borrarDoc('${data.id}')" style="background:none; border:none; color:red; margin-left:10px; font-size:18px; cursor:pointer;">🗑️</button>` : ''}
                 `;
                 feed.appendChild(card);
             });
