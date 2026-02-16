@@ -8,24 +8,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #c5a059; --bg: #0a0a0a; --card: #161616; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; }
         body { margin: 0; background: var(--bg); color: #e0e0e0; font-family: 'Source Sans Pro', sans-serif; }
-        header { background: #000; padding: 20px; text-align: center; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 100; }
+        header { background: #000; padding: 20px; text-align: center; border-bottom: 2px solid var(--gold); }
         .logo-img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--gold); margin-bottom: 10px; }
-        h1 { font-family: 'Playfair Display', serif; color: var(--gold); margin: 0; font-size: 22px; letter-spacing: 1px; }
+        h1 { font-family: 'Playfair Display', serif; color: var(--gold); margin: 0; font-size: 22px; }
         .container { max-width: 500px; margin: auto; padding: 20px; padding-bottom: 120px; }
         .track-card { background: var(--card); border-radius: 12px; margin-bottom: 15px; padding: 15px; display: flex; align-items: center; border: 1px solid #222; }
-        .track-img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; margin-right: 15px; border: 1px solid #333; }
+        .track-img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; margin-right: 15px; }
         .track-info { flex: 1; overflow: hidden; }
-        .track-title { font-size: 16px; font-weight: 700; color: #fff; margin: 0 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .track-desc { font-size: 13px; color: #888; margin: 0; }
-        .btn-play { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .track-title { font-size: 16px; font-weight: 700; color: #fff; margin: 0; }
+        .btn-play { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-play svg { width: 20px; height: 20px; fill: #000; }
-        #player-bar { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 2px solid var(--gold); padding: 15px; display: none; z-index: 1000; }
-        .player-content { max-width: 500px; margin: auto; display: flex; align-items: center; gap: 15px; }
-        .player-info { flex: 1; overflow: hidden; }
-        .player-title { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; color: var(--gold); }
-        audio { width: 100%; height: 35px; margin-top: 10px; filter: invert(100%) hue-rotate(180deg) brightness(1.5); }
+        #player-bar { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 2px solid var(--gold); padding: 15px; display: none; }
+        .player-title { font-size: 14px; font-weight: 700; color: var(--gold); margin: 0; }
+        audio { width: 100%; margin-top: 10px; filter: invert(100%); }
+        #debug-console { font-size: 10px; color: #555; text-align: center; margin-top: 20px; padding: 10px; }
     </style>
 </head>
 <body>
@@ -34,21 +32,19 @@
         <h1>JAZZTABUENO PRODUCTIONS</h1>
     </header>
     <div class="container" id="feed">
-        <p style="text-align:center; color:var(--gold);" id="status">Sintonizando Jazz...</p>
+        <p style="text-align:center; color:var(--gold);" id="status">Buscando señal de Jazz...</p>
     </div>
     <div id="player-bar">
         <div class="player-content">
-            <div class="player-info">
-                <p id="p-title" class="player-title">Selecciona un programa</p>
-                <audio id="main-audio" controls controlsList="nodownload"></audio>
-            </div>
+            <p id="p-title" class="player-title">Selecciona un programa</p>
+            <audio id="main-audio" controls controlsList="nodownload"></audio>
         </div>
     </div>
+    <div id="debug-console">Iniciando sistema...</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+    import { initializeFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI",
@@ -56,57 +52,69 @@
       projectId: "familia-yajure-app",
       storageBucket: "familia-yajure-app.firebasestorage.app",
       messagingSenderId: "692035727386",
-      appId: "1:692035727386:web:dfa3e39a481d56368a61a3",
-      measurementId: "G-GDBL4HPE79"
+      appId: "1:692035727386:web:dfa3e39a481d56368a61a3"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    let analytics; try { analytics = getAnalytics(app); } catch(e) {}
+    const debug = (msg) => { document.getElementById('debug-console').innerText = msg; };
 
-    const audio = document.getElementById('main-audio');
-    const pTitle = document.getElementById('p-title');
-    const playerBar = document.getElementById('player-bar');
-
-    window.playTrack = (url, title) => {
-        if(analytics) logEvent(analytics, 'play_program', { program_title: title });
-        pTitle.innerText = title;
-        audio.src = url;
-        playerBar.style.display = 'block';
-        audio.play();
-    };
-
-    // CONEXIÓN SÚPER BÁSICA (Quitamos el orderBy por un momento para probar)
-    onSnapshot(collection(db, "canciones"), (snap) => {
-        const feed = document.getElementById('feed');
-        if (snap.empty) {
-            feed.innerHTML = "<p style='text-align:center;'>La nube está vacía. Verifica el panel.</p>";
-            return;
-        }
-        feed.innerHTML = "";
-        let docs = [];
-        snap.forEach(d => docs.push(d.data()));
-        // Ordenamos por fecha manualmente aquí
-        docs.sort((a,b) => b.fecha - a.fecha);
+    try {
+        const app = initializeApp(firebaseConfig);
         
-        docs.forEach(data => {
-            const card = document.createElement('div');
-            card.className = 'track-card';
-            card.innerHTML = `
-                <img src="${data.imagenUrl || 'logo.png'}" class="track-img">
-                <div class="track-info">
-                    <p class="track-title">${data.titulo}</p>
-                    <p class="track-desc">${data.artista}</p>
-                </div>
-                <button class="btn-play" onclick="playTrack('${data.mp3Url}', '${data.titulo}')">
-                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-            `;
-            feed.appendChild(card);
+        // 🚀 EL TRUCO MAESTRO: Forzamos el modo de conexión compatible con redes móviles de Venezuela
+        const db = initializeFirestore(app, {
+            experimentalForceLongPolling: true
         });
-    }, (err) => {
-        document.getElementById('status').innerText = "Error de señal.";
-    });
+
+        const audio = document.getElementById('main-audio');
+        const pTitle = document.getElementById('p-title');
+        const playerBar = document.getElementById('player-bar');
+
+        window.playTrack = (url, title) => {
+            pTitle.innerText = title;
+            audio.src = url;
+            playerBar.style.display = 'block';
+            audio.play();
+        };
+
+        debug("Conectando con la base de datos...");
+
+        // Usamos la colección "canciones"
+        onSnapshot(collection(db, "canciones"), (snap) => {
+            const feed = document.getElementById('feed');
+            debug("Respuesta recibida. Documentos: " + snap.size);
+
+            if (snap.empty) {
+                feed.innerHTML = "<p style='text-align:center;'>La nube respondió vacía (0 programas).</p>";
+                return;
+            }
+
+            feed.innerHTML = "";
+            let docs = [];
+            snap.forEach(d => docs.push(d.data()));
+            docs.sort((a,b) => b.fecha - a.fecha);
+            
+            docs.forEach(data => {
+                const card = document.createElement('div');
+                card.className = 'track-card';
+                card.innerHTML = `
+                    <img src="${data.imagenUrl || 'logo.png'}" class="track-img">
+                    <div class="track-info">
+                        <p class="track-title">${data.titulo}</p>
+                        <p class="track-desc">${data.artista}</p>
+                    </div>
+                    <button class="btn-play" onclick="playTrack('${data.mp3Url}', '${data.titulo}')">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                `;
+                feed.appendChild(card);
+            });
+        }, (err) => {
+            debug("Error de Firebase: " + err.message);
+            document.getElementById('status').innerText = "Error de conexión.";
+        });
+    } catch (e) {
+        debug("Error crítico: " + e.message);
+    }
 </script>
 </body>
 </html>
