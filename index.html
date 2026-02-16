@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jazztabueno Productions V3.8</title>
+    <title>Jazztabueno Productions V3.9</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -27,7 +27,7 @@
 
 <div id="login-screen">
     <div class="login-card">
-        <h2 style="color:var(--gold); font-size:18px; font-family:'Playfair Display';">CONSOLA V3.8</h2>
+        <h2 style="color:var(--gold); font-size:18px; font-family:'Playfair Display';">CONSOLA V3.9</h2>
         <input type="password" id="passInput" class="input-box" placeholder="Clave">
         <button onclick="doLogin()" style="width:100%; background:var(--gold); padding:12px; border:none; border-radius:8px; font-weight:800; cursor:pointer; color:black;">ENTRAR</button>
     </div>
@@ -39,7 +39,7 @@
 </header>
 
 <div class="container" id="feed">
-    <p style="color:var(--gold);">Sintonizando la señal...</p>
+    <p id="loading-msg" style="color:var(--gold);">Sintonizando la señal...</p>
 </div>
 
 <div id="player-bar">
@@ -49,8 +49,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { initializeFirestore, collection, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+    import { initializeFirestore, collection, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI",
@@ -58,13 +57,11 @@
       projectId: "familia-yajure-app",
       storageBucket: "familia-yajure-app.firebasestorage.app",
       messagingSenderId: "692035727386",
-      appId: "1:692035727386:web:dfa3e39a481d56368a61a3",
-      measurementId: "G-GDBL4HPE79"
+      appId: "1:692035727386:web:dfa3e39a481d56368a61a3"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = initializeFirestore(app, { experimentalForceLongPolling: true });
-    let analytics; try { analytics = getAnalytics(app); logEvent(analytics, 'session_start'); } catch(e) {}
 
     let userRole = null;
 
@@ -78,7 +75,6 @@
     function iniciar() {
         const audio = document.getElementById('main-audio');
         window.tocar = (url, tit) => {
-            if(analytics) logEvent(analytics, 'play_program', { title: tit });
             document.getElementById('p-title').innerText = tit;
             audio.src = url;
             document.getElementById('player-bar').style.display = 'block';
@@ -87,12 +83,19 @@
 
         window.borrar = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "canciones", id)); };
 
-        onSnapshot(query(collection(db, "canciones"), orderBy("fecha", "desc")), (snap) => {
+        // 🚀 CAMBIO CLAVE: Quitamos el orderBy de la consulta para evitar errores de índice
+        onSnapshot(collection(db, "canciones"), (snap) => {
             const feed = document.getElementById('feed');
             if (snap.empty) { feed.innerHTML = "<p>No hay programas disponibles.</p>"; return; }
+            
             feed.innerHTML = "";
-            snap.forEach(d => {
-                const data = d.data();
+            let programas = [];
+            snap.forEach(d => { programas.push({ id: d.id, ...d.data() }); });
+
+            // Ordenamos aquí en el celular para que sea instantáneo
+            programas.sort((a, b) => (b.fecha || 0) - (a.fecha || 0));
+
+            programas.forEach(data => {
                 const div = document.createElement('div');
                 div.className = 'track-card';
                 div.innerHTML = `
@@ -106,6 +109,8 @@
                 `;
                 feed.appendChild(div);
             });
+        }, (err) => {
+            document.getElementById('loading-msg').innerText = "Error de conexión: " + err.message;
         });
     }
 </script>
