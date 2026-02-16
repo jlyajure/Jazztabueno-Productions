@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jazztabueno Productions V3.9</title>
+    <title>Jazztabueno Productions V4.0</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -11,35 +11,36 @@
         * { box-sizing: border-box; }
         body { margin: 0; background: var(--bg); color: #e0e0e0; font-family: 'Source Sans Pro', sans-serif; text-align: center; }
         #login-screen { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; align-items: center; justify-content: center; }
-        .login-card { width: 300px; padding: 30px; border: 2px solid var(--gold); border-radius: 20px; background: #0a0a0a; box-shadow: 0 0 20px rgba(197, 160, 89, 0.2); }
+        .login-card { width: 300px; padding: 30px; border: 2px solid var(--gold); border-radius: 20px; background: #0a0a0a; }
         .input-box { width: 100%; padding: 12px; margin: 20px 0; background: #000; border: 1px solid #333; color: white; border-radius: 8px; text-align: center; font-size: 16px; }
         header { padding: 20px; border-bottom: 2px solid var(--gold); background: #000; position: sticky; top: 0; z-index: 100; }
         .logo-img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--gold); }
         .container { max-width: 500px; margin: auto; padding: 20px; padding-bottom: 120px; }
         .track-card { background: var(--card); border-radius: 12px; margin-bottom: 15px; padding: 15px; display: flex; align-items: center; border: 1px solid #222; }
-        .track-img { width: 65px; height: 65px; border-radius: 8px; margin-right: 15px; object-fit: cover; border: 1px solid #333; }
+        .track-img { width: 60px; height: 60px; border-radius: 8px; margin-right: 15px; object-fit: cover; }
         .btn-play { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         #player-bar { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 2px solid var(--gold); padding: 15px; display: none; z-index: 1000; }
         audio { width: 100%; filter: invert(100%); margin-top: 10px; }
+        #debug-log { font-size: 10px; color: #444; margin-top: 20px; padding: 10px; border-top: 1px solid #222; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
     <div class="login-card">
-        <h2 style="color:var(--gold); font-size:18px; font-family:'Playfair Display';">CONSOLA V3.9</h2>
+        <h2 style="color:var(--gold); font-size:18px;">CONSOLA V4.0</h2>
         <input type="password" id="passInput" class="input-box" placeholder="Clave">
-        <button onclick="doLogin()" style="width:100%; background:var(--gold); padding:12px; border:none; border-radius:8px; font-weight:800; cursor:pointer; color:black;">ENTRAR</button>
+        <button onclick="doLogin()" style="width:100%; background:var(--gold); padding:12px; border:none; border-radius:8px; font-weight:800; cursor:pointer;">ENTRAR</button>
     </div>
 </div>
 
 <header>
     <img src="logo.png" class="logo-img">
-    <h1 style="font-family:'Playfair Display'; color:var(--gold); margin:10px 0 0 0; font-size:18px;">JAZZTABUENO</h1>
+    <h1 style="color:var(--gold); margin:10px 0 0 0; font-size:18px;">JAZZTABUENO</h1>
 </header>
 
 <div class="container" id="feed">
-    <p id="loading-msg" style="color:var(--gold);">Sintonizando la señal...</p>
+    <p id="status-msg">Iniciando antena...</p>
 </div>
 
 <div id="player-bar">
@@ -47,9 +48,11 @@
     <audio id="main-audio" controls controlsList="nodownload"></audio>
 </div>
 
+<div id="debug-log">Log: Esperando acción...</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { initializeFirestore, collection, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { initializeFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI",
@@ -60,39 +63,43 @@
       appId: "1:692035727386:web:dfa3e39a481d56368a61a3"
     };
 
+    const log = (msg) => { document.getElementById('debug-log').innerText = "Log: " + msg; };
+
     const app = initializeApp(firebaseConfig);
     const db = initializeFirestore(app, { experimentalForceLongPolling: true });
 
-    let userRole = null;
-
     window.doLogin = () => {
         const pass = document.getElementById('passInput').value;
-        if(pass === "ticoadmin") { userRole = 'admin'; document.getElementById('login-screen').style.display = 'none'; iniciar(); }
-        else if(pass === "jazz2026") { userRole = 'user'; document.getElementById('login-screen').style.display = 'none'; iniciar(); }
-        else { alert("Clave incorrecta."); }
+        if(pass === "ticoadmin" || pass === "jazz2026") {
+            document.getElementById('login-screen').style.display = 'none';
+            log("Login exitoso. Cargando...");
+            cargarDatos();
+        } else { alert("Clave incorrecta."); }
     };
 
-    function iniciar() {
-        const audio = document.getElementById('main-audio');
-        window.tocar = (url, tit) => {
-            document.getElementById('p-title').innerText = tit;
-            audio.src = url;
-            document.getElementById('player-bar').style.display = 'block';
-            audio.play();
-        };
+    async function cargarDatos() {
+        const feed = document.getElementById('feed');
+        const status = document.getElementById('status-msg');
+        status.innerText = "Buscando programas en la nube...";
 
-        window.borrar = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "canciones", id)); };
-
-        // 🚀 CAMBIO CLAVE: Quitamos el orderBy de la consulta para evitar errores de índice
-        onSnapshot(collection(db, "canciones"), (snap) => {
-            const feed = document.getElementById('feed');
-            if (snap.empty) { feed.innerHTML = "<p>No hay programas disponibles.</p>"; return; }
+        try {
+            log("Pidiendo documentos a la colección 'canciones'...");
+            const querySnapshot = await getDocs(collection(db, "canciones"));
             
+            log("Respuesta recibida. Total: " + querySnapshot.size);
+
+            if (querySnapshot.empty) {
+                status.innerText = "La antena no recibe nada (0 programas).";
+                return;
+            }
+
             feed.innerHTML = "";
             let programas = [];
-            snap.forEach(d => { programas.push({ id: d.id, ...d.data() }); });
+            querySnapshot.forEach(doc => {
+                programas.push({ id: doc.id, ...doc.data() });
+            });
 
-            // Ordenamos aquí en el celular para que sea instantáneo
+            // Ordenamos por fecha manualmente
             programas.sort((a, b) => (b.fecha || 0) - (a.fecha || 0));
 
             programas.forEach(data => {
@@ -105,14 +112,24 @@
                         <p style="margin:5px 0 0 0; font-size:11px; color:#888;">${data.artista}</p>
                     </div>
                     <button class="btn-play" onclick="tocar('${data.mp3Url}','${data.titulo}')">▶</button>
-                    ${userRole === 'admin' ? `<button onclick="borrar('${d.id}')" style="background:none; border:none; color:red; font-size:18px; margin-left:10px;">🗑️</button>` : ''}
                 `;
                 feed.appendChild(div);
             });
-        }, (err) => {
-            document.getElementById('loading-msg').innerText = "Error de conexión: " + err.message;
-        });
+            log("Carga completa.");
+
+        } catch (error) {
+            log("ERROR: " + error.message);
+            status.innerText = "Error de señal. Revisa el Log abajo.";
+        }
     }
+
+    window.tocar = (url, tit) => {
+        const audio = document.getElementById('main-audio');
+        document.getElementById('p-title').innerText = tit;
+        audio.src = url;
+        document.getElementById('player-bar').style.display = 'block';
+        audio.play();
+    };
 </script>
 </body>
 </html>
