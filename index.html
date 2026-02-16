@@ -18,15 +18,13 @@
 
         .container { max-width: 500px; margin: auto; padding: 20px; padding-bottom: 120px; }
         
-        .track-card { background: var(--card); border-radius: 12px; margin-bottom: 15px; padding: 15px; display: flex; align-items: center; border: 1px solid #222; transition: 0.3s; }
-        .track-card.active { border-color: var(--gold); background: #1a1a1a; }
+        .track-card { background: var(--card); border-radius: 12px; margin-bottom: 15px; padding: 15px; display: flex; align-items: center; border: 1px solid #222; }
         .track-img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; margin-right: 15px; border: 1px solid #333; }
         .track-info { flex: 1; }
         .track-title { font-size: 16px; font-weight: 700; color: #fff; margin: 0 0 5px 0; }
         .track-desc { font-size: 13px; color: #888; margin: 0; }
 
-        .btn-play { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .btn-play:active { transform: scale(0.9); }
+        .btn-play { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-play svg { width: 20px; height: 20px; fill: #000; }
 
         #player-bar { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 2px solid var(--gold); padding: 15px; display: none; z-index: 1000; }
@@ -45,7 +43,8 @@
 </header>
 
 <div class="container" id="feed">
-    </div>
+    <p style="text-align:center; color:#666;">Sintonizando señal...</p>
+</div>
 
 <div id="player-bar">
     <div class="player-content">
@@ -59,7 +58,6 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    // 📊 EL SENSOR DE RATING PARA JAZZTABUENO
     import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 
     const firebaseConfig = {
@@ -74,20 +72,36 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    // 📊 Inicializamos Analytics
-    const analytics = getAnalytics(app);
-
-    // Registro de entrada
-    logEvent(analytics, 'session_start');
-    logEvent(analytics, 'screen_view', { screen_name: 'App Jazztabueno' });
+    
+    // 🛡️ Inicialización SEGURA de Analytics (si falla, la app sigue)
+    let analytics;
+    try {
+        analytics = getAnalytics(app);
+        logEvent(analytics, 'session_start');
+    } catch (e) {
+        console.log("Analytics bloqueado por el navegador");
+    }
 
     const audio = document.getElementById('main-audio');
     const pTitle = document.getElementById('p-title');
     const playerBar = document.getElementById('player-bar');
 
+    // Función global para que el botón funcione
+    window.playTrack = (url, title) => {
+        if(analytics) logEvent(analytics, 'play_program', { program_title: title });
+        pTitle.innerText = title;
+        audio.src = url;
+        playerBar.style.display = 'block';
+        audio.play();
+    };
+
     onSnapshot(query(collection(db, "canciones"), orderBy("fecha", "desc")), (snap) => {
         const feed = document.getElementById('feed');
         feed.innerHTML = "";
+        if(snap.empty) {
+            feed.innerHTML = "<p style='text-align:center;'>No hay programas disponibles.</p>";
+            return;
+        }
         snap.forEach(doc => {
             const data = doc.data();
             const card = document.createElement('div');
@@ -104,17 +118,9 @@
             `;
             feed.appendChild(card);
         });
+    }, (error) => {
+        document.getElementById('feed').innerHTML = "<p style='text-align:center;'>Error de conexión.</p>";
     });
-
-    window.playTrack = (url, title) => {
-        // 📊 Anotamos qué programa están escuchando
-        logEvent(analytics, 'play_program', { program_title: title });
-        
-        pTitle.innerText = title;
-        audio.src = url;
-        playerBar.style.display = 'block';
-        audio.play();
-    };
 </script>
 </body>
 </html>
