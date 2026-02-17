@@ -1,10 +1,12 @@
 {
   "name": "Jazztabueno Productions",
   "short_name": "Jazztabueno",
-  "start_url": ".",
+  "description": "La mejor selección de Jazz, Salsa Brava, Studio 79 y Old School Radio.",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#050505",
+  "theme_color": "#a68a44",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "logo.png",
