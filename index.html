@@ -81,8 +81,8 @@
         .btn-play svg { width: 28px !important; height: 28px !important; fill: black !important; }
         
         .info { padding: 20px; }
-        .ep-title { margin: 8px 0; font-size: 19px; font-weight: 800; color: #ffffff; }
-        .btn-list { background: #1a1a1a !important; border: 1.5px solid #333 !important; color: #ffffff !important; padding: 12px !important; border-radius: 12px !important; font-size: 11px !important; font-weight: 800 !important; width: 100% !important; cursor: pointer; }
+        .ep-title { margin: 8px 0 4px 0; font-size: 19px; font-weight: 800; color: #ffffff; }
+        .btn-list { background: #1a1a1a !important; border: 1.5px solid #333 !important; color: #ffffff !important; padding: 12px !important; border-radius: 12px !important; font-size: 11px !important; font-weight: 800 !important; width: 100% !important; cursor: pointer; margin-top:12px; }
         .list-box { display: none; margin-top: 15px; padding: 20px; background: #080808; border-radius: 15px; border: 1px solid #222; font-size: 14px; white-space: pre-wrap; }
 
         #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 3px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
@@ -95,7 +95,6 @@
         
         google-cast-launcher { width: 20px; height: 20px; --disconnected-color: var(--gold); cursor: pointer; display: inline-block; }
         
-        /* ESTILO DEL CONTADOR DE OYENTES */
         .contador-oyentes { display: flex; align-items: center; gap: 5px; background: #1a1a1a; padding: 4px 10px; border-radius: 20px; border: 1px solid #333; font-size: 11px; color: #aaa; font-weight: bold; }
         .contador-oyentes span { color: var(--gold); }
     </style>
@@ -132,6 +131,9 @@
             </select>
             <input type="text" id="t-url" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL MP3">
             <input type="text" id="t-img" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="URL Portada">
+            
+            <input type="text" id="t-tags" style="width:100%; padding:14px; background:#000; color:white; border:1px solid #333; border-radius:10px; margin-bottom:10px;" placeholder="Hashtags (Ej: #BossaNova #80s)">
+            
             <textarea id="t-playlist" style="width:100%; height:120px; background:#000; color:white; border:1px solid var(--gold); border-radius:10px; padding:10px; margin-bottom:15px;" placeholder="Lista..."></textarea>
             <div style="display:flex; gap:10px;">
                 <button id="btn-save" style="flex:2; background:var(--gold); border:none; padding:15px; border-radius:12px; font-weight:800; cursor:pointer;">💾 GUARDAR</button>
@@ -175,7 +177,6 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    // IMPORTAMOS EL "INCREMENT" PARA SUMAR LOS OYENTES
     import { initializeFirestore, collection, query, orderBy, onSnapshot, addDoc, deleteDoc, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 
@@ -200,6 +201,7 @@
     let programas = [];
     let idActual = null;
     let filtro = 'Todo';
+    let hashtagFiltro = ''; // NUEVA MEMORIA PARA HASHTAGS
     let isAdmin = false;
 
     const SVG_PLAY = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
@@ -216,9 +218,20 @@
         } else { alert("Clave Incorrecta"); }
     };
     window.doLogout = () => { localStorage.clear(); location.reload(); };
-    window.setFilter = (cat, el) => { filtro = cat; document.querySelectorAll('.ch-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); render(); };
     
-    // AQUÍ OCURRE LA MAGIA DEL CONTADOR
+    // Al tocar un canal normal de arriba, limpiamos el filtro de hashtags
+    window.setFilter = (cat, el) => { 
+        filtro = cat; 
+        hashtagFiltro = ''; 
+        document.querySelectorAll('.ch-item').forEach(i => i.classList.remove('active')); 
+        el.classList.add('active'); 
+        render(); 
+    };
+
+    // FUNCIONES NUEVAS PARA HASHTAGS
+    window.setHashtagFilter = (tag) => { hashtagFiltro = tag; render(); window.scrollTo({top:0, behavior:'smooth'}); };
+    window.clearHashtag = () => { hashtagFiltro = ''; render(); };
+    
     window.playItem = async (id, url, tit, img) => {
         if(idActual === id) { 
             window.doToggle(); 
@@ -232,9 +245,8 @@
             
             if(analytics) logEvent(analytics, 'play_program', { program_name: tit });
 
-            // Si es la primera vez que le da play en su celular hoy, le suma 1 oyente
             if(!localStorage.getItem('oyente_' + id)) {
-                localStorage.setItem('oyente_' + id, 'true'); // Memoria Anti-Trampa
+                localStorage.setItem('oyente_' + id, 'true');
                 try {
                     await updateDoc(doc(db, "radio_programas", id), {
                         reproducciones: increment(1)
@@ -254,7 +266,14 @@
     
     window.prepEdit = (id) => {
         const p = programas.find(x => x.id === id);
-        document.getElementById('edit-id').value = p.id; document.getElementById('t-titulo').value = p.titulo; document.getElementById('t-programa').value = p.programa; document.getElementById('t-url').value = p.mp3Url; document.getElementById('t-img').value = p.imagenUrl; document.getElementById('t-playlist').value = p.playlist || ""; document.getElementById('admin-panel').style.display = 'block'; window.scrollTo({top:0, behavior:'smooth'});
+        document.getElementById('edit-id').value = p.id; 
+        document.getElementById('t-titulo').value = p.titulo; 
+        document.getElementById('t-programa').value = p.programa; 
+        document.getElementById('t-url').value = p.mp3Url; 
+        document.getElementById('t-img').value = p.imagenUrl; 
+        document.getElementById('t-tags').value = p.tags || ""; // LEE EL HASHTAG
+        document.getElementById('t-playlist').value = p.playlist || ""; 
+        document.getElementById('admin-panel').style.display = 'block'; window.scrollTo({top:0, behavior:'smooth'});
     };
     window.doDel = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "radio_programas", id)); };
 
@@ -265,11 +284,11 @@
             programa: document.getElementById('t-programa').value, 
             mp3Url: document.getElementById('t-url').value, 
             imagenUrl: document.getElementById('t-img').value || "logo.png", 
+            tags: document.getElementById('t-tags').value, // GUARDA EL HASHTAG
             playlist: document.getElementById('t-playlist').value, 
             fecha: new Date().getTime() 
         };
         
-        // Si es un programa nuevo, empezamos el contador en 0
         if(!id) data.reproducciones = 0;
 
         if(id) await updateDoc(doc(db, "radio_programas", id), data); 
@@ -299,18 +318,48 @@
         if(!feed) return;
         feed.innerHTML = "";
 
+        // SI HAY UN HASHTAG ACTIVO, MOSTRAMOS EL BOTÓN DE LIMPIAR
+        if(hashtagFiltro !== '') {
+            feed.innerHTML = `<div style="text-align:center; margin-bottom:20px;">
+                <span style="background:var(--gold); color:black; padding:8px 15px; border-radius:20px; font-weight:bold; font-size:12px;">
+                    Buscando: ${hashtagFiltro} <span style="margin-left:10px; cursor:pointer;" onclick="window.clearHashtag()">✖ Quitar Filtro</span>
+                </span>
+            </div>`;
+        }
+
         const list = programas.filter(p => {
-            if(filtro === 'Todo') return true;
-            const dbVal = (p.programa || "").toUpperCase();
-            const titVal = (p.titulo || "").toUpperCase(); 
-            const filterVal = filtro.toUpperCase();
-            if(filterVal.includes("STUDIO")) return dbVal.includes("STUDIO") || dbVal.includes("79") || titVal.includes("STUDIO") || titVal.includes("79");
-            return dbVal.includes(filterVal.split(' ')[0]) || titVal.includes(filterVal.split(' ')[0]);
+            // Filtro de canal normal
+            let matchCanal = false;
+            if(filtro === 'Todo') matchCanal = true;
+            else {
+                const dbVal = (p.programa || "").toUpperCase();
+                const titVal = (p.titulo || "").toUpperCase(); 
+                const filterVal = filtro.toUpperCase();
+                if(filterVal.includes("STUDIO")) matchCanal = dbVal.includes("STUDIO") || dbVal.includes("79") || titVal.includes("STUDIO") || titVal.includes("79");
+                else matchCanal = dbVal.includes(filterVal.split(' ')[0]) || titVal.includes(filterVal.split(' ')[0]);
+            }
+
+            // Filtro de Hashtag
+            let matchTag = true;
+            if(hashtagFiltro !== '') {
+                matchTag = (p.tags || "").toLowerCase().includes(hashtagFiltro.toLowerCase());
+            }
+
+            return matchCanal && matchTag;
         });
 
         list.forEach(p => {
             const isPlaying = idActual === p.id && !media.paused;
-            const vistas = p.reproducciones || 0; // Sacamos el número de la base de datos
+            const vistas = p.reproducciones || 0;
+
+            // CREAMOS LOS CUADRITOS DE LOS HASHTAGS (Si tiene)
+            const arrayTags = (p.tags || "").split(' ').filter(t => t.trim().startsWith('#'));
+            let htmlTags = "";
+            if(arrayTags.length > 0) {
+                htmlTags = `<div style="margin-top:6px;">` + 
+                    arrayTags.map(t => `<span onclick="window.setHashtagFilter('${t}')" style="color:var(--gold); background:#222; padding:4px 10px; border-radius:12px; font-size:10px; font-weight:800; margin-right:5px; cursor:pointer; display:inline-block; border: 1px solid #333;">${t}</span>`).join('') 
+                + `</div>`;
+            }
 
             const div = document.createElement('div');
             div.className = `card ${isPlaying ? 'playing' : ''}`;
@@ -326,6 +375,9 @@
                         <div class="contador-oyentes">🎧 <span>${vistas}</span></div>
                     </div>
                     <h3 class="ep-title">${p.titulo}</h3>
+                    
+                    ${htmlTags}
+
                     <button class="btn-list" onclick="window.toggleList('${p.id}')">📋 VER PROGRAMACIÓN</button>
                     <div id="list-${p.id}" class="list-box">${p.playlist || "Próximamente."}</div>
                     ${isAdmin ? `<div style="display:flex; gap:10px; margin-top:20px; border-top:1px solid #222; padding-top:20px;">
