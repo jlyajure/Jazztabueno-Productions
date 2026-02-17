@@ -93,7 +93,6 @@
         .controls { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 15px; margin-top: 12px; gap: 10px; }
         .ctrl-btn { flex: 1; background: #111; border: 1px solid #333; color: #fff; padding: 12px 5px; border-radius: 12px; font-size: 9px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
         
-        /* ESTILO DEL BOTÓN CAST */
         google-cast-launcher { width: 20px; height: 20px; --disconnected-color: var(--gold); cursor: pointer; display: inline-block; }
     </style>
 </head>
@@ -171,9 +170,11 @@
 </div>
 
 <script type="module">
-    // --- MOTOR NUEVO INYECTADO AQUÍ ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { initializeFirestore, collection, query, orderBy, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    // --- ESTO ES LO NUEVO: EL SENSOR DE ESTADÍSTICAS ---
+    import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI",
@@ -181,12 +182,20 @@
       projectId: "familia-yajure-app",
       storageBucket: "familia-yajure-app.firebasestorage.app",
       messagingSenderId: "692035727386",
-      appId: "1:692035727386:web:dfa3e39a481d56368a61a3"
+      appId: "1:692035727386:web:dfa3e39a481d56368a61a3",
+      measurementId: "G-GDBL4HPE79" // Tu llave de Analytics
     };
 
     const app = initializeApp(firebaseConfig);
     const db = initializeFirestore(app, { experimentalForceLongPolling: true });
-    // ----------------------------------
+    
+    // Activamos el sensor
+    let analytics;
+    try {
+        analytics = getAnalytics(app);
+        logEvent(analytics, 'page_view'); // Avisa cuando alguien entra a la página
+    } catch(e) {}
+    // ----------------------------------------------------
 
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
@@ -202,7 +211,14 @@
 
     window.doLogin = () => {
         const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { localStorage.setItem('jtp_auth', 'ok'); location.reload(); } else { alert("Clave Incorrecta"); }
+        if(p === "ticoadmin" || p === "jazz2026") { 
+            localStorage.setItem('jtp_auth', 'ok'); 
+            
+            // Avisamos a Analytics que alguien hizo Login
+            if(analytics) logEvent(analytics, 'login', { method: 'password' });
+            
+            location.reload(); 
+        } else { alert("Clave Incorrecta"); }
     };
     window.doLogout = () => { localStorage.clear(); location.reload(); };
     window.setFilter = (cat, el) => { filtro = cat; document.querySelectorAll('.ch-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); render(); };
@@ -215,6 +231,9 @@
             document.getElementById('p-title').innerText = tit;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`;
             document.getElementById('global-player').style.display = 'block';
+            
+            // Avisamos a Analytics qué programa están escuchando
+            if(analytics) logEvent(analytics, 'play_program', { program_name: tit });
         }
         render();
     };
@@ -245,14 +264,12 @@
         isAdmin = true; 
     }
     
-    // TRUCO DE LOS 3 TOQUES EN EL LOGO PARA ABRIR EL PANEL DE SUBIR
     let taps = 0, lastTap = 0;
     document.getElementById('admin-trigger').onclick = () => {
         const now = new Date().getTime(); if(now - lastTap > 1000) taps = 0; lastTap = now; taps++;
         if(taps === 3 && isAdmin) document.getElementById('admin-panel').style.display = 'block';
     };
 
-    // CONECTANDO A LA GAVETA CORRECTA: "radio_programas"
     onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => {
         programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
     });
