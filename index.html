@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jazztabueno Productions V5.0</title>
+    <title>Jazztabueno Productions V5.1</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #c5a059; --bg: #050505; --card: #121212; }
         * { box-sizing: border-box; }
-        body { margin: 0; background: var(--bg); color: #e0e0e0; font-family: 'Source Sans Pro', sans-serif; padding-bottom: 100px; }
+        body { margin: 0; background: var(--bg); color: #e0e0e0; font-family: 'Source Sans Pro', sans-serif; padding-bottom: 120px; }
         
         /* LOGIN */
         #login-screen { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; align-items: center; justify-content: center; }
@@ -17,42 +17,48 @@
         .input-box { width: 100%; padding: 12px; margin: 20px 0 10px 0; background: #000; border: 1px solid #333; color: white; border-radius: 8px; text-align: center; font-size: 16px; }
         .btn-gold { width: 100%; background: var(--gold); color: black; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; }
 
+        /* HEADER Y BOTÓN SALIR */
         header { background: #000; padding: 20px; text-align: center; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 100; }
         .logo-img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--gold); }
         h1 { font-family: 'Playfair Display', serif; color: var(--gold); margin: 10px 0 0 0; font-size: 20px; letter-spacing: 1px; }
+        .btn-salir { position: absolute; top: 20px; right: 20px; background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold; }
 
         .container { max-width: 500px; margin: auto; padding: 20px; }
         
         /* ADMIN PANEL */
         #admin-panel { display: none; background: #111; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed var(--gold); }
-        .admin-title { color: var(--gold); text-align: center; margin-top: 0; font-size: 16px; }
+        .admin-title { color: var(--gold); text-align: center; margin-top: 0; font-size: 16px; font-weight: bold; }
 
-        /* TRACK CARDS */
-        .track-card { background: var(--card); border-radius: 12px; margin-bottom: 15px; padding: 15px; display: flex; align-items: center; border: 1px solid #222; }
-        .track-img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; margin-right: 15px; border: 1px solid #333; }
-        .track-info { flex: 1; overflow: hidden; }
+        /* TRACK CARDS (Alineación blindada) */
+        .track-card { background: var(--card); border-radius: 12px; margin-bottom: 15px; padding: 15px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #222; width: 100%; }
+        .track-img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; margin-right: 15px; border: 1px solid #333; flex-shrink: 0; }
+        .track-info { flex-grow: 1; overflow: hidden; text-align: left; }
         .track-title { font-size: 16px; font-weight: 700; color: #fff; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .track-desc { font-size: 13px; color: #888; margin: 5px 0 0 0; }
+        .track-desc { font-size: 12px; color: #888; margin: 5px 0 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        .btn-play { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .btn-play svg { width: 20px; height: 20px; fill: #000; }
-        .btn-delete { background: none; border: none; color: #ff4444; font-size: 20px; margin-left: 10px; cursor: pointer; }
+        /* BOTONES DE PLAY Y BORRAR */
+        .botones-accion { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: 10px; }
+        .btn-play { background: var(--gold); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-play svg { width: 22px; height: 22px; fill: #000; margin-left: 3px; }
+        .btn-delete { background: none; border: none; color: #ff4444; font-size: 20px; cursor: pointer; padding: 0; }
 
-        #player-bar { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 2px solid var(--gold); padding: 15px; display: none; z-index: 1000; }
-        audio { width: 100%; margin-top: 10px; filter: invert(100%); }
+        /* REPRODUCTOR */
+        #player-bar { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 2px solid var(--gold); padding: 15px; display: none; z-index: 1000; text-align: center; }
+        audio { width: 100%; max-width: 500px; margin-top: 10px; filter: invert(100%); }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
     <div class="login-card">
-        <h2 style="color:var(--gold); margin:0; font-family:'Playfair Display';">CABINA JAZZ V5.0</h2>
+        <h2 style="color:var(--gold); margin:0 0 20px 0; font-family:'Playfair Display';">JAZZTABUENO</h2>
         <input type="password" id="passInput" class="input-box" placeholder="Introduce tu clave">
         <button onclick="doLogin()" class="btn-gold">ENTRAR</button>
     </div>
 </div>
 
 <header>
+    <button onclick="location.reload()" class="btn-salir" id="btnSalir" style="display:none;">SALIR</button>
     <img src="logo.png" class="logo-img">
     <h1>JAZZTABUENO PRODUCTIONS</h1>
 </header>
@@ -60,9 +66,9 @@
 <div class="container">
     <div id="admin-panel">
         <h3 class="admin-title">📻 PUBLICAR NUEVO PROGRAMA</h3>
-        <input type="text" id="t-titulo" class="input-box" placeholder="Título del Programa">
-        <input type="text" id="t-artista" class="input-box" placeholder="Fecha / Descripción">
-        <input type="text" id="t-url" class="input-box" placeholder="Link MP3 (iVoox/Drive)">
+        <input type="text" id="t-titulo" class="input-box" placeholder="Título (Ej: Jazz Especial)">
+        <input type="text" id="t-artista" class="input-box" placeholder="Descripción / Fecha">
+        <input type="text" id="t-url" class="input-box" placeholder="Link MP3 (Archive.org)">
         <input type="text" id="t-img" class="input-box" placeholder="Link Imagen (Opcional)">
         <button id="btn-guardar" class="btn-gold" style="margin-top:10px;">SUBIR A LA NUBE</button>
     </div>
@@ -75,7 +81,7 @@
 <div id="player-bar">
     <div style="max-width:500px; margin:auto;">
         <p id="p-title" style="font-size:14px; color:var(--gold); margin:0; font-weight:700;">...</p>
-        <audio id="main-audio" controls controlsList="nodownload"></audio>
+        <audio id="main-audio" controls></audio>
     </div>
 </div>
 
@@ -102,13 +108,15 @@
         if(pass === "ticoadmin") {
             userRole = 'admin';
             document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('btnSalir').style.display = 'block';
             document.getElementById('admin-panel').style.display = 'block';
             iniciar();
         } else if(pass === "jazz2026") {
             userRole = 'user';
             document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('btnSalir').style.display = 'block';
             iniciar();
-        } else { alert("Clave incorrecta. Intente de nuevo."); }
+        } else { alert("Clave incorrecta."); }
     };
 
     // SUBIR PROGRAMA
@@ -129,7 +137,6 @@
                 imagenUrl: document.getElementById('t-img').value || "logo.png",
                 fecha: new Date().getTime()
             });
-            alert("¡Programa al aire!");
             document.getElementById('t-titulo').value = "";
             document.getElementById('t-artista').value = "";
             document.getElementById('t-url').value = "";
@@ -141,40 +148,52 @@
 
     function iniciar() {
         const audio = document.getElementById('main-audio');
-        window.tocar = (url, tit) => {
+        
+        window.tocar = (url, tit, artista, img) => {
             document.getElementById('p-title').innerText = tit;
             audio.src = url;
             document.getElementById('player-bar').style.display = 'block';
             audio.play();
+
+            // MAGIA PARA LA SMART TV Y PANTALLA BLOQUEADA
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: tit,
+                    artist: artista,
+                    artwork: [ { src: img || 'logo.png', sizes: '512x512', type: 'image/png' } ]
+                });
+            }
         };
 
-        window.borrar = async (id) => { if(confirm("¿Eliminar definitivamente?")) await deleteDoc(doc(db, "canciones", id)); };
+        window.borrar = async (id) => { if(confirm("¿Eliminar programa?")) await deleteDoc(doc(db, "canciones", id)); };
 
-        // ESCUCHAR DATOS (Sin filtro previo para evitar bloqueos)
+        // ESCUCHAR DATOS
         onSnapshot(collection(db, "canciones"), (snap) => {
             const feed = document.getElementById('feed');
-            if (snap.empty) { feed.innerHTML = "<p style='text-align:center;'>No hay programas grabados.</p>"; return; }
+            if (snap.empty) { feed.innerHTML = "<p style='text-align:center;'>La cabina está lista. Sube tu primer programa.</p>"; return; }
             
             feed.innerHTML = "";
             let programas = [];
             snap.forEach(d => { programas.push({ id: d.id, ...d.data() }); });
             
-            // Ordenar más recientes primero
             programas.sort((a, b) => (b.fecha || 0) - (a.fecha || 0));
 
             programas.forEach(data => {
+                const imgSafe = data.imagenUrl || 'logo.png';
                 const div = document.createElement('div');
                 div.className = 'track-card';
                 div.innerHTML = `
-                    <img src="${data.imagenUrl || 'logo.png'}" class="track-img">
+                    <img src="${imgSafe}" class="track-img">
                     <div class="track-info">
                         <p class="track-title">${data.titulo}</p>
                         <p class="track-desc">${data.artista}</p>
                     </div>
-                    <button class="btn-play" onclick="tocar('${data.mp3Url}','${data.titulo}')">
-                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
-                    ${userRole === 'admin' ? `<button class="btn-delete" onclick="borrar('${data.id}')">🗑️</button>` : ''}
+                    <div class="botones-accion">
+                        <button class="btn-play" onclick="tocar('${data.mp3Url}','${data.titulo}','${data.artista}','${imgSafe}')">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                        ${userRole === 'admin' ? `<button class="btn-delete" onclick="borrar('${data.id}')">🗑️</button>` : ''}
+                    </div>
                 `;
                 feed.appendChild(div);
             });
