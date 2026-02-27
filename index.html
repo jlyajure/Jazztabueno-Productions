@@ -4,7 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Jazztabueno</title>
-    <link rel="icon" type="image/png" href="logo.png">
+    
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png">
+    <meta name="theme-color" content="#050505">
+    <meta property="og:title" content="Jazztabueno Productions">
+    <meta property="og:description" content="Escucha nuestros programas exclusivos de Radio.">
+    <meta property="og:image" content="https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png">
+    <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     
     <script>
@@ -232,7 +239,6 @@
         if(taps === 3) {
             if(!isAdmin) {
                 const pass = prompt("🔐 DIRECTOR: Ingrese Clave de Cabina:");
-                // 🔥 AQUÍ SE CAMBIÓ A LA NUEVA CLAVE MAESTRA ÚNICA
                 if(pass === "ticoadmin2026") {
                     localStorage.setItem('jtp_auth', 'ok');
                     isAdmin = true;
