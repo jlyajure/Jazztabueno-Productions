@@ -254,14 +254,21 @@
     window.setHashtagFilter = (tag) => { hashtagFiltro = tag; render(); window.scrollTo({top:0, behavior:'smooth'}); };
     window.clearHashtag = () => { hashtagFiltro = ''; render(); };
     
+    // 🔥 EL CANDADO DEL CORAZÓN (Blindado)
     window.doLike = async (id, el) => {
-        if(localStorage.getItem('liked_' + id)) return; 
+        if(localStorage.getItem('jtp_like_' + id) === 'true') {
+            alert("¡Ya le diste me gusta a este programa! ❤️");
+            return; 
+        }
+        
+        localStorage.setItem('jtp_like_' + id, 'true');
         el.classList.add('liked');
+        
         let countSpan = el.querySelector('.like-count');
         let current = parseInt(countSpan.innerText || "0");
         const newCount = current + 1;
         el.innerHTML = `❤️ <span class="like-count">${newCount}</span>`;
-        localStorage.setItem('liked_' + id, 'true');
+        
         try {
             await updateDoc(doc(db, "radio_programas", id), { likes: increment(1) });
         } catch(e) { console.log("Error like", e); }
@@ -347,7 +354,7 @@
         }
     };
     
-    // 🔥 EL NUEVO FIJADOR DE MEMORIA (Blindado para celulares)
+    // 🔥 EL NUEVO SISTEMA DE ARRANQUE (Promesa de Memoria)
     window.playItem = async (id, url, tit, img) => {
         if(idActual === id) { 
             window.doToggle(); 
@@ -355,25 +362,17 @@
             idActual = id; 
             window.castUrl = url; window.castTitle = tit; window.castCover = img; 
             media.src = url; 
-            
-            // Obligamos al celular a procesar el nuevo audio
-            media.load(); 
 
-            // Rescatamos la memoria
-            let memoria = localStorage.getItem('jtbp_mem_' + id);
-            
-            // Sensor infalible: Revisa cada 100 milisegundos si el audio ya está listo para saltar
-            let checkReady = setInterval(() => {
-                if (media.readyState > 0) { // El celular ya reconoció el archivo
-                    if (memoria && parseFloat(memoria) > 5) {
+            // Le damos play PRIMERO, y cuando el celular responda, hacemos el salto
+            let promesa = media.play();
+            if (promesa !== undefined) {
+                promesa.then(_ => {
+                    let memoria = localStorage.getItem('jtbp_mem_' + id);
+                    if(memoria && parseFloat(memoria) > 5) {
                         media.currentTime = parseFloat(memoria);
                     }
-                    clearInterval(checkReady); // Apagamos el sensor para que no moleste
-                }
-            }, 100);
-
-            // Le damos play
-            media.play().catch(e => console.log("Play bloqueado por navegador:", e));
+                }).catch(e => console.log("Play bloqueado por navegador:", e));
+            }
             
             // Actualizar interfaz
             document.getElementById('p-title').innerText = tit;
@@ -489,8 +488,11 @@
             const isPlaying = idActual === p.id && !media.paused;
             const vistas = p.reproducciones || 0;
             const likes = p.likes || 0;
-            const userLiked = localStorage.getItem('liked_' + p.id) ? 'liked' : '';
-            const heartIcon = userLiked ? '❤️' : '🤍';
+            
+            // 🔥 LEER ESTADO DE LIKE DESDE LA MEMORIA BLINDADA
+            const isLiked = localStorage.getItem('jtp_like_' + p.id) === 'true';
+            const userLikedClass = isLiked ? 'liked' : '';
+            const heartIcon = isLiked ? '❤️' : '🤍';
 
             const arrayTags = (p.tags || "").split(' ').filter(t => t.trim().startsWith('#'));
             let htmlTags = "";
@@ -516,7 +518,7 @@
                     
                     <div style="display:flex; justify-content:space-between; align-items:start; margin-top:8px;">
                          <h3 class="ep-title" style="margin:0;">${p.titulo}</h3>
-                         <button class="btn-like ${userLiked}" onclick="window.doLike('${p.id}', this)">
+                         <button class="btn-like ${userLikedClass}" onclick="window.doLike('${p.id}', this)">
                             ${heartIcon} <span class="like-count">${likes}</span>
                          </button>
                     </div>
