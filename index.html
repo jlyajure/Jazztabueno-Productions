@@ -219,7 +219,6 @@
 
     window.actualizarUI = () => { render(); }; 
 
-    // 🔥 SISTEMA DE ENTRADA SECRETO CORREGIDO
     if(localStorage.getItem('jtp_auth') === 'ok') { 
         isAdmin = true; 
         document.getElementById('btn-salir').style.display = 'block';
@@ -233,12 +232,13 @@
         if(taps === 3) {
             if(!isAdmin) {
                 const pass = prompt("🔐 DIRECTOR: Ingrese Clave de Cabina:");
-                if(pass === "ticoadmin" || pass === "jazz2026") {
+                // 🔥 AQUÍ SE CAMBIÓ A LA NUEVA CLAVE MAESTRA ÚNICA
+                if(pass === "ticoadmin2026") {
                     localStorage.setItem('jtp_auth', 'ok');
                     isAdmin = true;
                     document.getElementById('admin-panel').style.display = 'block';
                     document.getElementById('btn-salir').style.display = 'block';
-                    render(); // Refrescar para que salgan los botones de borrar/editar
+                    render();
                 } else {
                     if(pass) alert("❌ Clave Incorrecta");
                 }
