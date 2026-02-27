@@ -222,6 +222,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     let programas = [];
+    let currentRenderedList = []; // 🔥 Lista filtrada actual para el Piloto Automático
     let idActual = null;
     let filtro = 'Todo';
     let hashtagFiltro = ''; 
@@ -294,7 +295,6 @@
 
                 let adminTools = "";
                 if(isAdmin) {
-                    // BOTÓN DE RESPONDER Y BOTÓN DE BORRAR (SOLO ADMIN)
                     adminTools = `<div style="display:flex; align-items:center;">`;
                     if(!c.respuesta) adminTools += `<button class="btn-admin-reply" onclick="window.responderCom('${id}', '${d.id}')">↩️ RESPONDER</button>`;
                     adminTools += `<button class="btn-admin-del" onclick="window.borrarComentario('${id}', '${d.id}')">🗑️</button></div>`;
@@ -460,6 +460,9 @@
             return matchCanal && matchTag;
         });
 
+        // 🔥 Guardamos la lista actual mostrada para que el piloto automático sepa cuál es la siguiente
+        currentRenderedList = list;
+
         list.forEach(p => {
             const isPlaying = idActual === p.id && !media.paused;
             const vistas = p.reproducciones || 0;
@@ -528,13 +531,49 @@
         else document.getElementById('global-player').classList.remove('playing');
     }
 
+    // 🔥 MODIFICACIÓN 1: MEMORIA DE MINUTO EN EL RELOJ
     media.ontimeupdate = () => { 
         seekBar.value = media.currentTime; 
         const m = Math.floor(media.currentTime/60), s = Math.floor(media.currentTime%60);
         const dm = Math.floor(media.duration/60), ds = Math.floor(media.duration%60);
         document.getElementById('p-time').innerText = `${m}:${s<10?'0':''}${s} / ${dm|0}:${ds<10?'0':''}${ds|0}`;
+        
+        // El motor guarda dónde va el usuario cada vez que la canción avanza más de 5 segundos
+        if (idActual && media.currentTime > 5) {
+            localStorage.setItem('jtbp_mem_' + idActual, media.currentTime);
+        }
     };
-    media.onloadedmetadata = () => { seekBar.max = media.duration; };
+
+    // 🔥 MODIFICACIÓN 2: CARGAR MEMORIA CUANDO INICIA LA PISTA
+    media.onloadedmetadata = () => { 
+        seekBar.max = media.duration; 
+        let memoria = localStorage.getItem('jtbp_mem_' + idActual);
+        // Si hay memoria y no está al final de la canción, salta al minuto exacto
+        if (memoria && parseFloat(memoria) > 0 && parseFloat(memoria) < media.duration - 5) {
+            media.currentTime = parseFloat(memoria);
+        }
+    };
+
+    // 🔥 MODIFICACIÓN 3: PILOTO AUTOMÁTICO AL TERMINAR
+    media.onended = () => {
+        // 1. Borramos la memoria de este episodio porque ya lo escuchó completo
+        if(idActual) localStorage.removeItem('jtbp_mem_' + idActual);
+        
+        // 2. Buscamos cuál es el siguiente episodio en la pantalla
+        if (currentRenderedList.length > 0) {
+            let idxActual = currentRenderedList.findIndex(p => p.id === idActual);
+            
+            // Si lo encuentra y no es el último de la lista...
+            if (idxActual !== -1 && idxActual + 1 < currentRenderedList.length) {
+                let siguiente = currentRenderedList[idxActual + 1];
+                window.playItem(siguiente.id, siguiente.mp3Url, siguiente.titulo, siguiente.imagenUrl);
+            } else {
+                // Si ya no hay más episodios, cierra el reproductor
+                window.doClose();
+            }
+        }
+    };
+    
     seekBar.oninput = () => { media.currentTime = seekBar.value; };
 </script>
 </body>
