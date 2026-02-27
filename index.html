@@ -347,7 +347,7 @@
         }
     };
     
-    // 🔥 TRABAJO DE CIRUGÍA EN EL PLAY: LEEMOS MEMORIA Y FORZAMOS EL SALTO
+    // 🔥 EL NUEVO FIJADOR DE MEMORIA (Blindado para celulares)
     window.playItem = async (id, url, tit, img) => {
         if(idActual === id) { 
             window.doToggle(); 
@@ -355,21 +355,24 @@
             idActual = id; 
             window.castUrl = url; window.castTitle = tit; window.castCover = img; 
             media.src = url; 
+            
+            // Obligamos al celular a procesar el nuevo audio
+            media.load(); 
 
-            // Leer memoria antes de reproducir
+            // Rescatamos la memoria
             let memoria = localStorage.getItem('jtbp_mem_' + id);
             
-            // Sensor que espera a que el audio esté listo en el celular para saltar
-            const hacerSalto = () => {
-                if (memoria && parseFloat(memoria) > 5) {
-                    media.currentTime = parseFloat(memoria);
-                    memoria = null; // Borrar variable temporal para no repetir salto si pausan
+            // Sensor infalible: Revisa cada 100 milisegundos si el audio ya está listo para saltar
+            let checkReady = setInterval(() => {
+                if (media.readyState > 0) { // El celular ya reconoció el archivo
+                    if (memoria && parseFloat(memoria) > 5) {
+                        media.currentTime = parseFloat(memoria);
+                    }
+                    clearInterval(checkReady); // Apagamos el sensor para que no moleste
                 }
-                media.removeEventListener('canplay', hacerSalto); // Apagar sensor
-            };
-            media.addEventListener('canplay', hacerSalto);
+            }, 100);
 
-            // Dar play
+            // Le damos play
             media.play().catch(e => console.log("Play bloqueado por navegador:", e));
             
             // Actualizar interfaz
@@ -550,7 +553,7 @@
         else document.getElementById('global-player').classList.remove('playing');
     }
 
-    // 🔥 MODIFICACIÓN: RELOJ SEGURO (Manejo de NaN)
+    // ACTUALIZAR EL RELOJ Y GUARDAR MEMORIA
     media.ontimeupdate = () => { 
         seekBar.value = media.currentTime; 
         const m = Math.floor(media.currentTime/60), s = Math.floor(media.currentTime%60);
