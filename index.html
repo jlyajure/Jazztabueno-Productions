@@ -222,7 +222,7 @@
     const media = document.getElementById('main-media');
     const seekBar = document.getElementById('seek-bar');
     let programas = [];
-    let currentRenderedList = []; // 🔥 Lista filtrada actual para el Piloto Automático
+    let currentRenderedList = []; 
     let idActual = null;
     let filtro = 'Todo';
     let hashtagFiltro = ''; 
@@ -347,13 +347,32 @@
         }
     };
     
+    // 🔥 TRABAJO DE CIRUGÍA EN EL PLAY: LEEMOS MEMORIA Y FORZAMOS EL SALTO
     window.playItem = async (id, url, tit, img) => {
         if(idActual === id) { 
             window.doToggle(); 
         } else {
             idActual = id; 
             window.castUrl = url; window.castTitle = tit; window.castCover = img; 
-            media.src = url; media.play();
+            media.src = url; 
+
+            // Leer memoria antes de reproducir
+            let memoria = localStorage.getItem('jtbp_mem_' + id);
+            
+            // Sensor que espera a que el audio esté listo en el celular para saltar
+            const hacerSalto = () => {
+                if (memoria && parseFloat(memoria) > 5) {
+                    media.currentTime = parseFloat(memoria);
+                    memoria = null; // Borrar variable temporal para no repetir salto si pausan
+                }
+                media.removeEventListener('canplay', hacerSalto); // Apagar sensor
+            };
+            media.addEventListener('canplay', hacerSalto);
+
+            // Dar play
+            media.play().catch(e => console.log("Play bloqueado por navegador:", e));
+            
+            // Actualizar interfaz
             document.getElementById('p-title').innerText = tit;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`;
             document.getElementById('global-player').style.display = 'block';
@@ -531,44 +550,35 @@
         else document.getElementById('global-player').classList.remove('playing');
     }
 
-    // 🔥 MODIFICACIÓN 1: MEMORIA DE MINUTO EN EL RELOJ
+    // 🔥 MODIFICACIÓN: RELOJ SEGURO (Manejo de NaN)
     media.ontimeupdate = () => { 
         seekBar.value = media.currentTime; 
         const m = Math.floor(media.currentTime/60), s = Math.floor(media.currentTime%60);
-        const dm = Math.floor(media.duration/60), ds = Math.floor(media.duration%60);
-        document.getElementById('p-time').innerText = `${m}:${s<10?'0':''}${s} / ${dm|0}:${ds<10?'0':''}${ds|0}`;
+        const dm = isNaN(media.duration) ? 0 : Math.floor(media.duration/60);
+        const ds = isNaN(media.duration) ? 0 : Math.floor(media.duration%60);
+        document.getElementById('p-time').innerText = `${m}:${s<10?'0':''}${s} / ${dm}:${ds<10?'0':''}${ds}`;
         
-        // El motor guarda dónde va el usuario cada vez que la canción avanza más de 5 segundos
+        // Guardar cada 5 segundos
         if (idActual && media.currentTime > 5) {
             localStorage.setItem('jtbp_mem_' + idActual, media.currentTime);
         }
     };
 
-    // 🔥 MODIFICACIÓN 2: CARGAR MEMORIA CUANDO INICIA LA PISTA
     media.onloadedmetadata = () => { 
-        seekBar.max = media.duration; 
-        let memoria = localStorage.getItem('jtbp_mem_' + idActual);
-        // Si hay memoria y no está al final de la canción, salta al minuto exacto
-        if (memoria && parseFloat(memoria) > 0 && parseFloat(memoria) < media.duration - 5) {
-            media.currentTime = parseFloat(memoria);
-        }
+        if(!isNaN(media.duration)) seekBar.max = media.duration; 
     };
 
-    // 🔥 MODIFICACIÓN 3: PILOTO AUTOMÁTICO AL TERMINAR
     media.onended = () => {
-        // 1. Borramos la memoria de este episodio porque ya lo escuchó completo
+        // 1. Borramos la memoria de este episodio
         if(idActual) localStorage.removeItem('jtbp_mem_' + idActual);
         
-        // 2. Buscamos cuál es el siguiente episodio en la pantalla
+        // 2. Piloto automático
         if (currentRenderedList.length > 0) {
             let idxActual = currentRenderedList.findIndex(p => p.id === idActual);
-            
-            // Si lo encuentra y no es el último de la lista...
             if (idxActual !== -1 && idxActual + 1 < currentRenderedList.length) {
                 let siguiente = currentRenderedList[idxActual + 1];
                 window.playItem(siguiente.id, siguiente.mp3Url, siguiente.titulo, siguiente.imagenUrl);
             } else {
-                // Si ya no hay más episodios, cierra el reproductor
                 window.doClose();
             }
         }
