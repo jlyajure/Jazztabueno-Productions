@@ -56,15 +56,10 @@
         :root { --gold: #a68a44; --bg: #050505; --card: #121212; --red: #ff4444; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; background: var(--bg); color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
-        
-        #login-screen { position: fixed; inset: 0; background: black; z-index: 5000; display: flex; align-items: center; justify-content: center; }
-        .login-card { width: 85%; max-width: 320px; text-align: center; background: #111; padding: 40px 30px; border-radius: 25px; border: 1px solid #222; }
-        .login-card input { width: 100%; padding: 15px; margin-bottom: 25px; background: #222; border: 1px solid var(--gold); color: white; border-radius: 12px; text-align: center; font-size: 16px; }
-        .btn-entrar { width: 100% !important; background: var(--gold) !important; color: black !important; border: none !important; padding: 18px !important; border-radius: 50px !important; font-weight: 800 !important; cursor: pointer !important; }
 
         header { background: rgba(0,0,0,0.98); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
         .brand-title { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 11px; text-transform: uppercase; line-height: 1.2; }
-        .btn-salir { background: transparent !important; border: 2px solid var(--gold) !important; color: var(--gold) !important; padding: 7px 15px !important; border-radius: 8px !important; font-size: 10px !important; font-weight: 900 !important; cursor: pointer !important; }
+        .btn-salir { display: none; background: transparent !important; border: 2px solid var(--gold) !important; color: var(--gold) !important; padding: 7px 15px !important; border-radius: 8px !important; font-size: 10px !important; font-weight: 900 !important; cursor: pointer !important; }
 
         .container { max-width: 450px; margin: auto; padding: 15px; padding-bottom: 300px; }
         .channels-grid { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: 5px; margin-bottom: 25px; padding: 10px 0; }
@@ -124,22 +119,13 @@
 </head>
 <body>
 
-<div id="login-screen">
-    <div class="login-card">
-        <img src="logo.png" style="width:80px; margin-bottom:20px;" onerror="this.src='https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png'">
-        <h2 style="color:var(--gold); font-family:'Playfair Display';">ACCESO DIRECTOR</h2>
-        <input type="password" id="passInput" placeholder="Clave de Cabina">
-        <button onclick="window.doLogin()" class="btn-entrar">ENTRAR ▶</button>
-    </div>
-</div>
-
-<div id="app-content" style="display:none;">
+<div id="app-content">
     <header>
-        <div style="display:flex; align-items:center; gap:12px;">
-            <img src="logo.png" width="35" height="35" id="admin-trigger" onerror="this.src='https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png'">
+        <div style="display:flex; align-items:center; gap:12px; cursor:pointer;" id="admin-trigger">
+            <img src="logo.png" width="35" height="35" onerror="this.src='https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png'">
             <div class="brand-title">Jazztabueno<br>Productions</div>
         </div>
-        <button onclick="window.doLogout()" class="btn-salir">SALIR</button>
+        <button onclick="window.doLogout()" class="btn-salir" id="btn-salir">SALIR</button>
     </header>
 
     <div class="container">
@@ -233,15 +219,35 @@
 
     window.actualizarUI = () => { render(); }; 
 
-    window.doLogin = () => {
-        const p = document.getElementById('passInput').value.toLowerCase().trim();
-        if(p === "ticoadmin" || p === "jazz2026") { 
-            localStorage.setItem('jtp_auth', 'ok'); 
-            if(analytics) logEvent(analytics, 'login', { method: 'password' });
-            location.reload(); 
-        } else { alert("Clave Incorrecta"); }
+    // 🔥 SISTEMA DE ENTRADA SECRETO CORREGIDO
+    if(localStorage.getItem('jtp_auth') === 'ok') { 
+        isAdmin = true; 
+        document.getElementById('btn-salir').style.display = 'block';
+    }
+    
+    window.doLogout = () => { localStorage.removeItem('jtp_auth'); location.reload(); };
+
+    let taps = 0, lastTap = 0;
+    document.getElementById('admin-trigger').onclick = () => {
+        const now = new Date().getTime(); if(now - lastTap > 1000) taps = 0; lastTap = now; taps++;
+        if(taps === 3) {
+            if(!isAdmin) {
+                const pass = prompt("🔐 DIRECTOR: Ingrese Clave de Cabina:");
+                if(pass === "ticoadmin" || pass === "jazz2026") {
+                    localStorage.setItem('jtp_auth', 'ok');
+                    isAdmin = true;
+                    document.getElementById('admin-panel').style.display = 'block';
+                    document.getElementById('btn-salir').style.display = 'block';
+                    render(); // Refrescar para que salgan los botones de borrar/editar
+                } else {
+                    if(pass) alert("❌ Clave Incorrecta");
+                }
+            } else {
+                document.getElementById('admin-panel').style.display = 'block';
+            }
+            taps = 0;
+        }
     };
-    window.doLogout = () => { localStorage.clear(); location.reload(); };
     
     window.setFilter = (cat, el) => { 
         filtro = cat; 
@@ -254,7 +260,6 @@
     window.setHashtagFilter = (tag) => { hashtagFiltro = tag; render(); window.scrollTo({top:0, behavior:'smooth'}); };
     window.clearHashtag = () => { hashtagFiltro = ''; render(); };
     
-    // 🔥 EL CANDADO DEL CORAZÓN (Blindado)
     window.doLike = async (id, el) => {
         if(localStorage.getItem('jtp_like_' + id) === 'true') {
             alert("¡Ya le diste me gusta a este programa! ❤️");
@@ -354,7 +359,6 @@
         }
     };
     
-    // 🔥 EL NUEVO SISTEMA DE ARRANQUE (Promesa de Memoria)
     window.playItem = async (id, url, tit, img) => {
         if(idActual === id) { 
             window.doToggle(); 
@@ -363,7 +367,6 @@
             window.castUrl = url; window.castTitle = tit; window.castCover = img; 
             media.src = url; 
 
-            // Le damos play PRIMERO, y cuando el celular responda, hacemos el salto
             let promesa = media.play();
             if (promesa !== undefined) {
                 promesa.then(_ => {
@@ -374,7 +377,6 @@
                 }).catch(e => console.log("Play bloqueado por navegador:", e));
             }
             
-            // Actualizar interfaz
             document.getElementById('p-title').innerText = tit;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`;
             document.getElementById('global-player').style.display = 'block';
@@ -433,18 +435,6 @@
         window.cancelEdit();
     };
 
-    if(localStorage.getItem('jtp_auth')) { 
-        document.getElementById('login-screen').style.display = 'none'; 
-        document.getElementById('app-content').style.display = 'block'; 
-        isAdmin = true; 
-    }
-    
-    let taps = 0, lastTap = 0;
-    document.getElementById('admin-trigger').onclick = () => {
-        const now = new Date().getTime(); if(now - lastTap > 1000) taps = 0; lastTap = now; taps++;
-        if(taps === 3 && isAdmin) document.getElementById('admin-panel').style.display = 'block';
-    };
-
     onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => {
         programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render();
     });
@@ -481,15 +471,12 @@
             return matchCanal && matchTag;
         });
 
-        // 🔥 Guardamos la lista actual mostrada para que el piloto automático sepa cuál es la siguiente
         currentRenderedList = list;
 
         list.forEach(p => {
             const isPlaying = idActual === p.id && !media.paused;
             const vistas = p.reproducciones || 0;
             const likes = p.likes || 0;
-            
-            // 🔥 LEER ESTADO DE LIKE DESDE LA MEMORIA BLINDADA
             const isLiked = localStorage.getItem('jtp_like_' + p.id) === 'true';
             const userLikedClass = isLiked ? 'liked' : '';
             const heartIcon = isLiked ? '❤️' : '🤍';
@@ -555,7 +542,6 @@
         else document.getElementById('global-player').classList.remove('playing');
     }
 
-    // ACTUALIZAR EL RELOJ Y GUARDAR MEMORIA
     media.ontimeupdate = () => { 
         seekBar.value = media.currentTime; 
         const m = Math.floor(media.currentTime/60), s = Math.floor(media.currentTime%60);
@@ -563,7 +549,6 @@
         const ds = isNaN(media.duration) ? 0 : Math.floor(media.duration%60);
         document.getElementById('p-time').innerText = `${m}:${s<10?'0':''}${s} / ${dm}:${ds<10?'0':''}${ds}`;
         
-        // Guardar cada 5 segundos
         if (idActual && media.currentTime > 5) {
             localStorage.setItem('jtbp_mem_' + idActual, media.currentTime);
         }
@@ -574,10 +559,8 @@
     };
 
     media.onended = () => {
-        // 1. Borramos la memoria de este episodio
         if(idActual) localStorage.removeItem('jtbp_mem_' + idActual);
         
-        // 2. Piloto automático
         if (currentRenderedList.length > 0) {
             let idxActual = currentRenderedList.findIndex(p => p.id === idActual);
             if (idxActual !== -1 && idxActual + 1 < currentRenderedList.length) {
