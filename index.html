@@ -121,18 +121,22 @@
         .btn-admin-reply { background:transparent; border:1px solid #444; color:#888; font-size:9px; padding:2px 6px; border-radius:4px; cursor:pointer; margin-left:5px; }
         .btn-admin-del { background:transparent; border:none; color:#ff4444; font-size:10px; cursor:pointer; margin-left:5px; }
 
-        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 3px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; }
-        .p-vinyl { width: 55px; height: 55px; border-radius: 50%; border: 2.3px solid var(--gold); background-size: cover; animation: rot 4s linear infinite; animation-play-state: paused; }
+        #global-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; border-top: 3px solid var(--gold); padding: 15px 20px; display: none; z-index: 1000; box-shadow: 0 -10px 30px rgba(0,0,0,0.8); }
+        .p-vinyl { width: 55px; height: 55px; border-radius: 50%; border: 2.3px solid var(--gold); background-size: cover; animation: rot 4s linear infinite; animation-play-state: paused; flex-shrink: 0; }
         .playing .p-vinyl { animation-play-state: running; }
         @keyframes rot { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
         .controls { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #222; padding-top: 15px; margin-top: 12px; gap: 10px; }
-        .ctrl-btn { flex: 1; background: #111; border: 1px solid #333; color: #fff; padding: 12px 5px; border-radius: 12px; font-size: 9px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .ctrl-btn { flex: 1; background: #111; border: 1px solid #333; color: #fff; padding: 12px 5px; border-radius: 12px; font-size: 9px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
+        .ctrl-btn:active { transform: scale(0.95); border-color: var(--gold); }
         
         google-cast-launcher { width: 20px; height: 20px; --disconnected-color: var(--gold); cursor: pointer; display: inline-block; }
         
         .contador-oyentes { display: flex; align-items: center; gap: 5px; background: #1a1a1a; padding: 4px 10px; border-radius: 20px; border: 1px solid #333; font-size: 11px; color: #aaa; font-weight: bold; }
         .contador-oyentes span { color: var(--gold); }
+
+        /* 🔥 ESTILO DEL VISUALIZADOR */
+        #visualizador { width: 100%; height: 35px; background: transparent; border-radius: 5px; margin-top: 5px; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -182,15 +186,18 @@
 
 <div id="global-player">
     <audio id="main-media" crossorigin="anonymous"></audio>
-    <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+    <div style="display:flex; align-items:center; gap:15px; margin-bottom:5px;">
         <div id="p-vinyl" class="p-vinyl" style="background-image: url('https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png');"></div>
         <div style="flex:1; overflow:hidden;">
             <h4 id="p-title" style="margin:0; font-size:15px; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:800;">...</h4>
             <div id="p-time" style="font-size:12px; color:var(--gold); font-weight:900; margin-top:3px;">00:00 / 00:00</div>
         </div>
-        <button onclick="window.doToggle()" id="p-play-btn" style="background:none; border:none; cursor:pointer;"></button>
-        <button onclick="window.doClose()" style="background:none; border:none; color:#666; font-size:28px;">×</button>
+        <button onclick="window.doToggle()" id="p-play-btn" style="background:none; border:none; cursor:pointer; flex-shrink: 0;"></button>
+        <button onclick="window.doClose()" style="background:none; border:none; color:#666; font-size:28px; flex-shrink: 0;">×</button>
     </div>
+    
+    <canvas id="visualizador"></canvas>
+
     <input type="range" id="seek-bar" value="0" min="0" step="1" style="width:100%;">
     
     <div class="controls">
@@ -231,6 +238,12 @@
     let filtro = 'Todo';
     let hashtagFiltro = ''; 
     let isAdmin = false;
+
+    // 🔥 VARIABLES DEL VISUALIZADOR DE AUDIO
+    let audioCtx, analyser, source;
+    let isVisualizerRunning = false;
+    const canvas = document.getElementById('visualizador');
+    const ctx = canvas.getContext('2d');
 
     const SVG_PLAY = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
     const SVG_PAUSE = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
@@ -375,6 +388,61 @@
             } catch(e) { alert("Error al borrar"); }
         }
     };
+
+    // 🔥 MOTOR DEL VISUALIZADOR DE AUDIO 🔥
+    function encenderVisualizador() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioCtx.createAnalyser();
+            // Evitamos que se cree más de una vez si cambian de canción
+            try {
+                source = audioCtx.createMediaElementSource(media);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+            } catch(e) { console.log("Ya conectado"); }
+            
+            analyser.fftSize = 128; 
+        }
+        
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
+        if (!isVisualizerRunning) {
+            pintarBarras();
+        }
+    }
+
+    function pintarBarras() {
+        isVisualizerRunning = true;
+        requestAnimationFrame(pintarBarras);
+        if (!analyser) return;
+
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        analyser.getByteFrequencyData(dataArray);
+
+        // Adaptar el canvas a la pantalla del celular
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const barWidth = (canvas.width / bufferLength) * 2;
+        let barHeight;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+            // Normalizar la altura de la barra al tamaño del canvas
+            barHeight = (dataArray[i] / 255) * canvas.height;
+            
+            ctx.fillStyle = '#a68a44'; // Dorado JTBP
+            // Dibujamos la barra con un pequeño espacio abajo para que no toque el borde
+            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+            
+            x += barWidth + 1.5;
+        }
+    }
     
     window.playItem = async (id, url, tit, img) => {
         if(idActual === id) { 
@@ -391,6 +459,8 @@
                     if(memoria && parseFloat(memoria) > 5) {
                         media.currentTime = parseFloat(memoria);
                     }
+                    // Encendemos las barras doradas
+                    encenderVisualizador();
                 }).catch(e => console.log("Play bloqueado por navegador:", e));
             }
             
@@ -412,7 +482,16 @@
         render();
     };
 
-    window.doToggle = () => { if(media.paused) media.play(); else media.pause(); render(); };
+    window.doToggle = () => { 
+        if(media.paused) {
+            media.play();
+            encenderVisualizador(); // Reanudamos si pausó
+        } else {
+            media.pause();
+        }
+        render(); 
+    };
+    
     window.doClose = () => { media.pause(); document.getElementById('global-player').style.display='none'; idActual=null; render(); };
     window.toggleList = (id) => { const el = document.getElementById(`list-${id}`); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; };
     window.doSpeed = () => { const r = [1.0, 1.25, 1.5, 2.0]; media.playbackRate = r[(r.indexOf(media.playbackRate)+1)%r.length]; document.getElementById('btn-speed').innerText = media.playbackRate+"x"; };
