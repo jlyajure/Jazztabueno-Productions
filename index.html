@@ -389,7 +389,7 @@
         }
     };
 
-    // 🔥 MOTOR DEL VISUALIZADOR DE AUDIO VIP (BARRAS FINITAS Y SEPARADAS) 🔥
+    // 🔥 MOTOR DEL VISUALIZADOR DE AUDIO BALANCEADO Y CALIBRADO 🔥
     function encenderVisualizador() {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -400,7 +400,7 @@
                 analyser.connect(audioCtx.destination);
             } catch(e) { console.log("Ya conectado"); }
             
-            analyser.fftSize = 512; 
+            analyser.fftSize = 256; 
         }
         if (audioCtx.state === 'suspended') audioCtx.resume();
         if (!isVisualizerRunning) pintarBarras();
@@ -411,38 +411,40 @@
         requestAnimationFrame(pintarBarras);
         if (!analyser) return;
 
-        const bufferLength = analyser.frequencyBinCount;
+        const bufferLength = analyser.frequencyBinCount; // 128
         const dataArray = new Uint8Array(bufferLength);
         analyser.getByteFrequencyData(dataArray);
 
-        // Ajustar resolución de la pantalla LED
-        const displayWidth = canvas.clientWidth;
-        const displayHeight = canvas.clientHeight;
-        if (canvas.width !== displayWidth) canvas.width = displayWidth;
-        if (canvas.height !== displayHeight) canvas.height = displayHeight;
+        // Adaptar el canvas a la pantalla (celular o PC)
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 🔥 TRUCO VIP: Cantidad fija de barras (70) y separación milimétrica
-        const cantidadBarras = 70; 
-        const barWidth = 2.5; // Grosor finito y elegante
-        const gap = (canvas.width - (cantidadBarras * barWidth)) / cantidadBarras; // Espacio calculado
+        // 🔥 CORRECCIÓN VIP 🔥
+        // No leemos las frecuencias muertas de la derecha. Solo agarramos las 80 primeras 
+        // que es donde están los bajos, voces y trompetas.
+        const barrasActivas = 80; 
         
-        let x = gap / 2; // Empezar con un pequeño margen izquierdo
+        // Calculamos un ancho dinámico para que se vea con cuerpo tanto en PC como en móvil
+        const gap = 4; // 4 pixeles de separación perfecta
+        const barWidth = (canvas.width / barrasActivas) - gap; 
+        
+        let x = gap / 2;
 
-        for (let i = 0; i < cantidadBarras; i++) {
-            // Repartir la lectura por todas las frecuencias de la canción
-            const dataIndex = Math.floor(i * (bufferLength / cantidadBarras)); 
-            let barHeight = (dataArray[dataIndex] / 255) * canvas.height;
-            
-            barHeight = barHeight * 1.2; // Un empujoncito de altura visual
+        for (let i = 0; i < barrasActivas; i++) {
+            let barHeight = (dataArray[i] / 255) * canvas.height;
+            barHeight = barHeight * 1.3; // Un empujoncito de altura visual
             
             ctx.fillStyle = '#a68a44'; // Dorado JTBP
             
-            // Si la canción hace silencio, dejamos un puntico base de 2 pixeles
-            ctx.fillRect(x, canvas.height - Math.max(barHeight, 2), barWidth, Math.max(barHeight, 2));
+            // Dibujamos. Si hay silencio, deja un "bloque" chiquito de 4px para que no se vea vacío
+            const finalHeight = Math.max(barHeight, 4);
             
-            x += barWidth + gap; // Siguiente barra + espacio
+            // Los bordes del dibujo se redondearán visualmente por el gap
+            ctx.fillRect(x, canvas.height - finalHeight, barWidth, finalHeight);
+            
+            x += barWidth + gap;
         }
     }
     
@@ -461,7 +463,7 @@
                     if(memoria && parseFloat(memoria) > 5) {
                         media.currentTime = parseFloat(memoria);
                     }
-                    // Encendemos las barras doradas finitas
+                    // Encendemos las barras doradas perfectas
                     encenderVisualizador();
                 }).catch(e => console.log("Play bloqueado por navegador:", e));
             }
