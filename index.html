@@ -389,19 +389,19 @@
         }
     };
 
-    // 🔥 MOTOR DEL VISUALIZADOR DE AUDIO 🔥
+    // 🔥 MOTOR DEL VISUALIZADOR DE AUDIO ACTUALIZADO 🔥
     function encenderVisualizador() {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             analyser = audioCtx.createAnalyser();
-            // Evitamos que se cree más de una vez si cambian de canción
             try {
                 source = audioCtx.createMediaElementSource(media);
                 source.connect(analyser);
                 analyser.connect(audioCtx.destination);
             } catch(e) { console.log("Ya conectado"); }
             
-            analyser.fftSize = 128; 
+            // 🔥 Subimos la resolución a 512 para que las barras sean finitas y elegantes
+            analyser.fftSize = 512; 
         }
         
         if (audioCtx.state === 'suspended') {
@@ -422,25 +422,26 @@
         const dataArray = new Uint8Array(bufferLength);
         analyser.getByteFrequencyData(dataArray);
 
-        // Adaptar el canvas a la pantalla del celular
+        // Adaptar el canvas a la pantalla
         canvas.width = canvas.offsetWidth;
         canvas.height = canvas.offsetHeight;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        const barWidth = (canvas.width / bufferLength) * 2;
+        // Calculamos el ancho de cada barra más delgadita
+        const barWidth = (canvas.width / bufferLength); 
         let barHeight;
         let x = 0;
 
         for (let i = 0; i < bufferLength; i++) {
-            // Normalizar la altura de la barra al tamaño del canvas
             barHeight = (dataArray[i] / 255) * canvas.height;
             
             ctx.fillStyle = '#a68a44'; // Dorado JTBP
-            // Dibujamos la barra con un pequeño espacio abajo para que no toque el borde
-            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
             
-            x += barWidth + 1.5;
+            // Dibujamos restando 1px al ancho para dejar la separación entre ellas
+            ctx.fillRect(x, canvas.height - barHeight, barWidth - 1, barHeight);
+            
+            x += barWidth;
         }
     }
     
