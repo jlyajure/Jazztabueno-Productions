@@ -152,39 +152,54 @@
         .alerta-gala { color: #0070f3; font-size: 11px; margin-bottom: 20px; max-width: 100%; line-height: 1.6; text-align: center; background: rgba(0, 0, 0, 0.5); padding: 10px; border-radius: 8px; border: 1px solid #333; }
         .alerta-gala strong { color: #D4AF37; }
 
+        /* 🔥 FIX DEL SCROLL HORIZONTAL AQUÍ 🔥 */
         .timeline-swipe {
-            display: flex; overflow-x: auto; gap: 10px; padding: 10px; justify-content: center; border-bottom: 1px solid #0070f3; margin-bottom: 20px; padding-bottom: 15px; 
+            display: flex; 
+            overflow-x: auto; 
+            gap: 12px; 
+            padding: 10px 20px; 
+            justify-content: flex-start; /* Cambiado de center a flex-start para que no se corte */
+            border-bottom: 1px solid #0070f3; 
+            margin-bottom: 20px; 
+            padding-bottom: 15px; 
             scrollbar-width: thin; 
-            scrollbar-color: var(--gold) #1a1a1a; 
+            scrollbar-color: var(--gold) #1a1a1a;
+            -webkit-overflow-scrolling: touch; /* Suavidad en iPhone */
+            flex-wrap: nowrap; /* Fuerza que se mantengan en una sola línea */
         }
         .timeline-swipe::-webkit-scrollbar { height: 6px; }
         .timeline-swipe::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 3px; }
         .timeline-swipe::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
-        .timeline-swipe::-webkit-scrollbar-thumb:hover { background: #c19a3b; }
 
-        .year-btn { background: none; border: 1px solid #D4AF37; color: #D4AF37; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: 0.3s; font-family: inherit; font-weight: bold;}
+        .year-btn { 
+            background: none; 
+            border: 1px solid #D4AF37; 
+            color: #D4AF37; 
+            padding: 6px 18px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-size: 12px; 
+            transition: 0.3s; 
+            font-family: inherit; 
+            font-weight: bold;
+            flex-shrink: 0; /* 🎯 IMPORTANTE: Evita que el botón se aplaste en móvil */
+        }
         .year-btn.activo { background: #D4AF37; color: #000; box-shadow: 0 0 10px #D4AF37; }
+        
         .grid-vault { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; text-align: left; }
         .categoria-titulo-vault { color: #0070f3; border-bottom: 1px solid #333; margin-top: 15px; padding-bottom: 5px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;}
         .mix-card-v { background: #000; border-radius: 5px; overflow: hidden; height: 55px; }
         .card-especial-v { border: 2px solid #D4AF37; box-shadow: 0 0 10px #D4AF37; }
         .card-regular-v { border: 1px solid #333; }
 
-        /* 🔥 ESTILOS DEL REPRODUCTOR VINTAGE PULIDOS 🔥 */
+        /* REPRODUCTOR VINTAGE */
         .vintage-player {
             background: #111; border: 1.5px solid #222; border-left: 4px solid var(--gold); border-radius: 8px;
             display: flex; align-items: center; padding: 10px; margin-bottom: 5px; gap: 12px;
             box-shadow: 0 5px 15px rgba(212, 175, 55, 0.1); transition: border-color 0.3s;
         }
         .vintage-player.playing { border-color: var(--gold); }
-        
-        .vp-cover { 
-            width: 55px; height: 55px; border-radius: 6px; border: 1px solid #333; flex-shrink: 0;
-            background-color: #000;
-            object-fit: contain;
-            object-position: center;
-        }
-        
+        .vp-cover { width: 55px; height: 55px; border-radius: 6px; border: 1px solid #333; flex-shrink: 0; background-color: #000; object-fit: contain; object-position: center; }
         .vp-info { flex: 1; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
         .vp-title { color: #fff; font-size: 12px; font-weight: 800; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .vp-controls { display: flex; align-items: center; gap: 10px; width: 100%; }
@@ -289,7 +304,6 @@
     </div>
     
     <canvas id="visualizador"></canvas>
-
     <input type="range" id="seek-bar" value="0" min="0" step="1" style="width:100%;">
     
     <div class="controls">
@@ -306,7 +320,6 @@
     const SVG_PAUSE = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
 
     window.MIS_ARCHIVOS_BOVEDA = [
-        /* === 2025 === */
         { año: 2025, categoria: "Studio 79", titulo: "Especial Studio Mix Two", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2FStudio79%2Fstudio79-192025-especial-studio-mix-two%2F", plataforma: "mixcloud" },
         { año: 2025, categoria: "Studio 79", titulo: "Funky Fever", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2FStudio79%2Fstudio79-182025-funky-fever%2F", plataforma: "mixcloud" },
         { año: 2025, categoria: "Studio 79", titulo: "Disco Nights", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2FStudio79%2Fstudio79-122025-disco-nights%2F", plataforma: "mixcloud" },
@@ -322,17 +335,7 @@
         { año: 2025, categoria: "Salsa Brava", titulo: "La Libertad", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2FByJTB%2Fsalsabrava-092025-la-libertad%2F", plataforma: "mixcloud" },
         { año: 2025, categoria: "Salsa Brava", titulo: "Escucha El Ritmo", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2FByJTB%2Fsalsabrava-102025-escucha-el-ritmo%2F", plataforma: "mixcloud" },
         { año: 2025, categoria: "Salsa Brava", titulo: "No Quiero Nada Regalao", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2FByJTB%2Fsalsabrava-112025-no-quiero-nada-regalao%2F", plataforma: "mixcloud" },
-
-        /* === 2024 === */
-        { 
-            año: 2024, 
-            categoria: "STUDIO 79", 
-            titulo: "Programa 5 Clásico", 
-            url: "https://archive.org/download/studio-79-programa-5/Studio%2079%20Programa%205.mp3", 
-            plataforma: "archive"
-        },
-
-        /* === 2023 === */
+        { año: 2024, categoria: "STUDIO 79", titulo: "Programa 5 Clásico", url: "https://archive.org/download/studio-79-programa-5/Studio%2079%20Programa%205.mp3", plataforma: "archive" },
         { año: 2023, categoria: "Old School Rock", titulo: "Slight Return", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2Foldschoolradio%2Fold-school-rock-radio-012023-slight-return%2F", plataforma: "mixcloud" },
         { año: 2023, categoria: "Old School Rock", titulo: "Bionic Grass", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2Foldschoolradio%2Fold-school-rock-radio-052023-bionic-grass%2F", plataforma: "mixcloud" },
         { año: 2023, categoria: "Old School Rock", titulo: "Deadly Screams", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2Foldschoolradio%2Fold-school-rock-radio-092023-deadly-screams%2F", plataforma: "mixcloud" },
@@ -343,93 +346,23 @@
         { año: 2023, categoria: "Old School Rock", titulo: "Viking Wylde", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2Foldschoolradio%2Fold-school-rock-radio-032023-viking-wylde%2F", plataforma: "mixcloud" },
         { año: 2023, categoria: "JAZZTABUENO", titulo: "Acid Funk", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2FJazzTaBueno%2Fjazztabueno-172023-acid-funk%2F", plataforma: "mixcloud" },
         { año: 2023, categoria: "JAZZTABUENO", titulo: "Big Band Orchestras Y Algo Jazz", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2FJazzTaBueno%2Fjazztabueno-142023-big-band-orchestras-y-algo-jazz%2F", plataforma: "mixcloud" },
-        
-        /* === 2022 === */
-        { 
-            año: 2022, 
-            categoria: "JAZZTABUENO", 
-            titulo: "Programa 1", 
-            url: "https://archive.org/download/jazztabueno-programa-1-2022/Jazztabueno%20Programa%201-2022.mp3", 
-            plataforma: "archive" 
-        },
-        { 
-            año: 2022, 
-            categoria: "JAZZTABUENO", 
-            titulo: "Programa 2", 
-            url: "https://archive.org/download/jazztabueno-programa-2-2022/Jazztabueno%20Programa%202-2022.mp3", 
-            plataforma: "archive" 
-        },
-        { 
-            año: 2022, 
-            categoria: "JAZZTABUENO", 
-            titulo: "Programa 3", 
-            url: "https://archive.org/download/jazztabueno-programa-3-2022/Jazztabueno%20Programa%203-2022.mp3", 
-            plataforma: "archive" 
-        },
+        { año: 2022, categoria: "JAZZTABUENO", titulo: "Programa 1", url: "https://archive.org/download/jazztabueno-programa-1-2022/Jazztabueno%20Programa%201-2022.mp3", plataforma: "archive" },
+        { año: 2022, categoria: "JAZZTABUENO", titulo: "Programa 2", url: "https://archive.org/download/jazztabueno-programa-2-2022/Jazztabueno%20Programa%202-2022.mp3", plataforma: "archive" },
+        { año: 2022, categoria: "JAZZTABUENO", titulo: "Programa 3", url: "https://archive.org/download/jazztabueno-programa-3-2022/Jazztabueno%20Programa%203-2022.mp3", plataforma: "archive" },
         { año: 2022, categoria: "JAZZTABUENO", titulo: "Get Lucky", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2FJazzTaBueno%2Fjazztabueno-342022-get-lucky%2F", plataforma: "mixcloud" },
         { año: 2022, categoria: "JAZZTABUENO", titulo: "Original", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2FJazzTaBueno%2Fjazztabueno-072022-original%2F", plataforma: "mixcloud" },
-
-        /* === 2021 === */
-        /* 🔥 AQUÍ ESTÁN TUS 2 ENLACES NUEVOS DE SALSA BRAVA 🔥 */
-        { 
-            año: 2021, 
-            categoria: "SALSA BRAVA", 
-            titulo: "Programa 1", 
-            url: "https://archive.org/download/salsa-brava-programa-1-2021/Salsa%20Brava%20Programa%201-2021.mp3", 
-            plataforma: "archive" 
-        },
-        { 
-            año: 2021, 
-            categoria: "SALSA BRAVA", 
-            titulo: "Programa 2", 
-            url: "https://archive.org/download/salsa-brava-programa-2-2021/Salsa%20Brava%20Programa%202-2021.mp3", 
-            plataforma: "archive" 
-        },
+        { año: 2021, categoria: "SALSA BRAVA", titulo: "Programa 1", url: "https://archive.org/download/salsa-brava-programa-1-2021/Salsa%20Brava%20Programa%201-2021.mp3", plataforma: "archive" },
+        { año: 2021, categoria: "SALSA BRAVA", titulo: "Programa 2", url: "https://archive.org/download/salsa-brava-programa-2-2021/Salsa%20Brava%20Programa%202-2021.mp3", plataforma: "archive" },
         { año: 2021, categoria: "JAZZTABUENO", titulo: "The Music Time", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2FJazzTaBueno%2Fjazztabueno-012021-the-music-time%2F", plataforma: "mixcloud" },
-
-        /* === 2020 === */
-        /* 🔥 AQUÍ ESTÁN TUS 5 ENLACES NUEVOS DE STUDIO 79 🔥 */
-        { 
-            año: 2020, 
-            categoria: "STUDIO 79", 
-            titulo: "Programa 4", 
-            url: "https://archive.org/download/studio-79-programa-4-2020/Studio%2079%20Programa%204-2020.mp3", 
-            plataforma: "archive" 
-        },
-        { 
-            año: 2020, 
-            categoria: "STUDIO 79", 
-            titulo: "Programa 5", 
-            url: "https://archive.org/download/studio-79-programa-5-2020/Studio%2079%20Programa%205-2020.mp3", 
-            plataforma: "archive" 
-        },
-        { 
-            año: 2020, 
-            categoria: "STUDIO 79", 
-            titulo: "Programa 6", 
-            url: "https://archive.org/download/studio-79-programa-6-2020/Studio%2079%20Programa%206-2020.mp3", 
-            plataforma: "archive" 
-        },
-        { 
-            año: 2020, 
-            categoria: "STUDIO 79", 
-            titulo: "Programa 7", 
-            url: "https://archive.org/download/studio-79-programa-7-2020/Studio%2079%20Programa%207-2020.mp3", 
-            plataforma: "archive" 
-        },
-        { 
-            año: 2020, 
-            categoria: "STUDIO 79", 
-            titulo: "Programa 8", 
-            url: "https://archive.org/download/studio-79-programa-8-2020/Studio%2079%20Programa%208-2020.mp3", 
-            plataforma: "archive" 
-        },
+        { año: 2020, categoria: "STUDIO 79", titulo: "Programa 4", url: "https://archive.org/download/studio-79-programa-4-2020/Studio%2079%20Programa%204-2020.mp3", plataforma: "archive" },
+        { año: 2020, categoria: "STUDIO 79", titulo: "Programa 5", url: "https://archive.org/download/studio-79-programa-5-2020/Studio%2079%20Programa%205-2020.mp3", plataforma: "archive" },
+        { año: 2020, categoria: "STUDIO 79", titulo: "Programa 6", url: "https://archive.org/download/studio-79-programa-6-2020/Studio%2079%20Programa%206-2020.mp3", plataforma: "archive" },
+        { año: 2020, categoria: "STUDIO 79", titulo: "Programa 7", url: "https://archive.org/download/studio-79-programa-7-2020/Studio%2079%20Programa%207-2020.mp3", plataforma: "archive" },
+        { año: 2020, categoria: "STUDIO 79", titulo: "Programa 8", url: "https://archive.org/download/studio-79-programa-8-2020/Studio%2079%20Programa%208-2020.mp3", plataforma: "archive" },
         { año: 2020, categoria: "JAZZTABUENO", titulo: "Funky Moment", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2FJazzTaBueno%2Fjazztabueno-212020-funky-moment%2F", plataforma: "mixcloud" },
         { año: 2020, categoria: "JAZZTABUENO", titulo: "Blues", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2FJazzTaBueno%2Fjazztabueno-232020-blues%2F", plataforma: "mixcloud" },
         { año: 2020, categoria: "JAZZTABUENO", titulo: "The People", url: "https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&feed=%2FJazzTaBueno%2Fjazztabueno-282020-the-people%2F", plataforma: "mixcloud" }
     ];
-
-    window.misReproductoresMixcloud = [];
 
     window.openVault = () => {
         document.getElementById('main-view').style.display = 'none';
@@ -442,13 +375,11 @@
         document.getElementById('vault-view').style.display = 'none';
         document.getElementById('main-view').style.display = 'block';
         document.getElementById('grid-archivos').innerHTML = ''; 
-        
         if(window.misReproductoresMixcloud) {
             window.misReproductoresMixcloud.forEach(item => { try { item.reproductor.pause(); } catch(e){} });
         }
         window.misReproductoresMixcloud = [];
         document.querySelectorAll('.vintage-audio').forEach(a => { a.pause(); });
-        
         window.scrollTo({top:0, behavior:'smooth'});
     };
 
@@ -469,21 +400,18 @@
 
         categoriasUnicas.forEach(cat => {
             contenidoHtml += `<div class="categoria-titulo-vault">► ${cat}</div>`;
-            
             const programasDeCat = filtrados.filter(item => item.categoria === cat);
             programasDeCat.forEach(item => {
                 const esEspecial = item.titulo.toLowerCase().includes('especial');
                 const clase = esEspecial ? 'card-especial-v' : 'card-regular-v';
                 
                 if (item.plataforma === 'archive') {
-                    // 🔥 LÓGICA DE AUTO-PORTADA INYECTADA PULIDA (V8.4) 🔥
-                    let defaultCover = "https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png"; // Jazztabueno por defecto
+                    let defaultCover = "https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png";
                     const catUp = item.categoria.toUpperCase();
                     if(catUp.includes("STUDIO")) defaultCover = "https://i.postimg.cc/NKMDbYJB/S79.png";
                     else if(catUp.includes("SALSA")) defaultCover = "https://i.postimg.cc/75fchgyt/Salsa-Brava.png";
                     else if(catUp.includes("OLD")) defaultCover = "https://i.postimg.cc/jwQ3mczC/Old-School-Radio.png";
                     
-                    // Si el programa trae cover úsala, si no, usa la default calculada
                     const finalCover = item.cover ? item.cover : defaultCover;
 
                     contenidoHtml += `
@@ -540,18 +468,14 @@
         const card = document.getElementById(cardId);
         const mainMedia = document.getElementById('main-media');
         
-        // Pausar reproductor principal
         if(mainMedia && !mainMedia.paused) { mainMedia.pause(); if(window.actualizarUI) window.actualizarUI(); }
-        // Pausar Mixclouds
         if(window.misReproductoresMixcloud) { window.misReproductoresMixcloud.forEach(item => { try { item.reproductor.pause(); } catch(e){} }); }
 
         if (audio.paused) {
-            // Pausar otros audios vintage y quitarles el estilo
             document.querySelectorAll('.vintage-audio').forEach(a => { 
                 if(a.id !== audioId) { a.pause(); document.getElementById(a.id.replace('audio', 'btn')).innerHTML = SVG_PLAY; } 
             });
             document.querySelectorAll('.vintage-player').forEach(c => c.classList.remove('playing'));
-            
             audio.play();
             btn.innerHTML = SVG_PAUSE;
             card.classList.add('playing');
@@ -711,7 +635,6 @@
             window.doToggle(); 
         } else {
             idActual = id; window.castUrl = url; window.castTitle = tit; window.castCover = img; media.src = url; 
-
             let promesa = media.play();
             if (promesa !== undefined) {
                 promesa.then(_ => {
@@ -720,23 +643,16 @@
                     encenderVisualizador();
                 }).catch(e => {});
             }
-            
             document.getElementById('p-title').innerText = tit;
             document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`;
             document.getElementById('global-player').style.display = 'block';
-
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
-                    title: tit,
-                    artist: 'Jazztabueno Productions',
-                    album: 'Radio Oficial',
-                    artwork: [ { src: img, sizes: '512x512', type: 'image/jpeg' } ]
+                    title: tit, artist: 'Jazztabueno Productions', album: 'Radio Oficial', artwork: [ { src: img, sizes: '512x512', type: 'image/jpeg' } ]
                 });
-                
                 navigator.mediaSession.setActionHandler('play', function() { media.play(); encenderVisualizador(); render(); });
                 navigator.mediaSession.setActionHandler('pause', function() { media.pause(); render(); });
             }
-            
             if(analytics) logEvent(analytics, 'play_program', { program_name: tit });
             if(!localStorage.getItem('oyente_' + id)) {
                 localStorage.setItem('oyente_' + id, 'true');
