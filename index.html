@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -220,7 +221,7 @@
             </div>
             
             <div class="alerta-gala">
-                <i>⚠️ <strong>Aviso:</strong> Para escuchar, presiona únicamente el botón de <strong>▶ PLAY</strong>.</i><br>
+                <i>⚠️ <strong>Aviso:</strong> Para escuchar, presiona únicamente el botón de <strong>▶ PLAY</strong>.</i><br><br>
                 <i>⭐ <strong>Nota:</strong> Los programas con marco iluminado son <strong>Ediciones Especiales</strong>.</i>
             </div>
 
@@ -378,7 +379,6 @@
                 const esEspecial = item.titulo.toLowerCase().includes('especial');
                 const claseEspecial = esEspecial ? 'card-especial-v' : '';
                 
-                // 💎 CAJA PRINCIPAL CON SU TÍTULO Y MARCO (SIN BOTONES DE INFO) 💎
                 contenidoHtml += `
                 <div class="vault-card ${claseEspecial}">
                     <span style="color:var(--gold); font-size:9px; font-weight:900; text-transform:uppercase;">${item.categoria}</span>
@@ -415,7 +415,7 @@
                     </div>`;
                 }
                 
-                contenidoHtml += `</div>`; // Se cierra la caja (sin añadir Info ni Chat)
+                contenidoHtml += `</div>`;
                 idCounter++;
             });
         });
@@ -508,6 +508,16 @@
     const SVG_PLAY = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`; const SVG_PAUSE = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
 
     window.actualizarUI = () => { render(); }; 
+
+    // 🔗 CREADOR DE PASES VIP
+    window.copiarLinkVIP = (id) => {
+        const urlPase = window.location.origin + window.location.pathname + "?play=" + id;
+        navigator.clipboard.writeText(urlPase).then(() => {
+            alert("🎟️ ¡Pase VIP copiado!\n\nYa puedes pegar el link en WhatsApp. Quien lo abra, escuchará este programa.");
+        }).catch(err => {
+            alert("Error al copiar: " + err);
+        });
+    };
 
     media.addEventListener('play', () => {
         if(window.misReproductoresMixcloud) {
@@ -606,22 +616,33 @@
         }
     }
     
+    // 🎧 FUNCIÓN PLAY MEJORADA CON AVISO ANTIBLOQUEO
     window.playItem = async (id, url, tit, img) => {
         if(idActual === id) { 
             window.doToggle(); 
         } else {
             idActual = id; window.castUrl = url; window.castTitle = tit; window.castCover = img; media.src = url; 
+            
+            // 1. Cargamos el diseño del reproductor de inmediato
+            document.getElementById('p-title').innerText = tit;
+            document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`;
+            document.getElementById('global-player').style.display = 'block';
+
+            // 2. Intentamos reproducir el audio
             let promesa = media.play();
             if (promesa !== undefined) {
                 promesa.then(_ => {
                     let memoria = localStorage.getItem('jtbp_mem_' + id);
                     if(memoria && parseFloat(memoria) > 5) { media.currentTime = parseFloat(memoria); }
                     encenderVisualizador();
-                }).catch(e => {});
+                }).catch(e => {
+                    // 🛡️ 3. SI EL NAVEGADOR BLOQUEA EL AUDIO, MUESTRA ESTE AVISO
+                    const btn = document.getElementById('p-play-btn');
+                    if(btn) btn.innerHTML = SVG_PLAY;
+                    alert("🎟️ ¡Tu Pase VIP está listo!\n\nPor reglas de seguridad de tu navegador, presiona el botón de PLAY (▶️) en la barra inferior para escuchar.");
+                });
             }
-            document.getElementById('p-title').innerText = tit;
-            document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`;
-            document.getElementById('global-player').style.display = 'block';
+            
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: tit, artist: 'Jazztabueno Productions', album: 'Radio Oficial', artwork: [ { src: img, sizes: '512x512', type: 'image/jpeg' } ]
@@ -654,7 +675,30 @@
         window.cancelEdit();
     };
 
-    onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => { programas = []; snap.forEach(d => programas.push({id: d.id, ...d.data()})); render(); });
+    // 🎟️ SISTEMA AUTOMÁTICO DE PASES VIP
+    let paseVipUsado = false; 
+
+    onSnapshot(query(collection(db, "radio_programas"), orderBy("fecha", "desc")), (snap) => { 
+        programas = []; 
+        snap.forEach(d => programas.push({id: d.id, ...d.data()})); 
+        render(); 
+
+        if (!paseVipUsado) {
+            const parametros = new URLSearchParams(window.location.search);
+            const programaId = parametros.get('play');
+            
+            if (programaId) {
+                const programaEspecial = programas.find(p => p.id === programaId);
+                if (programaEspecial) {
+                    setTimeout(() => {
+                        window.playItem(programaEspecial.id, programaEspecial.mp3Url, programaEspecial.titulo, programaEspecial.imagenUrl);
+                        window.history.replaceState(null, null, window.location.pathname);
+                    }, 1000); 
+                }
+            }
+            paseVipUsado = true;
+        }
+    });
 
     function render() {
         const feed = document.getElementById('feed'); if(!feed) return; feed.innerHTML = "";
@@ -697,6 +741,7 @@
                     <div style="display:flex; gap:10px;">
                         <button class="btn-list" style="flex:1" onclick="window.toggleList('${p.id}')">📋 INFO</button>
                         <button class="btn-list" style="flex:1" onclick="window.toggleComments('${p.id}')">💬 CHAT</button>
+                        <button class="btn-list" style="flex:0.4; font-size: 15px !important; padding: 0 !important; display: flex; align-items: center; justify-content: center;" onclick="window.copiarLinkVIP('${p.id}')" title="Copiar link directo">🔗</button>
                     </div>
                     <div id="list-${p.id}" class="list-box">${p.playlist || "Próximamente."}</div>
                     <div id="comments-${p.id}" class="comments-section">
