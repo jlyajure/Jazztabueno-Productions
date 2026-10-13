@@ -396,17 +396,29 @@ window.playItem = async (id, url, tit, img) => {
         document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`;
         document.getElementById('global-player').style.display = 'block';
 
-        let promesa = media.play();
-        if (promesa !== undefined) {
-            promesa.then(_ => {
-                let memoria = localStorage.getItem('jtbp_mem_' + id);
-                if(memoria && parseFloat(memoria) > 5) { media.currentTime = parseFloat(memoria); }
-                encenderVisualizador();
-            }).catch(e => {
-                const btn = document.getElementById('p-play-btn');
-                if(btn) btn.innerHTML = SVG_PLAY;
-                alert("🎟️ ¡Tu Pase VIP está listo!\n\nPor reglas de seguridad de tu navegador, presiona el botón de PLAY (▶️) en la barra inferior para escuchar.");
-            });
+        // Actualizamos los botones visualmente para decir "estamos intentando arrancar"
+        const cardBtn = document.querySelector(`.card.playing .btn-play`);
+        const pBtn = document.getElementById('p-play-btn');
+        if(cardBtn) cardBtn.innerHTML = SVG_PAUSE;
+        if(pBtn) pBtn.innerHTML = SVG_PAUSE;
+
+        try {
+            // Le decimos a la música que suene de manera silenciosa para ver si el navegador nos deja
+            await media.play();
+            
+            // Si nos deja, seguimos todo normal
+            let memoria = localStorage.getItem('jtbp_mem_' + id);
+            if(memoria && parseFloat(memoria) > 5) { media.currentTime = parseFloat(memoria); }
+            encenderVisualizador();
+            
+        } catch (error) {
+            // SI EL NAVEGADOR FRENA EL AUDIO: No tiramos alerta, solo cancelamos la orden y dejamos que el usuario toque Play manualmente.
+            console.log("Esperando toque del usuario por seguridad del navegador.");
+            media.pause();
+            if(cardBtn) cardBtn.innerHTML = SVG_PLAY;
+            if(pBtn) pBtn.innerHTML = SVG_PLAY;
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('playing'));
+            document.getElementById('global-player').classList.remove('playing');
         }
         
         // LOS CONTROLES COMPLEJOS DE PANTALLA DE BLOQUEO PARA QUE EL CELULAR LO RESPETE
