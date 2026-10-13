@@ -248,12 +248,17 @@ window.copiarLinkVIP = (id) => {
 };
 
 media.addEventListener('play', () => {
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
     document.querySelectorAll('.vintage-audio').forEach(a => { 
         a.pause(); 
         const btn = document.getElementById(a.id.replace('audio', 'btn'));
         if(btn) btn.innerHTML = SVG_PLAY;
     });
     document.querySelectorAll('.vintage-player').forEach(c => c.classList.remove('playing'));
+});
+
+media.addEventListener('pause', () => {
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
 });
 
 if(localStorage.getItem('jtp_auth') === 'ok') { isAdmin = true; document.getElementById('btn-salir').style.display = 'block'; }
@@ -371,11 +376,22 @@ window.playItem = async (id, url, tit, img) => {
         
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
-                title: tit, artist: 'Jazztabueno Productions', album: 'Radio Oficial', artwork: [ { src: img, sizes: '512x512', type: 'image/jpeg' } ]
+                title: tit,
+                artist: 'Jazztabueno Productions',
+                album: 'Radio Oficial',
+                artwork: [
+                    { src: img, sizes: '96x96', type: 'image/png' },
+                    { src: img, sizes: '128x128', type: 'image/png' },
+                    { src: img, sizes: '512x512', type: 'image/png' }
+                ]
             });
-            navigator.mediaSession.setActionHandler('play', function() { media.play(); encenderVisualizador(); render(); });
-            navigator.mediaSession.setActionHandler('pause', function() { media.pause(); render(); });
+            navigator.mediaSession.setActionHandler('play', function() { window.doToggle(); });
+            navigator.mediaSession.setActionHandler('pause', function() { window.doToggle(); });
+            navigator.mediaSession.setActionHandler('seekbackward', function() { media.currentTime = Math.max(media.currentTime - 15, 0); });
+            navigator.mediaSession.setActionHandler('seekforward', function() { media.currentTime = Math.min(media.currentTime + 15, media.duration); });
+            navigator.mediaSession.setActionHandler('seekto', function(details) { media.currentTime = details.seekTime; });
         }
+        
         if(typeof firebase !== 'undefined' && firebase.analytics) firebase.analytics().logEvent('play_program', { program_name: tit });
         if(!localStorage.getItem('oyente_' + id)) {
             localStorage.setItem('oyente_' + id, 'true');
