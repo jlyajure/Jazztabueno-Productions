@@ -209,7 +209,7 @@ window.resetVintage = (btnId, cardId) => {
     if(c) c.classList.remove('playing');
 };
 
-// Configuración de Firebase y Componentes (Compat, seguro para celus)
+// Configuración de Firebase y Componentes
 const firebaseConfig = { 
     apiKey: "AIzaSyBwBq4gLgv4DSfUidzUuC7Irmvj_4pCTtI", 
     authDomain: "familia-yajure-app.firebaseapp.com", 
@@ -220,7 +220,6 @@ const firebaseConfig = {
     measurementId: "G-GDBL4HPE79" 
 };
 
-// Inicializamos Firebase de forma clásica
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
@@ -247,6 +246,7 @@ window.copiarLinkVIP = (id) => {
     });
 };
 
+// AVISAMOS AL CELULAR CUANDO SUENA Y CUANDO SE PAUSA PARA QUE NO CORTE LA APP
 media.addEventListener('play', () => {
     if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
     document.querySelectorAll('.vintage-audio').forEach(a => { 
@@ -319,7 +319,17 @@ window.responderCom = async (progId, comId) => {
 
 window.borrarComentario = async (progId, comId) => { if(confirm("¿Borrar este comentario permanentemente?")) { try { await db.collection("radio_programas").doc(progId).collection("comentarios").doc(comId).delete(); } catch(e) {} } };
 
+// === DETECTOR DE CELULARES ===
+const isMobileDevice = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+let timeCount = 0;
+
 function encenderVisualizador() {
+    // Si es un celular, NO procesamos el audio porque satura en segundo plano
+    if (isMobileDevice) {
+        if (!isVisualizerRunning) pintarBarrasFalsas();
+        return;
+    }
+
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)(); analyser = audioCtx.createAnalyser();
         try { source = audioCtx.createMediaElementSource(media); source.connect(analyser); analyser.connect(audioCtx.destination); } catch(e) {}
@@ -344,9 +354,34 @@ function pintarBarras() {
 
     for (let i = 0; i < barrasActivas; i++) {
         const dataIndex = Math.floor(i * factorEnfoque) + ignorarBajosSordos; 
-        
         let barHeight = (dataArray[dataIndex] / 255) * displayHeight * 1.3; ctx.fillStyle = '#a68a44'; 
         const finalHeight = Math.max(barHeight, isMobile ? 3 : 4); ctx.fillRect(x, displayHeight - finalHeight, barWidth, finalHeight);
+        x += barWidth + gap;
+    }
+}
+
+// === VISUALIZADOR SEGURO PARA CELULARES (CERO SATURACIÓN) ===
+function pintarBarrasFalsas() {
+    isVisualizerRunning = true; requestAnimationFrame(pintarBarrasFalsas); 
+    const estaPausado = media.paused;
+    timeCount += 0.08; // Velocidad de la animación
+    
+    const dpr = window.devicePixelRatio || 1; const displayWidth = canvas.clientWidth; const displayHeight = canvas.clientHeight;
+    canvas.width = displayWidth * dpr; canvas.height = displayHeight * dpr; ctx.scale(dpr, dpr); ctx.clearRect(0, 0, displayWidth, displayHeight);
+    
+    const barrasActivas = 40; const gap = 2; const barWidth = (displayWidth / barrasActivas) - gap; let x = gap / 2;
+    
+    for (let i = 0; i < barrasActivas; i++) {
+        let barHeight = 3;
+        if (!estaPausado) {
+            // Un truquito matemático para que bailen bonito sin tocar la música
+            let wave = Math.sin(timeCount + i * 0.3) * Math.cos(timeCount * 0.7 + i * 0.2);
+            let intensity = Math.abs(wave) + 0.1;
+            barHeight = intensity * displayHeight * 0.7;
+        }
+        ctx.fillStyle = '#a68a44'; 
+        const finalHeight = Math.max(barHeight, 3); 
+        ctx.fillRect(x, displayHeight - finalHeight, barWidth, finalHeight);
         x += barWidth + gap;
     }
 }
@@ -374,6 +409,7 @@ window.playItem = async (id, url, tit, img) => {
             });
         }
         
+        // LOS CONTROLES COMPLEJOS DE PANTALLA DE BLOQUEO PARA QUE EL CELULAR LO RESPETE
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: tit,
