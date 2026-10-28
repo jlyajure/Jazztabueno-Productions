@@ -224,9 +224,6 @@ try {
 const media = document.getElementById('main-media');
 const isMobileDevice = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-// === MAGIA ANTI-BLOQUEOS DE ARCHIVE.ORG PARA CELULARES ===
-// A las computadoras (que tienen más poder) les exigimos los permisos para dibujar las barras musicales reales.
-// A los celulares se los quitamos para que Archive.org nunca más les tranque un programa por falta de permisos.
 if (!isMobileDevice) {
     media.crossOrigin = "anonymous";
 }
@@ -263,15 +260,38 @@ media.addEventListener('pause', () => {
 if(localStorage.getItem('jtp_auth') === 'ok') { isAdmin = true; document.getElementById('btn-salir').style.display = 'block'; }
 window.doLogout = () => { localStorage.removeItem('jtp_auth'); location.reload(); };
 
+// === AQUÍ ESTÁ EL LIMPIAPARABRISAS NUEVO ===
+window.cancelEdit = () => { 
+    document.getElementById('admin-panel').style.display='none'; 
+    document.getElementById('edit-id').value=""; 
+    document.getElementById('t-titulo').value="";
+    document.getElementById('t-programa').value="JAZZTABUENO";
+    document.getElementById('t-url').value="";
+    document.getElementById('t-img').value="";
+    document.getElementById('t-tags').value="";
+    document.getElementById('t-playlist').value="";
+    document.getElementById('t-estreno').value="";
+};
+
 let taps = 0, lastTap = 0;
 document.getElementById('admin-trigger').onclick = () => {
     const now = new Date().getTime(); if(now - lastTap > 1000) taps = 0; lastTap = now; taps++;
     if(taps === 3) {
         if(!isAdmin) {
             const pass = prompt("🔐 DIRECTOR: Ingrese Clave de Cabina:");
-            if(pass === "ticoadmin2026") { localStorage.setItem('jtp_auth', 'ok'); isAdmin = true; document.getElementById('admin-panel').style.display = 'block'; document.getElementById('btn-salir').style.display = 'block'; render(); } 
+            if(pass === "ticoadmin2026") { 
+                localStorage.setItem('jtp_auth', 'ok'); 
+                isAdmin = true; 
+                window.cancelEdit(); // Limpia los datos antes de abrir
+                document.getElementById('admin-panel').style.display = 'block'; 
+                document.getElementById('btn-salir').style.display = 'block'; 
+                render(); 
+            } 
             else { if(pass) alert("❌ Clave Incorrecta"); }
-        } else { document.getElementById('admin-panel').style.display = 'block'; }
+        } else { 
+            window.cancelEdit(); // Limpia los datos antes de abrir
+            document.getElementById('admin-panel').style.display = 'block'; 
+        }
         taps = 0;
     }
 };
@@ -449,7 +469,6 @@ window.doToggle = () => { if(media.paused) { media.play(); encenderVisualizador(
 window.doClose = () => { media.pause(); document.getElementById('global-player').style.display='none'; idActual=null; render(); };
 window.doSpeed = () => { const r = [1.0, 1.25, 1.5, 2.0]; media.playbackRate = r[(r.indexOf(media.playbackRate)+1)%r.length]; document.getElementById('btn-speed').innerText = media.playbackRate+"x"; };
 window.doMute = () => { media.muted = !media.muted; document.getElementById('btn-mute').innerText = media.muted ? "🔇 MUTE" : "🔊 VOL"; };
-window.cancelEdit = () => { document.getElementById('admin-panel').style.display='none'; document.getElementById('edit-id').value=""; document.getElementById('t-estreno').value=""; };
 
 window.prepEdit = (id) => { 
     const p = programas.find(x => x.id === id); 
