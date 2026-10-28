@@ -374,7 +374,6 @@ function pintarBarrasFalsas() {
     for (let i = 0; i < barrasActivas; i++) {
         let barHeight = 3;
         if (!estaPausado) {
-            // Un truquito matemático para que bailen bonito sin tocar la música
             let wave = Math.sin(timeCount + i * 0.3) * Math.cos(timeCount * 0.7 + i * 0.2);
             let intensity = Math.abs(wave) + 0.1;
             barHeight = intensity * displayHeight * 0.7;
@@ -390,30 +389,34 @@ window.playItem = async (id, url, tit, img) => {
     if(idActual === id) { 
         window.doToggle(); 
     } else {
-        idActual = id; window.castUrl = url; window.castTitle = tit; window.castCover = img; media.src = url; 
+        // === PURIFICADOR MÁGICO DE ENLACES ARCHIVE.ORG ===
+        let urlLimpia = url ? url.trim() : "";
+        if (urlLimpia.includes('.us.archive.org/') && urlLimpia.includes('/items/')) {
+            const partes = urlLimpia.split('/items/');
+            if (partes.length === 2) {
+                urlLimpia = 'https://archive.org/download/' + partes[1];
+            }
+        }
+
+        idActual = id; window.castUrl = urlLimpia; window.castTitle = tit; window.castCover = img; media.src = urlLimpia; 
         
         document.getElementById('p-title').innerText = tit;
         document.getElementById('p-vinyl').style.backgroundImage = `url('${img}')`;
         document.getElementById('global-player').style.display = 'block';
 
-        // Actualizamos los botones visualmente para decir "estamos intentando arrancar"
         const cardBtn = document.querySelector(`.card.playing .btn-play`);
         const pBtn = document.getElementById('p-play-btn');
         if(cardBtn) cardBtn.innerHTML = SVG_PAUSE;
         if(pBtn) pBtn.innerHTML = SVG_PAUSE;
 
         try {
-            // Le decimos a la música que suene de manera silenciosa para ver si el navegador nos deja
             await media.play();
-            
-            // Si nos deja, seguimos todo normal
             let memoria = localStorage.getItem('jtbp_mem_' + id);
             if(memoria && parseFloat(memoria) > 5) { media.currentTime = parseFloat(memoria); }
             encenderVisualizador();
             
         } catch (error) {
-            // SI EL NAVEGADOR FRENA EL AUDIO: No tiramos alerta, solo cancelamos la orden y dejamos que el usuario toque Play manualmente.
-            console.log("Esperando toque del usuario por seguridad del navegador.");
+            console.log("Error al reproducir o bloqueado por seguridad:", error);
             media.pause();
             if(cardBtn) cardBtn.innerHTML = SVG_PLAY;
             if(pBtn) pBtn.innerHTML = SVG_PLAY;
@@ -491,10 +494,22 @@ document.getElementById('btn-save').onclick = async () => {
         fechaEstrenoMs = new Date(y, m-1, d).getTime();
     }
 
+    // === PURIFICADOR MÁGICO TAMBIÉN AL GUARDAR EN FIREBASE ===
+    let urlParaGuardar = document.getElementById('t-url').value;
+    if (urlParaGuardar) {
+        urlParaGuardar = urlParaGuardar.trim();
+        if (urlParaGuardar.includes('.us.archive.org/') && urlParaGuardar.includes('/items/')) {
+            const partes = urlParaGuardar.split('/items/');
+            if (partes.length === 2) {
+                urlParaGuardar = 'https://archive.org/download/' + partes[1];
+            }
+        }
+    }
+
     const data = { 
         titulo: document.getElementById('t-titulo').value, 
         programa: document.getElementById('t-programa').value, 
-        mp3Url: document.getElementById('t-url').value, 
+        mp3Url: urlParaGuardar, 
         imagenUrl: document.getElementById('t-img').value || "logo.png", 
         tags: document.getElementById('t-tags').value, 
         playlist: document.getElementById('t-playlist').value, 
@@ -537,7 +552,6 @@ function render() {
     const ahoraMs = new Date().getTime();
 
     const list = programas.filter(p => {
-        // Magia del Estreno: Si la fecha no ha llegado y NO eres admin, escóndelo.
         if (p.fechaEstreno && p.fechaEstreno > ahoraMs && !isAdmin) {
             return false;
         }
