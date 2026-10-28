@@ -116,8 +116,8 @@
 </div>
 
 <div id="global-player">
-    <!-- Aquí agregamos preload="auto" para que baje la música de Archive.org rápido -->
-    <audio id="main-media" crossorigin="anonymous" playsinline webkit-playsinline preload="auto"></audio>
+    <!-- Le quitamos el crossorigin=anonymous de aquí para que el celular no pida permisos a Archive.org -->
+    <audio id="main-media" playsinline webkit-playsinline preload="auto"></audio>
     <div style="display:flex; align-items:center; gap:15px; margin-bottom:5px;">
         <div id="p-vinyl" class="p-vinyl" style="background-image: url('https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png');"></div>
         <div style="flex:1; overflow:hidden;">
@@ -151,10 +151,8 @@
         const programa = urlParams.get('programa');
 
         if (programa) {
-            // Activa la clase que esconde el header y los logos
             document.body.classList.add('modo-miniatura');
             
-            // Diccionario para traducir la señal al nombre exacto de la pestaña en tu App
             const mapaProgramas = {
                 'jazz': 'JAZZTABUENO',
                 'studio79': 'STUDIO 79',
@@ -165,8 +163,6 @@
 
             const programaReal = mapaProgramas[programa];
 
-            // Le damos 1.5 segundos a app.js y Firebase para que carguen los programas
-            // y luego simulamos un clic invisible en el género correspondiente.
             setTimeout(() => {
                 if (programaReal && window.setFilter) {
                     const tabs = document.querySelectorAll('.ch-item');
