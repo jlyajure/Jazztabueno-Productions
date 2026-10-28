@@ -260,7 +260,6 @@ media.addEventListener('pause', () => {
 if(localStorage.getItem('jtp_auth') === 'ok') { isAdmin = true; document.getElementById('btn-salir').style.display = 'block'; }
 window.doLogout = () => { localStorage.removeItem('jtp_auth'); location.reload(); };
 
-// === AQUÍ ESTÁ EL LIMPIAPARABRISAS NUEVO ===
 window.cancelEdit = () => { 
     document.getElementById('admin-panel').style.display='none'; 
     document.getElementById('edit-id').value=""; 
@@ -282,14 +281,14 @@ document.getElementById('admin-trigger').onclick = () => {
             if(pass === "ticoadmin2026") { 
                 localStorage.setItem('jtp_auth', 'ok'); 
                 isAdmin = true; 
-                window.cancelEdit(); // Limpia los datos antes de abrir
+                window.cancelEdit(); 
                 document.getElementById('admin-panel').style.display = 'block'; 
                 document.getElementById('btn-salir').style.display = 'block'; 
                 render(); 
             } 
             else { if(pass) alert("❌ Clave Incorrecta"); }
         } else { 
-            window.cancelEdit(); // Limpia los datos antes de abrir
+            window.cancelEdit(); 
             document.getElementById('admin-panel').style.display = 'block'; 
         }
         taps = 0;
@@ -562,6 +561,10 @@ function render() {
     
     const ahoraMs = new Date().getTime();
 
+    // === ESCUDO ANTI-COMILLAS ===
+    // Esta funcioncita limpia los apostrofes de los titulos para que los botones no se rompan jamás.
+    const tituloSeguro = (str) => (str || "").replace(/'/g, "\\'").replace(/"/g, "&quot;");
+
     const list = programas.filter(p => {
         if (p.fechaEstreno && p.fechaEstreno > ahoraMs && !isAdmin) {
             return false;
@@ -593,7 +596,9 @@ function render() {
         const div = document.createElement('div'); div.className = `card ${isPlaying ? 'playing' : ''}`;
         div.innerHTML = `
             <div class="card-cover" style="background-image: url('${p.imagenUrl}')">
-                <div class="card-overlay"><button class="btn-play" onclick="window.playItem('${p.id}','${p.mp3Url}','${p.titulo}','${p.imagenUrl}')">${isPlaying ? SVG_PAUSE : SVG_PLAY}</button></div>
+                <div class="card-overlay">
+                    <button class="btn-play" onclick="window.playItem('${p.id}','${p.mp3Url}','${tituloSeguro(p.titulo)}','${p.imagenUrl}')">${isPlaying ? SVG_PAUSE : SVG_PLAY}</button>
+                </div>
             </div>
             <div class="info">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
