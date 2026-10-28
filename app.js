@@ -35,22 +35,15 @@ const SVG_PAUSE = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5
 
 // Base de datos de la Bóveda del Legado (Limpia, solo con Archive.org)
 window.MIS_ARCHIVOS_BOVEDA = [
-    // --- 2025 ---
     { año: 2025, categoria: "Studio 79", titulo: "Funky Fever", url: "https://archive.org/download/studio-79-18-2025-funky-fever/Studio79%20-%2018_2025%20_Funky%20Fever_.mp3", plataforma: "archive" },
     { año: 2025, categoria: "Studio 79", titulo: "Especial Studio Mix Two", url: "https://archive.org/download/studio-79-13-2025-especial-studio-mix-one/Studio79%20-%2019_2025%20_ESPECIAL%20STUDIO%20MIX%20TWO_.mp3", cover: "https://i.postimg.cc/zVD4mstP/Jazztabueno-(2).png", plataforma: "archive" },
     { año: 2025, categoria: "Studio 79", titulo: "Especial Studio Mix One", url: "https://archive.org/download/studio-79-13-2025-especial-studio-mix-one/Studio79%20-%2013_2025%20_ESPECIAL%20STUDIO%20MIX%20ONE_.mp3", plataforma: "archive" },
     { año: 2025, categoria: "Studio 79", titulo: "Rhythm & Blues", url: "https://archive.org/download/programa-11-rhythm-blues/Programa%2011%20%28Rhythm%20%26%20Blues%29.mp3", plataforma: "archive" }, 
-    
-    // --- 2024 ---
     { año: 2024, categoria: "STUDIO 79", titulo: "Programa 5 Clásico", url: "https://archive.org/download/studio-79-programa-5/Studio%2079%20Programa%205.mp3", plataforma: "archive" },
-    
-    // --- 2022 ---
     { año: 2022, categoria: "JAZZTABUENO", titulo: "Programa 1", url: "https://archive.org/download/jazztabueno-programa-1-2022/Jazztabueno%20Programa%201-2022.mp3", plataforma: "archive" },
     { año: 2022, categoria: "JAZZTABUENO", titulo: "Programa 2", url: "https://archive.org/download/jazztabueno-programa-2-2022/Jazztabueno%20Programa%202-2022.mp3", plataforma: "archive" },
     { año: 2022, categoria: "JAZZTABUENO", titulo: "Programa 3", url: "https://archive.org/download/jazztabueno-programa-3-2022/Jazztabueno%20Programa%203-2022.mp3", plataforma: "archive" },
     { año: 2022, categoria: "OLD SCHOOL ROCK RADIO", titulo: "Programa 1 (Yellow Sunshine)", url: "https://archive.org/download/old-school-rock-radio-yellow-sunshine-01-2022/Old%20School%20Rock%20Radio%20Yellow%20Sunshine%2001-2022.mp3", plataforma: "archive" },
-    
-    // --- 2021 ---
     { año: 2021, categoria: "STUDIO 79", titulo: "Programa 1 (El Bucanero)", url: "https://archive.org/download/studio-79-01-2021-el-bucanero/Studio79%E2%80%99%2001-2021%20El%20Bucanero.mp3", plataforma: "archive" },
     { año: 2021, categoria: "STUDIO 79", titulo: "Programa 2 (Moncheri)", url: "https://archive.org/download/studio-79-02-2021-moncheri/Studio79%E2%80%99%2002-2021%20Moncheri.mp3", plataforma: "archive" },
     { año: 2021, categoria: "STUDIO 79", titulo: "Programa 3 (Molino Rojo)", url: "https://archive.org/download/studio-79-03-2021-molino-rojo/Studio79%E2%80%99%2003-2021%20Molino%20Rojo.mp3", plataforma: "archive" },
@@ -61,8 +54,6 @@ window.MIS_ARCHIVOS_BOVEDA = [
     { año: 2021, categoria: "OLD SCHOOL ROCK RADIO", titulo: "Programa 5 (Black Domina)", url: "https://archive.org/download/old-school-rock-radio-black-domina-05-2021/Old%20School%20Rock%20Radio%20Black%20Domina%2005-2021.mp3", plataforma: "archive" },
     { año: 2021, categoria: "SALSA BRAVA", titulo: "Programa 1", url: "https://archive.org/download/salsa-brava-programa-1-2021/Salsa%20Brava%20Programa%201-2021.mp3", plataforma: "archive" },
     { año: 2021, categoria: "SALSA BRAVA", titulo: "Programa 2", url: "https://archive.org/download/salsa-brava-programa-2-2021/Salsa%20Brava%20Programa%202-2021.mp3", plataforma: "archive" },
-    
-    // --- 2020 ---
     { año: 2020, categoria: "JAZZTABUENO", titulo: "Programa 3 (Pray For The World)", url: "https://archive.org/download/jazz-ta-bueno-03-2020-pray-for-the-world/JazzTaBueno%2003-2020%20Pray%20For%20The%20World.mp3", plataforma: "archive" },
     { año: 2020, categoria: "JAZZTABUENO", titulo: "Programa 4 (Stay Home)", url: "https://archive.org/download/jazz-ta-bueno-04-2020-stay-home/JazzTaBueno%2004-2020%20Stay%20Home.mp3", plataforma: "archive" },
     { año: 2020, categoria: "JAZZTABUENO", titulo: "Programa 5 (Quarantine)", url: "https://archive.org/download/jazz-ta-bueno-05-2020-quarantine/JazzTaBueno%2005-2020%20Quarantine.mp3", plataforma: "archive" },
@@ -231,6 +222,15 @@ try {
 } catch(e) {}
 
 const media = document.getElementById('main-media');
+const isMobileDevice = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+// === MAGIA ANTI-BLOQUEOS DE ARCHIVE.ORG PARA CELULARES ===
+// A las computadoras (que tienen más poder) les exigimos los permisos para dibujar las barras musicales reales.
+// A los celulares se los quitamos para que Archive.org nunca más les tranque un programa por falta de permisos.
+if (!isMobileDevice) {
+    media.crossOrigin = "anonymous";
+}
+
 const seekBar = document.getElementById('seek-bar');
 let programas = []; let currentRenderedList = []; let idActual = null; let filtro = 'Todo'; let hashtagFiltro = ''; let isAdmin = false;
 let audioCtx, analyser, source; let isVisualizerRunning = false; const canvas = document.getElementById('visualizador'); const ctx = canvas.getContext('2d');
@@ -246,7 +246,6 @@ window.copiarLinkVIP = (id) => {
     });
 };
 
-// AVISAMOS AL CELULAR CUANDO SUENA Y CUANDO SE PAUSA PARA QUE NO CORTE LA APP
 media.addEventListener('play', () => {
     if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
     document.querySelectorAll('.vintage-audio').forEach(a => { 
@@ -319,12 +318,9 @@ window.responderCom = async (progId, comId) => {
 
 window.borrarComentario = async (progId, comId) => { if(confirm("¿Borrar este comentario permanentemente?")) { try { await db.collection("radio_programas").doc(progId).collection("comentarios").doc(comId).delete(); } catch(e) {} } };
 
-// === DETECTOR DE CELULARES ===
-const isMobileDevice = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 let timeCount = 0;
 
 function encenderVisualizador() {
-    // Si es un celular, NO procesamos el audio porque satura en segundo plano
     if (isMobileDevice) {
         if (!isVisualizerRunning) pintarBarrasFalsas();
         return;
@@ -346,7 +342,7 @@ function pintarBarras() {
     const bufferLength = analyser.frequencyBinCount; const dataArray = new Uint8Array(bufferLength); analyser.getByteFrequencyData(dataArray);
     const dpr = window.devicePixelRatio || 1; const displayWidth = canvas.clientWidth; const displayHeight = canvas.clientHeight;
     canvas.width = displayWidth * dpr; canvas.height = displayHeight * dpr; ctx.scale(dpr, dpr); ctx.clearRect(0, 0, displayWidth, displayHeight);
-    const isMobile = displayWidth < 600; const barrasActivas = isMobile ? 40 : 80; const gap = isMobile ? 2 : 4; 
+    const barrasActivas = 80; const gap = 4; 
     const barWidth = (displayWidth / barrasActivas) - gap; let x = gap / 2;
     
     const factorEnfoque = 120 / barrasActivas; 
@@ -355,16 +351,15 @@ function pintarBarras() {
     for (let i = 0; i < barrasActivas; i++) {
         const dataIndex = Math.floor(i * factorEnfoque) + ignorarBajosSordos; 
         let barHeight = (dataArray[dataIndex] / 255) * displayHeight * 1.3; ctx.fillStyle = '#a68a44'; 
-        const finalHeight = Math.max(barHeight, isMobile ? 3 : 4); ctx.fillRect(x, displayHeight - finalHeight, barWidth, finalHeight);
+        const finalHeight = Math.max(barHeight, 4); ctx.fillRect(x, displayHeight - finalHeight, barWidth, finalHeight);
         x += barWidth + gap;
     }
 }
 
-// === VISUALIZADOR SEGURO PARA CELULARES (CERO SATURACIÓN) ===
 function pintarBarrasFalsas() {
     isVisualizerRunning = true; requestAnimationFrame(pintarBarrasFalsas); 
     const estaPausado = media.paused;
-    timeCount += 0.08; // Velocidad de la animación
+    timeCount += 0.08; 
     
     const dpr = window.devicePixelRatio || 1; const displayWidth = canvas.clientWidth; const displayHeight = canvas.clientHeight;
     canvas.width = displayWidth * dpr; canvas.height = displayHeight * dpr; ctx.scale(dpr, dpr); ctx.clearRect(0, 0, displayWidth, displayHeight);
@@ -389,7 +384,6 @@ window.playItem = async (id, url, tit, img) => {
     if(idActual === id) { 
         window.doToggle(); 
     } else {
-        // === PURIFICADOR MÁGICO DE ENLACES ARCHIVE.ORG ===
         let urlLimpia = url ? url.trim() : "";
         if (urlLimpia.includes('.us.archive.org/') && urlLimpia.includes('/items/')) {
             const partes = urlLimpia.split('/items/');
@@ -424,7 +418,6 @@ window.playItem = async (id, url, tit, img) => {
             document.getElementById('global-player').classList.remove('playing');
         }
         
-        // LOS CONTROLES COMPLEJOS DE PANTALLA DE BLOQUEO PARA QUE EL CELULAR LO RESPETE
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: tit,
@@ -494,7 +487,6 @@ document.getElementById('btn-save').onclick = async () => {
         fechaEstrenoMs = new Date(y, m-1, d).getTime();
     }
 
-    // === PURIFICADOR MÁGICO TAMBIÉN AL GUARDAR EN FIREBASE ===
     let urlParaGuardar = document.getElementById('t-url').value;
     if (urlParaGuardar) {
         urlParaGuardar = urlParaGuardar.trim();
